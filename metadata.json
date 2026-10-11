@@ -1,0 +1,6 @@
+{
+  "name": "VibeEnglish - Habla Inglés Sin Reglas Ni Enredos",
+  "description": "Aprende a hablar inglés con fluidez natural usando bloques conversacionales, simulaciones de voz y reflejos de la vida real, sin gramática pesada ni traducciones lentas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,111 @@
+[
+  {
+    "id": "post-1791737986576-mww5",
+    "type": "sugerencia",
+    "title": "Proponer situaciones en el supermercado y compras",
+    "content": "Sería genial sumar una charla para preguntar en qué góndola están ciertos productos o pedir una bolsa reutilizable.",
+    "author": "Estudiante de Entrecasa",
+    "authorLevel": "Principiante",
+    "isCreator": false,
+    "date": "2026-10-11",
+    "likes": 2,
+    "comments": [
+      {
+        "id": "c-1791737992001-y02o",
+        "author": "Camila",
+        "isCreator": false,
+        "content": "¡Apoyo totalmente! Siempre dudo con how much is this vs how much does it cost.",
+        "date": "2026-10-11",
+        "likes": 0
+      }
+    ],
+    "status": "abierto"
+  },
+  {
+    "id": "post-1",
+    "type": "sugerencia",
+    "title": "Buzón Abierto: ¿Qué situaciones te gustaría ver en el Simulador de Voz?",
+    "content": "¡Hola a todos! Queremos que este simulador contenga las charlas del día a día que realmente necesitas. ¿Pedir comida a domicilio? ¿Consultas en el médico o farmacia? ¿Hacer un reclamo amigable en el hotel? Deja tu sugerencia en los comentarios.",
+    "author": "Equipo Entrecasa",
+    "authorLevel": "Creador",
+    "isCreator": true,
+    "date": "2026-10-09",
+    "likes": 38,
+    "status": "en_progreso",
+    "comments": [
+      {
+        "id": "c-101",
+        "author": "Lucía P. (Buenos Aires)",
+        "isCreator": false,
+        "content": "¡Me encantaría una situación para pedir que dividan la cuenta en un restaurante (\"Can we split the bill?\") o pedir mesa afuera si hay lindo clima!",
+        "date": "2026-10-10",
+        "likes": 14
+      },
+      {
+        "id": "c-102",
+        "author": "Roberto M. (Santiago)",
+        "isCreator": false,
+        "content": "La de pedir café para llevar me sirvió una barbaridad. Una situación de check-in en el hotel o pedir toallas extra sería de gran ayuda.",
+        "date": "2026-10-11",
+        "likes": 9
+      }
+    ]
+  },
+  {
+    "id": "post-2",
+    "type": "opinion",
+    "title": "Mi experiencia empezando de cero a los 45 años: al fin entiendo sin memorizar",
+    "content": "Toda mi vida sentí que el inglés no era para mí porque en la secundaria me hacían conjugar tablas de verbos interminables. Acá con la fonética figurada en español y los audios lentos a 0.65x pude soltar frases completas en 2 días sin trabarme. ¡El enfoque de bloques es un alivio total!",
+    "author": "Marcos G.",
+    "authorLevel": "Desde Cero",
+    "isCreator": false,
+    "date": "2026-10-10",
+    "likes": 29,
+    "status": "abierto",
+    "comments": [
+      {
+        "id": "c-103",
+        "author": "Valeria S.",
+        "isCreator": false,
+        "content": "¡Totalmente identificada Marcos! Escuchar el audio pausado te quita el pánico a no entender nada.",
+        "date": "2026-10-10",
+        "likes": 6
+      }
+    ]
+  },
+  {
+    "id": "post-3",
+    "type": "sugerencia",
+    "title": "Sugerencia: ¿Se podría agregar un botón de prueba de micrófono en el Simulador?",
+    "content": "A veces cuando estoy con auriculares no sé si el navegador captó bien el micrófono antes de empezar. Un botoncito rápido de testeo antes de la charla sería genial.",
+    "author": "Andrés (Viajero)",
+    "authorLevel": "Principiante",
+    "isCreator": false,
+    "date": "2026-10-11",
+    "likes": 19,
+    "status": "implementado",
+    "comments": [
+      {
+        "id": "c-104",
+        "author": "Equipo Entrecasa",
+        "isCreator": true,
+        "content": "¡Excelente idea Andrés! El simulador ahora valida permisos en tiempo real y permite fallback con botones de voz si no tienes micrófono a mano.",
+        "date": "2026-10-11",
+        "likes": 8
+      }
+    ]
+  },
+  {
+    "id": "post-4",
+    "type": "debate",
+    "title": "El secreto de aprender en pantuflas: ¿Por qué menos presión significa más fluidez?",
+    "content": "Cuando estás en un aula bajo presión de que te corrijan con un bolígrafo rojo, el cerebro libera cortisol y bloquea el acceso rápido al vocabulario. En cambio, cuando practicas 5 minutos descalzo en la cocina jugando con el Gimnasio de Reflejos, los bloques se fijan en la memoria a largo plazo de forma natural.",
+    "author": "Coach Leo",
+    "authorLevel": "Asesor",
+    "isCreator": true,
+    "date": "2026-10-11",
+    "likes": 44,
+    "status": "abierto",
+    "comments": []
+  }
+]

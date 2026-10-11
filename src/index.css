@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    color: #f8fafc;
+    background-color: #0c0a1d;
+  }
+}
+
+.font-display {
+  font-family: 'Bricolage Grotesque', 'Outfit', system-ui, sans-serif;
+  letter-spacing: -0.015em;
+}
+
+.font-sans-clean {
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+}
+
+.font-mono-clean {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Lively ambient glow backdrop */
+.bg-vibrant-dark {
+  background-color: #0c0a1d;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(139, 92, 246, 0.18) 0px, transparent 50%),
+    radial-gradient(at 90% 15%, rgba(245, 158, 11, 0.16) 0px, transparent 50%),
+    radial-gradient(at 50% 60%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+    radial-gradient(at 80% 85%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+}
+
+/* Subtle, smooth entry animation for blog post cards */
+@keyframes postFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-post-card {
+  animation: postFadeSlideUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-post-card {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
