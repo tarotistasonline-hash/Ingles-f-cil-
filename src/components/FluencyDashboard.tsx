@@ -38,6 +38,7 @@ import {
 } from '../services/fluencyTracker';
 import { triggerConfetti } from '../utils/confetti';
 import { BadgesProfileSection } from './BadgesProfileSection';
+import { QuickDailyTip } from './QuickDailyTip';
 
 interface FluencyDashboardProps {
   onNavigateToGym?: () => void;
@@ -122,12 +123,12 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
             </div>
 
             <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
-              Crecimiento de Fluidez: Tu Evolución en Tiempo Real
+              Progreso Easy: Tu Soltura en Tiempo Real
             </h2>
 
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
               Descubre cómo tu mente deja de traducir palabra por palabra y empieza a disparar bloques
-              automáticos en el <strong className="text-white font-semibold">Simulador de Voz</strong> y el <strong className="text-white font-semibold">Gimnasio de Reflejos</strong>.
+              automáticos y fáciles (<span className="text-amber-300 font-semibold italic">easy english</span>) en el <strong className="text-white font-semibold">Simulador de Voz</strong> y el <strong className="text-white font-semibold">Gimnasio de Reflejos</strong>.
             </p>
           </div>
 
@@ -144,13 +145,18 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
           </div>
         </div>
 
+        {/* Quick Daily Fluency Tip Floating / Featured Card */}
+        <div className="relative">
+          <QuickDailyTip onExploreTopic={onNavigateToGym || onNavigateToSimulator} />
+        </div>
+
         {/* 4 High-Impact KPI Scorecards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {/* Card 1: Overall Fluency Index */}
+          {/* Card 1: Overall Easy Score */}
           <div className="bg-gradient-to-br from-[#18113E] to-[#110D2C] p-5 sm:p-6 rounded-2xl border border-amber-500/40 shadow-xl space-y-3 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-amber-400/5 rounded-bl-full pointer-events-none" />
             <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
-              <span className="uppercase tracking-wider">Índice Global de Fluidez</span>
+              <span className="uppercase tracking-wider">Nivel Easy Global</span>
               <Award className="w-4 h-4 text-amber-400" />
             </div>
             <div className="flex items-baseline gap-2">
@@ -264,7 +270,7 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
               }`}
             >
               <TrendingUp className="w-4 h-4" />
-              <span>Evolución Temporal de Fluidez</span>
+              <span>Evolución de Soltura Easy</span>
             </button>
 
             <button
@@ -315,7 +321,7 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
                 <div className="flex items-center gap-3 text-xs font-semibold">
                   <span className="flex items-center gap-1.5 text-amber-400">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
-                    Fluidez Global
+                    Soltura Easy
                   </span>
                   <span className="flex items-center gap-1.5 text-emerald-400">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" />

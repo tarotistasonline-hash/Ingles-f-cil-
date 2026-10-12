@@ -146,18 +146,18 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule }) => {
     },
     {
       id: 'dashboard',
-      title: 'Mi Crecimiento y Fluidez',
-      tagline: '📊 Estadísticas visuales de práctica',
+      title: 'Progreso Easy & Medallas',
+      tagline: '📊 Estadísticas visuales y soltura real',
       description:
-        'Visualiza cuántos bloques dominas, tu racha de días practicando y tus progresos por herramienta con gráficos claros.',
-      levelBadge: 'Progreso y Hábitos',
+        'Visualiza cuántos bloques dominas, tu racha de días practicando y tus medallas ganadas con gráficos claros y sin estrés.',
+      levelBadge: 'Progreso & Hábitos',
       levelColor: 'bg-amber-400/15 text-amber-300 border-amber-400/30',
       category: 'progreso',
       icon: <BarChart3 className="w-5 h-5 text-amber-400" />,
       accentColor: 'text-amber-400',
       borderColor: 'border-amber-400/30 hover:border-amber-400/70',
       hoverBg: 'hover:bg-amber-950/20',
-      features: ['Gráficos Recharts en vivo', 'Racha de días activos', 'Medidor de soltura'],
+      features: ['Tu nivel Easy en vivo', 'Racha de días activos', 'Medallas ganadas'],
     },
     {
       id: 'coach',

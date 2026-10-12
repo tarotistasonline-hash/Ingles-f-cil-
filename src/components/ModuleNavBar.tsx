@@ -83,9 +83,9 @@ export const MODULE_REGISTRY: Record<string, ModuleInfo> = {
   },
   'dashboard': {
     id: 'dashboard',
-    title: 'Mi Crecimiento y Fluidez',
+    title: 'Mi Progreso Easy (Soltura & Medallas)',
     icon: '📊',
-    badge: 'Estadísticas Recharts',
+    badge: 'Estadísticas & Medallas',
     prevId: 'connected',
     prevName: 'Laboratorio de Oído',
     nextId: 'coach',

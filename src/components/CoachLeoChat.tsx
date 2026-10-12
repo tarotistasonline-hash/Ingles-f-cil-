@@ -113,10 +113,10 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-white">
-                      Leo (Fluency Coach)
+                      Leo (Tu Coach Easy)
                     </span>
                     <span className="text-[11px] text-amber-300 bg-amber-950/60 px-2.5 py-0.5 rounded-full font-semibold border border-amber-900/60">
-                      Explicación Sin Gramática
+                      Explicación Simple (Easy)
                     </span>
                   </div>
 

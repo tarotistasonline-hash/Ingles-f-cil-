@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap oficial para Google Search Console y buscadores
+Sitemap: https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/sitemap.xml

@@ -118,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
                 : 'text-amber-300'
             }`}
           >
-            <span>📊 Mi Fluidez</span>
+            <span>📊 Progreso Easy</span>
           </button>
           <button
             onClick={() => setActiveTab('blog')}

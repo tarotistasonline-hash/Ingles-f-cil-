@@ -977,6 +977,33 @@ app.post('/api/blog/like', (req, res) => {
   return res.json({ success: true, likes: post.likes });
 });
 
+// Explicit SEO and Google Search Console Verification routes
+app.get('/googlee814d7c05b3fbac6.html', (_req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send('google-site-verification: googlee814d7c05b3fbac6.html');
+});
+
+app.get('/robots.txt', (_req, res) => {
+  const robotsPath = path.resolve(__dirname, 'public', 'robots.txt');
+  if (fs.existsSync(robotsPath)) {
+    return res.sendFile(robotsPath);
+  }
+  res.setHeader('Content-Type', 'text/plain');
+  res.send("User-agent: *\nAllow: /\n\nSitemap: https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/sitemap.xml\n");
+});
+
+app.get('/sitemap.xml', (_req, res) => {
+  const sitemapPath = path.resolve(__dirname, 'public', 'sitemap.xml');
+  if (fs.existsSync(sitemapPath)) {
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    return res.sendFile(sitemapPath);
+  }
+  res.status(404).send('Not found');
+});
+
+// Serve public directory explicitly
+app.use(express.static(path.resolve(__dirname, 'public')));
+
 // Vite middleware in dev or static files in production
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

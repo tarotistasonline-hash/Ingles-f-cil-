@@ -283,18 +283,18 @@ export function getFluencyDashboardData(): FluencyDashboardData {
     },
   ];
 
-  // 3. Current Level Title
-  let currentLevelBadge = 'Hablante Pragmático';
-  let estimatedSpeakingLevel = 'B1 Fluido Cotidiano';
+  // 3. Current Level Title (Easy English levels)
+  let currentLevelBadge = 'Nivel Easy Pragmático';
+  let estimatedSpeakingLevel = 'B1 Soltura Easy Cotidiana';
   if (currentOverallScore >= 88) {
-    currentLevelBadge = 'Nativo Espontáneo de Entrecasa';
-    estimatedSpeakingLevel = 'B2+ Conversador Natural';
+    currentLevelBadge = 'Nativo Easy de Entrecasa';
+    estimatedSpeakingLevel = 'B2+ Conversador Easy & Natural';
   } else if (currentOverallScore >= 75) {
-    currentLevelBadge = 'Conversador Ágil sin Miedo';
-    estimatedSpeakingLevel = 'B1 Fluidez en Piloto Automático';
+    currentLevelBadge = 'Conversador Easy sin Miedo';
+    estimatedSpeakingLevel = 'B1 Soltura en Piloto Automático';
   } else {
-    currentLevelBadge = 'Primeros Reflejos Naturales';
-    estimatedSpeakingLevel = 'A2 Despegue Cotidiano';
+    currentLevelBadge = 'Primeros Pasos Easy';
+    estimatedSpeakingLevel = 'A2 Despegue Easy Cotidiano';
   }
 
   const toolStats: ToolActivityStats = {
