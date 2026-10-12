@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HERO_IMAGE } from '../data/defaultData';
-import { Volume2, ArrowRight, Sparkles, Check, X } from 'lucide-react';
+import { Volume2, ArrowRight, Sparkles, Check, X, Headphones } from 'lucide-react';
 import { playEnglishVoice, getGlobalAudioSpeed } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
 
@@ -111,9 +111,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               {onExploreEntrecasa && (
                 <button
                   onClick={onExploreEntrecasa}
-                  className="px-5 py-3 text-sm font-semibold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/40 rounded-xl transition-colors cursor-pointer"
+                  className="px-5 py-3 text-sm font-semibold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-xl transition-colors cursor-pointer"
                 >
-                  Rincón de Entrecasa
+                  Vida Cotidiana
                 </button>
               )}
               <button
@@ -125,10 +125,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               {onOpenKit && (
                 <button
                   onClick={onOpenKit}
-                  className="px-4 py-3 text-sm font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  className="px-5 py-3 text-sm font-bold text-amber-300 bg-gradient-to-r from-amber-500/20 via-amber-400/25 to-emerald-500/20 hover:from-amber-500/30 hover:to-emerald-500/30 border border-amber-400/50 hover:border-amber-400 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-md hover:scale-102"
                   title="Descargá el pack de 120 audios en MP3 y la guía para tu celular"
                 >
-                  <span>🎧 Audio-Kit Offline</span>
+                  <Headphones className="w-4 h-4 text-amber-400 animate-pulse" />
+                  <span>🎧 Audio-Kit de Bolsillo ($9)</span>
                 </button>
               )}
             </div>

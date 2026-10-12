@@ -16,6 +16,8 @@ import { FluencyDashboard } from './components/FluencyDashboard';
 import { CoachLeoChat } from './components/CoachLeoChat';
 import { CommunityBlog } from './components/CommunityBlog';
 import { OfflineKitSection } from './components/OfflineKitSection';
+import { AudioKitModal } from './components/AudioKitModal';
+import { AudioKitFloatingTrigger } from './components/AudioKitFloatingTrigger';
 import { Footer } from './components/Footer';
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
 import { SkillLevel } from './types';
@@ -49,6 +51,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'modular' | 'full'>('modular');
   const [currentSpeed, setCurrentSpeed] = useState<number>(() => getGlobalAudioSpeed());
   const [activeLevel, setActiveLevel] = useState<SkillLevel | 'all'>('all');
+  const [isKitModalOpen, setIsKitModalOpen] = useState(false);
 
   React.useEffect(() => {
     const handleHash = () => {
@@ -223,6 +226,7 @@ export default function App() {
         onSpeedChange={handleSpeedChange}
         viewMode={viewMode}
         onToggleViewMode={toggleViewMode}
+        onOpenKitModal={() => setIsKitModalOpen(true)}
       />
 
       <main className="flex-1">
@@ -238,6 +242,7 @@ export default function App() {
                   onTryTweak={() => navigateTo('tweak')}
                   onExploreEntrecasa={() => navigateTo('entrecasa')}
                   onStartDesdeCero={() => navigateTo('desde-cero')}
+                  onOpenKit={() => setIsKitModalOpen(true)}
                   currentSpeed={currentSpeed}
                 />
               </div>
@@ -289,7 +294,7 @@ export default function App() {
                 onTryTweak={() => navigateTo('tweak')}
                 onExploreEntrecasa={() => navigateTo('entrecasa')}
                 onStartDesdeCero={() => navigateTo('desde-cero')}
-                onOpenKit={() => navigateTo('kit')}
+                onOpenKit={() => setIsKitModalOpen(true)}
                 currentSpeed={currentSpeed}
               />
             </div>
@@ -386,6 +391,19 @@ export default function App() {
 
       {/* Footer */}
       <Footer onNavigate={navigateTo} />
+
+      {/* Floating Audio-Kit Trigger (Visible Everywhere across the app) */}
+      <AudioKitFloatingTrigger onOpenModal={() => setIsKitModalOpen(true)} />
+
+      {/* Audio-Kit de Bolsillo Popup Window (Ventana Emergente Interactiva) */}
+      <AudioKitModal
+        isOpen={isKitModalOpen}
+        onClose={() => setIsKitModalOpen(false)}
+        onGoToFullKit={() => {
+          setIsKitModalOpen(false);
+          navigateTo('kit');
+        }}
+      />
     </div>
   );
 }

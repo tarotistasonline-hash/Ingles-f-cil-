@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, Sparkles, Gauge, LayoutGrid, ScrollText } from 'lucide-react';
+import { Volume2, Sparkles, Gauge, LayoutGrid, ScrollText, Headphones } from 'lucide-react';
 import { SPEED_LEVELS } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
 
@@ -11,6 +11,7 @@ interface HeaderProps {
   onSpeedChange: (speed: number) => void;
   viewMode?: 'modular' | 'full';
   onToggleViewMode?: () => void;
+  onOpenKitModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSpeedChange,
   viewMode = 'modular',
   onToggleViewMode,
+  onOpenKitModal,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-[#0C0A1D]/85 backdrop-blur-md border-b border-[#281F54]/80 shadow-md">
@@ -131,14 +133,15 @@ export const Header: React.FC<HeaderProps> = ({
             <span>💬 Blog & Sugerencias</span>
           </button>
           <button
-            onClick={() => setActiveTab('kit')}
-            className={`transition-colors hover:text-white flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 ${
+            onClick={onOpenKitModal || (() => setActiveTab('kit'))}
+            className={`transition-colors hover:text-white flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/40 hover:border-amber-400 text-amber-300 font-bold shadow-xs ${
               activeTab === 'kit'
-                ? 'text-emerald-300 font-semibold border-emerald-400/60 shadow-xs'
-                : 'text-emerald-300/90 hover:text-emerald-200'
+                ? 'ring-2 ring-amber-400 text-white'
+                : 'hover:text-amber-200'
             }`}
           >
-            <span>🎧 Kit de Bolsillo</span>
+            <Headphones className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            <span>🎧 Audio-Kit ($9)</span>
           </button>
         </nav>
 
@@ -197,6 +200,18 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
             </div>
           </div>
+
+          <button
+            onClick={onOpenKitModal || (() => setActiveTab('kit'))}
+            className="px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-bold text-amber-300 bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs hover:scale-102"
+            title="Abrir ventana emergente del Audio-Kit de Bolsillo"
+          >
+            <Headphones className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            <span className="hidden sm:inline">Audio-Kit</span>
+            <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded font-extrabold uppercase">
+              $9
+            </span>
+          </button>
 
           <button
             onClick={onQuickTry}

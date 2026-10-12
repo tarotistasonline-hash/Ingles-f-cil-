@@ -207,16 +207,16 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule }) => {
     {
       id: 'kit',
       title: 'Audio-Kit de Bolsillo',
-      tagline: '🎧 Pack MP3 + Guía PDF para tu celular',
+      tagline: '🎧 Pack MP3 + Guía PDF para tu celular ($9 USD)',
       description:
         'Llevate los 120 audios en 2 velocidades y la guía visual de heladera para escuchar sin internet en el auto, caminando o cocinando.',
-      levelBadge: 'Pack Offline · Pago Único',
-      levelColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      levelBadge: '⭐ Destacado · Pack Offline',
+      levelColor: 'bg-amber-400/20 text-amber-300 border-amber-400/60 font-extrabold',
       category: 'herramientas',
-      icon: <Headphones className="w-5 h-5 text-amber-400" />,
+      icon: <Headphones className="w-5 h-5 text-amber-400 animate-pulse" />,
       accentColor: 'text-amber-400',
-      borderColor: 'border-amber-500/30 hover:border-amber-400/70',
-      hoverBg: 'hover:bg-amber-950/20',
+      borderColor: 'border-amber-400/60 ring-2 ring-amber-400/30 hover:border-amber-400',
+      hoverBg: 'hover:bg-amber-950/30',
       features: ['120 Audios MP3 descargables', 'Guía imprimible en PDF', 'Sin suscripciones mensuales'],
     },
   ];
