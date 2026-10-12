@@ -39,6 +39,7 @@ import {
 import { triggerConfetti } from '../utils/confetti';
 import { BadgesProfileSection } from './BadgesProfileSection';
 import { QuickDailyTip } from './QuickDailyTip';
+import { DailyStreakCounter } from './DailyStreakCounter';
 
 interface FluencyDashboardProps {
   onNavigateToGym?: () => void;
@@ -150,6 +151,16 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
           <QuickDailyTip onExploreTopic={onNavigateToGym || onNavigateToSimulator} />
         </div>
 
+        {/* Daily Streak Counter Component with Live Engagement Tracker */}
+        <div className="relative">
+          <DailyStreakCounter
+            streakInfo={data.streakInfo}
+            onNavigateToGym={onNavigateToGym}
+            onNavigateToSimulator={onNavigateToSimulator}
+            onNavigateToTweak={onNavigateToTweak}
+          />
+        </div>
+
         {/* 4 High-Impact KPI Scorecards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Card 1: Overall Easy Score */}
@@ -226,25 +237,26 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
           </div>
 
           {/* Card 4: Consistency Streak & Modules Mastered */}
-          <div className="bg-gradient-to-br from-[#141238] to-[#0E0C28] p-5 sm:p-6 rounded-2xl border border-[#2D2363] shadow-xl space-y-3 group hover:border-pink-500/40 transition-colors">
+          <div className="bg-gradient-to-br from-[#141238] to-[#0E0C28] p-5 sm:p-6 rounded-2xl border border-[#2D2363] shadow-xl space-y-3 group hover:border-rose-500/40 transition-colors">
             <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
-              <span className="uppercase tracking-wider">Racha & Dominio</span>
-              <Flame className="w-4 h-4 text-rose-400" />
+              <span className="uppercase tracking-wider">Racha Diaria Activa</span>
+              <Flame className={`w-4 h-4 text-rose-400 ${data.streakInfo.isActiveToday ? 'animate-pulse' : ''}`} />
             </div>
             <div className="flex items-baseline gap-2">
               <span className="font-mono text-3xl sm:text-4xl font-black text-rose-400 tabular-nums">
-                {data.toolStats.streakDays}
+                {data.streakInfo.currentStreak}
               </span>
               <span className="text-xs font-semibold text-rose-300">
-                Días Consecutivos 🔥
+                {data.streakInfo.currentStreak === 1 ? 'Día de Racha 🔥' : 'Días Consecutivos 🔥'}
               </span>
             </div>
             <div className="space-y-1">
-              <div className="text-xs font-bold text-white">
-                {data.toolStats.completedModulesCount} lecciones completadas
+              <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${data.streakInfo.isActiveToday ? 'bg-emerald-400' : 'bg-amber-400 animate-ping'}`} />
+                <span>{data.streakInfo.isActiveToday ? 'Práctica de hoy registrada' : 'Falta tu práctica de hoy'}</span>
               </div>
               <p className="text-[11px] text-slate-400">
-                Constancia diaria = fluidez natural
+                Meta diaria: <strong className="text-slate-200">{data.streakInfo.todayActionsCount}/{data.streakInfo.todayGoalTarget}</strong> micro-sesiones
               </p>
             </div>
           </div>

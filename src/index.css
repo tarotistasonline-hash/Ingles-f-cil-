@@ -59,11 +59,81 @@
   will-change: transform, opacity;
 }
 
+/* Dynamic Hero Animations & Motion */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(0.4deg);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(6px) rotate(-0.4deg);
+  }
+}
+
+@keyframes pulseAmbient {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes waveOscillate {
+  0%, 100% {
+    height: 4px;
+    opacity: 0.4;
+  }
+  50% {
+    height: 22px;
+    opacity: 1;
+  }
+}
+
+@keyframes shimmerGlow {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4.5s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 5.2s ease-in-out infinite;
+}
+
+.animate-pulse-ambient {
+  animation: pulseAmbient 6s ease-in-out infinite;
+}
+
+.animate-shimmer-text {
+  background-size: 200% auto;
+  animation: shimmerGlow 6s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-post-card {
+  .animate-post-card,
+  .animate-float-slow,
+  .animate-float-reverse,
+  .animate-pulse-ambient,
+  .animate-shimmer-text {
     animation: none !important;
     transform: none !important;
-    opacity: 1 !important;
   }
 }
 

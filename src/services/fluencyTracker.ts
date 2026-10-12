@@ -16,6 +16,33 @@ export interface PillarScore {
   fullMark: number;
 }
 
+export interface WeekDayProgress {
+  dayName: string;
+  dayNumber: number;
+  dateStr: string;
+  isCompleted: boolean;
+  isToday: boolean;
+  isPast: boolean;
+  isFuture: boolean;
+}
+
+export interface DailyStreakInfo {
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string;
+  isActiveToday: boolean;
+  todayActionsCount: number;
+  todayGoalTarget: number;
+  goalProgressPercent: number;
+  isGoalCompletedToday: boolean;
+  activeDates: string[];
+  statusMessage: string;
+  nextMilestone: number;
+  daysToNextMilestone: number;
+  milestoneTitle: string;
+  weekProgress: WeekDayProgress[];
+}
+
 export interface ToolActivityStats {
   roleplaySessions: number;
   roleplayTurns: number;
@@ -25,12 +52,16 @@ export interface ToolActivityStats {
   completedModulesCount: number;
   audioListensCount: number;
   streakDays: number;
+  longestStreak: number;
+  todayActionsCount: number;
+  isActiveToday: boolean;
 }
 
 export interface FluencyDashboardData {
   history: FluencyHistoryPoint[];
   pillars: PillarScore[];
   toolStats: ToolActivityStats;
+  streakInfo: DailyStreakInfo;
   currentLevelBadge: string;
   estimatedSpeakingLevel: string;
   currentOverallScore: number;
@@ -58,10 +89,30 @@ interface StoredTrackerState {
   audioListensCount: number;
   lastActiveDate: string;
   streakDays: number;
+  longestStreak: number;
+  activeDates: string[];
+  todayActionsCount: number;
+  todayGoalTarget: number;
+}
+
+export function getLocalDateString(d: Date = new Date()): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function getYesterdayDateString(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return getLocalDateString(d);
 }
 
 function getInitialStoredState(): StoredTrackerState {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getLocalDateString();
+  const yesterday = getYesterdayDateString();
+  const twoDaysAgo = getLocalDateString(new Date(Date.now() - 2 * 86400000));
+
   return {
     gymAttempts: 3,
     gymScores: [76, 84, 91],
@@ -88,6 +139,10 @@ function getInitialStoredState(): StoredTrackerState {
     audioListensCount: 14,
     lastActiveDate: today,
     streakDays: 3,
+    longestStreak: 5,
+    activeDates: [twoDaysAgo, yesterday, today],
+    todayActionsCount: 2,
+    todayGoalTarget: 3,
   };
 }
 
@@ -100,7 +155,19 @@ function loadState(): StoredTrackerState {
       return initial;
     }
     const parsed = JSON.parse(raw);
-    return { ...getInitialStoredState(), ...parsed };
+    const defaults = getInitialStoredState();
+    return {
+      ...defaults,
+      ...parsed,
+      activeDates: Array.isArray(parsed.activeDates) && parsed.activeDates.length > 0
+        ? parsed.activeDates
+        : defaults.activeDates,
+      longestStreak: parsed.longestStreak || Math.max(parsed.streakDays || 3, defaults.longestStreak),
+      todayActionsCount: typeof parsed.todayActionsCount === 'number'
+        ? parsed.todayActionsCount
+        : defaults.todayActionsCount,
+      todayGoalTarget: parsed.todayGoalTarget || 3,
+    };
   } catch {
     return getInitialStoredState();
   }
@@ -115,6 +182,134 @@ function saveState(state: StoredTrackerState) {
   } catch {
     // ignore
   }
+}
+
+// Compute 7 days of the current week (Monday through Sunday)
+export function getCurrentWeekDays(activeDates: string[], todayStr: string): WeekDayProgress[] {
+  const now = new Date();
+  const currentDayOfWeek = now.getDay();
+  // Monday is index 0: if Sunday (0) shift by -6, else 1 - currentDayOfWeek
+  const distanceToMonday = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + distanceToMonday);
+
+  const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  const week: WeekDayProgress[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const dateStr = getLocalDateString(d);
+    const dayNumber = d.getDate();
+    const isToday = dateStr === todayStr;
+    const isPast = dateStr < todayStr;
+    const isFuture = dateStr > todayStr;
+    const isCompleted = activeDates.includes(dateStr);
+
+    week.push({
+      dayName: dayNames[i],
+      dayNumber,
+      dateStr,
+      isCompleted,
+      isToday,
+      isPast,
+      isFuture,
+    });
+  }
+  return week;
+}
+
+/**
+ * Universal engagement handler: updates streak and today's action counts
+ */
+export function recordEngagement(activityName: string = 'practice'): StoredTrackerState {
+  const state = loadState();
+  const todayStr = getLocalDateString();
+  const yesterdayStr = getYesterdayDateString();
+
+  if (!Array.isArray(state.activeDates)) {
+    state.activeDates = [];
+  }
+
+  const lastDate = state.lastActiveDate;
+
+  if (lastDate === todayStr) {
+    // Already engaged today: increment activity
+    state.todayActionsCount = (state.todayActionsCount || 0) + 1;
+    if (!state.activeDates.includes(todayStr)) {
+      state.activeDates.push(todayStr);
+    }
+  } else if (lastDate === yesterdayStr) {
+    // Consecutive day streak extended!
+    state.streakDays = (state.streakDays || 0) + 1;
+    state.lastActiveDate = todayStr;
+    state.todayActionsCount = 1;
+    state.longestStreak = Math.max(state.longestStreak || 0, state.streakDays);
+    if (!state.activeDates.includes(todayStr)) {
+      state.activeDates.push(todayStr);
+    }
+  } else {
+    // Gap occurred: start fresh streak
+    state.streakDays = 1;
+    state.lastActiveDate = todayStr;
+    state.todayActionsCount = 1;
+    state.longestStreak = Math.max(state.longestStreak || 0, 1);
+    if (!state.activeDates.includes(todayStr)) {
+      state.activeDates.push(todayStr);
+    }
+  }
+
+  // Cap recent active dates list to last 30 entries
+  if (state.activeDates.length > 30) {
+    state.activeDates = state.activeDates.slice(-30);
+  }
+
+  saveState(state);
+
+  // Automatically check and award consistency badge
+  if (state.streakDays >= 3) {
+    try {
+      const BADGES_KEY = 'vibe_unlocked_badges_v1';
+      const map = JSON.parse(localStorage.getItem(BADGES_KEY) || '{}');
+      if (!map['streak-flame']) {
+        map['streak-flame'] = new Date().toLocaleDateString('es-ES', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+        localStorage.setItem(BADGES_KEY, JSON.stringify(map));
+        window.dispatchEvent(new CustomEvent('vibe:badge_updated'));
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  return state;
+}
+
+/**
+ * Explicit daily check-in button action from FluencyDashboard
+ */
+export function recordDailyPracticeCheckIn(): {
+  currentStreak: number;
+  todayActionsCount: number;
+  isGoalMet: boolean;
+} {
+  const state = recordEngagement('Check-in Diario');
+  const target = state.todayGoalTarget || 3;
+  return {
+    currentStreak: state.streakDays,
+    todayActionsCount: state.todayActionsCount,
+    isGoalMet: state.todayActionsCount >= target,
+  };
+}
+
+/**
+ * Record a lesson module completion
+ */
+export function recordModuleCompletion(moduleId?: string) {
+  recordEngagement(`Módulo ${moduleId || 'Completado'}`);
 }
 
 // Check how many modules in localStorage have completed flag
@@ -141,6 +336,7 @@ function getCompletedModulesCount(): number {
  * Record a completion in the 5-second Reflex Gym
  */
 export function recordGymInteraction(score: number, responseSeconds: number = 3.2) {
+  recordEngagement('Gimnasio de Reflejos');
   const state = loadState();
   state.gymAttempts += 1;
   state.gymScores.push(score);
@@ -152,6 +348,7 @@ export function recordGymInteraction(score: number, responseSeconds: number = 3.
  * Record a conversational message turn in the Roleplay Simulator
  */
 export function recordRoleplayTurnEvent() {
+  recordEngagement('Simulador de Diálogos');
   const state = loadState();
   state.roleplayTurns += 1;
   saveState(state);
@@ -161,6 +358,7 @@ export function recordRoleplayTurnEvent() {
  * Record an evaluated session with Confidence Score feedback in the Roleplay Simulator
  */
 export function recordRoleplaySessionEvaluation(feedback: SessionConfidenceFeedback) {
+  recordEngagement('Evaluación de Simulador');
   const state = loadState();
   state.roleplaySessions += 1;
   state.roleplayReports.push({
@@ -177,6 +375,7 @@ export function recordRoleplaySessionEvaluation(feedback: SessionConfidenceFeedb
  * Record a school phrase transformed with SpeakTweak
  */
 export function recordSpeakTweakUse() {
+  recordEngagement('SpeakTweak');
   const state = loadState();
   state.tweakCount += 1;
   saveState(state);
@@ -186,17 +385,76 @@ export function recordSpeakTweakUse() {
  * Record an audio listen
  */
 export function recordAudioListenEvent() {
+  recordEngagement('Audio Escuchado');
   const state = loadState();
   state.audioListensCount += 1;
   saveState(state);
 }
 
 /**
- * Compile full Fluency Dashboard Data for Recharts
+ * Compile full Fluency Dashboard Data for Recharts and Streak Counter
  */
 export function getFluencyDashboardData(): FluencyDashboardData {
   const state = loadState();
   const completedModules = getCompletedModulesCount();
+  const todayStr = getLocalDateString();
+  const yesterdayStr = getYesterdayDateString();
+
+  // Streak status calculation
+  const isActiveToday = state.lastActiveDate === todayStr;
+  const isPendingToday = !isActiveToday && state.lastActiveDate === yesterdayStr;
+  const currentStreak = state.streakDays || 1;
+  const longestStreak = Math.max(state.longestStreak || 1, currentStreak);
+  const todayActionsCount = isActiveToday ? (state.todayActionsCount || 0) : 0;
+  const todayGoalTarget = state.todayGoalTarget || 3;
+  const goalProgressPercent = Math.min(100, Math.round((todayActionsCount / todayGoalTarget) * 100));
+  const isGoalCompletedToday = todayActionsCount >= todayGoalTarget;
+
+  // Milestones: 3, 7, 14, 30, 60, 100 days
+  const milestones = [
+    { target: 3, title: 'Fuego Encendido' },
+    { target: 7, title: 'Hábito de Hierro' },
+    { target: 14, title: 'Piloto Automático' },
+    { target: 30, title: 'Inglés de Entrecasa Imparable' },
+    { target: 60, title: 'Bilingüe Intuitivo' },
+    { target: 100, title: 'Leyenda de Fluidez' },
+  ];
+  const next = milestones.find((m) => m.target > currentStreak) || milestones[milestones.length - 1];
+  const nextMilestone = next.target;
+  const daysToNextMilestone = Math.max(1, nextMilestone - currentStreak);
+  const milestoneTitle = next.title;
+
+  let statusMessage = '';
+  if (isActiveToday) {
+    if (isGoalCompletedToday) {
+      statusMessage = `¡Meta diaria superada (${todayActionsCount}/${todayGoalTarget})! Tu fuego brilla al 100%.`;
+    } else {
+      statusMessage = `Racha activa hoy: ${todayActionsCount}/${todayGoalTarget} micro-prácticas realizadas.`;
+    }
+  } else if (isPendingToday) {
+    statusMessage = `¡Racha de ${currentStreak} días en juego! Haz 1 práctica rápida hoy para llegar a ${currentStreak + 1} días.`;
+  } else {
+    statusMessage = `Inicia hoy tu racha de constancia: 1 práctica fácil para encender tu fuego.`;
+  }
+
+  const weekProgress = getCurrentWeekDays(state.activeDates || [todayStr], todayStr);
+
+  const streakInfo: DailyStreakInfo = {
+    currentStreak,
+    longestStreak,
+    lastActiveDate: state.lastActiveDate,
+    isActiveToday,
+    todayActionsCount,
+    todayGoalTarget,
+    goalProgressPercent,
+    isGoalCompletedToday,
+    activeDates: state.activeDates || [todayStr],
+    statusMessage,
+    nextMilestone,
+    daysToNextMilestone,
+    milestoneTitle,
+    weekProgress,
+  };
 
   // 1. Build Time Progression Series for AreaChart
   const history: FluencyHistoryPoint[] = [];
@@ -254,7 +512,7 @@ export function getFluencyDashboardData(): FluencyDashboardData {
   // Best gym score
   const gymBestScore = state.gymScores.length > 0 ? Math.max(...state.gymScores) : 90;
 
-  // 2. Pillars for RadarChart (5 Core Pillars of "Inglés Real")
+  // 2. Pillars for RadarChart (5 Core Pillars of "Inglés Fácil y Fluido")
   const pillars: PillarScore[] = [
     {
       pillar: 'Reflejos (< 5 seg)',
@@ -284,17 +542,17 @@ export function getFluencyDashboardData(): FluencyDashboardData {
   ];
 
   // 3. Current Level Title (Easy English levels)
-  let currentLevelBadge = 'Nivel Easy Pragmático';
-  let estimatedSpeakingLevel = 'B1 Soltura Easy Cotidiana';
+  let currentLevelBadge = 'Nivel Fácil Pragmático';
+  let estimatedSpeakingLevel = 'B1 Soltura Cotidiana';
   if (currentOverallScore >= 88) {
-    currentLevelBadge = 'Nativo Easy de Entrecasa';
-    estimatedSpeakingLevel = 'B2+ Conversador Easy & Natural';
+    currentLevelBadge = 'Nativo Fácil de Entrecasa';
+    estimatedSpeakingLevel = 'B2+ Conversador Fácil & Natural';
   } else if (currentOverallScore >= 75) {
-    currentLevelBadge = 'Conversador Easy sin Miedo';
+    currentLevelBadge = 'Conversador Fácil sin Miedo';
     estimatedSpeakingLevel = 'B1 Soltura en Piloto Automático';
   } else {
-    currentLevelBadge = 'Primeros Pasos Easy';
-    estimatedSpeakingLevel = 'A2 Despegue Easy Cotidiano';
+    currentLevelBadge = 'Primeros Pasos Fáciles';
+    estimatedSpeakingLevel = 'A2 Despegue Fácil Cotidiano';
   }
 
   const toolStats: ToolActivityStats = {
@@ -305,7 +563,10 @@ export function getFluencyDashboardData(): FluencyDashboardData {
     tweakCount: state.tweakCount,
     completedModulesCount: completedModules,
     audioListensCount: state.audioListensCount,
-    streakDays: state.streakDays,
+    streakDays: currentStreak,
+    longestStreak,
+    todayActionsCount,
+    isActiveToday,
   };
 
   const totalInteractions =
@@ -315,6 +576,7 @@ export function getFluencyDashboardData(): FluencyDashboardData {
     history,
     pillars,
     toolStats,
+    streakInfo,
     currentLevelBadge,
     estimatedSpeakingLevel,
     currentOverallScore,

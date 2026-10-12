@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Lightbulb, ChevronDown, CheckCircle, Sparkles, PartyPopper, Check } from 'lucide-react';
 import { triggerConfetti } from '../utils/confetti';
+import { recordModuleCompletion } from '../services/fluencyTracker';
 
 export interface TakeawayItem {
   point: string;
@@ -48,6 +49,7 @@ export const KeyTakeawaysToggle: React.FC<KeyTakeawaysToggleProps> = ({
     }
 
     if (nextState) {
+      recordModuleCompletion(moduleId || moduleName || 'modulo');
       triggerConfetti({
         particleCount: 50,
         spread: 60,
