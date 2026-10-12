@@ -254,7 +254,7 @@ export function getFluencyDashboardData(): FluencyDashboardData {
   // Best gym score
   const gymBestScore = state.gymScores.length > 0 ? Math.max(...state.gymScores) : 90;
 
-  // 2. Pillars for RadarChart (5 Core Pillars of "Inglés de Entrecasa")
+  // 2. Pillars for RadarChart (5 Core Pillars of "Inglés Real")
   const pillars: PillarScore[] = [
     {
       pillar: 'Reflejos (< 5 seg)',

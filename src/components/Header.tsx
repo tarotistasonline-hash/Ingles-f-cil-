@@ -31,10 +31,10 @@ export const Header: React.FC<HeaderProps> = ({
           className="text-left group cursor-pointer focus:outline-none flex items-center gap-2"
         >
           <span className="font-display text-lg sm:text-2xl font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors">
-            Inglés de Entrecasa
+            Inglés Real
           </span>
           <span className="hidden sm:inline-block text-[10px] font-bold text-amber-300 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
-            Simple & Real
+            Fácil & Sin Vueltas
           </span>
         </button>
 
@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
                 : ''
             }`}
           >
-            Rincón de Entrecasa
+            Vida Cotidiana
           </button>
           <button
             onClick={() => setActiveTab('simulator')}

@@ -8,10 +8,10 @@ export const Footer: React.FC<{ onNavigate: (tab: string) => void }> = ({ onNavi
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-800/80">
           <div className="space-y-1 text-center md:text-left">
             <span className="font-display text-xl font-bold text-white tracking-tight">
-              Inglés de Entrecasa
+              Inglés Real
             </span>
             <p className="text-xs text-slate-400 max-w-sm">
-              Una forma sencilla de aprender el idioma: fluidez en zapatillas, bloques de conversación real y cero recetas gramaticales rígidas.
+              Una forma sencilla de aprender el idioma: fluidez natural, bloques de conversación real y cero recetas gramaticales rígidas.
             </p>
           </div>
 
@@ -20,7 +20,7 @@ export const Footer: React.FC<{ onNavigate: (tab: string) => void }> = ({ onNavi
               onClick={() => onNavigate('entrecasa')}
               className="hover:text-amber-400 transition-colors cursor-pointer"
             >
-              Rincón de Entrecasa
+              Vida Cotidiana
             </button>
             <button
               onClick={() => onNavigate('simulator')}

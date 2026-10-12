@@ -81,7 +81,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Left Column: Proposition & CTAs */}
           <div className="lg:col-span-7 space-y-6">
             <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.12] text-balance">
-              Inglés de entrecasa.{' '}
+              Inglés Real.{' '}
               <span className="font-normal text-amber-400">
                 Una forma sencilla de aprender el idioma desde cero.
               </span>
@@ -178,7 +178,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-400" />
                   <span className="text-xs font-bold text-white">
-                    Inglés de Entrecasa en Vivo
+                    Inglés Real en Vivo
                   </span>
                 </div>
                 <div className="flex gap-1 bg-[#0C0A1D] p-0.5 rounded-lg border border-[#251D52]">

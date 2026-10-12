@@ -332,7 +332,7 @@ export const QuickDailyTip: React.FC<QuickDailyTipProps> = ({
             💡 <strong className="text-amber-300">Regla de oro:</strong> {tip.ruleOfThumb}
           </p>
           <p className="text-slate-400 text-xs">
-            ✨ <span className="text-slate-300 font-semibold">Clave de entrecasa:</span> {tip.entrecasaInsight}
+            ✨ <span className="text-slate-300 font-semibold">Clave de la vida real:</span> {tip.entrecasaInsight}
           </p>
         </div>
 

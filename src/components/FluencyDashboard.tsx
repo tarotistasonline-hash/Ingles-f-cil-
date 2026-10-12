@@ -282,7 +282,7 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
               }`}
             >
               <Compass className="w-4 h-4" />
-              <span>Radar: 5 Pilares de Entrecasa</span>
+              <span>Radar: 5 Pilares de Fluidez Real</span>
             </button>
 
             <button
@@ -480,7 +480,7 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
 
               <div className="lg:col-span-5 space-y-4">
                 <h4 className="font-display text-lg font-bold text-white">
-                  Equilibrio de los 5 Pilares de Entrecasa
+                  Equilibrio de los 5 Pilares de Inglés Real
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   La fluidez de la vida real no es saber 10,000 palabras aisladas, sino mantener un equilibrio
@@ -610,7 +610,7 @@ export const FluencyDashboard: React.FC<FluencyDashboardProps> = ({
                     <span>SpeakTweak Tool</span>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Convierte cualquier idea en inglés de entrecasa fluido.
+                    Convierte cualquier idea en inglés real y fluido.
                   </p>
                 </button>
               </div>

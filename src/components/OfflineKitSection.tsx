@@ -167,7 +167,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
 
         <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight text-balance">
           El Audio-Kit de Bolsillo:{' '}
-          <span className="text-amber-400">Inglés de Entrecasa Offline</span>
+          <span className="text-amber-400">Inglés Real Offline</span>
         </h1>
 
         <p className="text-base sm:text-lg text-slate-300 leading-relaxed text-pretty">

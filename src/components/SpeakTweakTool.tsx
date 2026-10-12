@@ -79,7 +79,7 @@ export const SpeakTweakTool: React.FC<SpeakTweakToolProps> = ({ currentSpeed }) 
             <span>Transformador a Inglés Coloquial</span>
           </div>
           <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Tu Frase en Inglés de Entrecasa: Sencillo y Coloquial
+            Tu Frase en Inglés Real: Sencillo y Coloquial
           </h2>
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
             Escribe cómo dirías una idea en español o en inglés. Obtén al instante el bloque

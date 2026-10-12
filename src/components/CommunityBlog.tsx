@@ -219,9 +219,9 @@ export const CommunityBlog: React.FC<CommunityBlogProps> = () => {
     const prefix = note.trim() ? `"${note.trim()}"\n\n` : '';
     if (post) {
       const snippet = post.content.length > 130 ? `${post.content.slice(0, 130)}...` : post.content;
-      return `${prefix}💬 "${post.title}"\nPor ${post.author} (${post.authorLevel}):\n"${snippet}"\n\nLeé más y sumate a la comunidad en Inglés de Entrecasa:`;
+      return `${prefix}💬 "${post.title}"\nPor ${post.author} (${post.authorLevel}):\n"${snippet}"\n\nLeé más y sumate a la comunidad en Inglés Real:`;
     }
-    return `${prefix}☕ ¡Te recomiendo 'Inglés de Entrecasa'! Una forma sencilla y relajada de aprender el idioma sin rodeos gramaticales ni vergüenza.\nMirá las opiniones y sugerencias de la comunidad:`;
+    return `${prefix}☕ ¡Te recomiendo 'Inglés Real'! Una forma sencilla y relajada de aprender el idioma sin rodeos gramaticales ni vergüenza.\nMirá las opiniones y sugerencias de la comunidad:`;
   };
 
   const handleCopyLink = async () => {
@@ -248,8 +248,8 @@ export const CommunityBlog: React.FC<CommunityBlogProps> = () => {
   const handleNativeShare = async () => {
     const url = getShareUrl(shareTargetPost);
     const title = shareTargetPost
-      ? `${shareTargetPost.title} - Inglés de Entrecasa`
-      : 'Inglés de Entrecasa - Blog y Comunidad';
+      ? `${shareTargetPost.title} - Inglés Real`
+      : 'Inglés Real - Blog y Comunidad';
     const text = getShareText(shareTargetPost, customShareNote);
 
     if (navigator.share) {
@@ -697,7 +697,7 @@ export const CommunityBlog: React.FC<CommunityBlogProps> = () => {
                 <div className="flex items-center justify-between text-[11px] text-slate-400">
                   <span className="font-semibold text-amber-400 flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-amber-400" />
-                    {shareTargetPost ? 'Aporte de la comunidad' : 'Inglés de Entrecasa'}
+                    {shareTargetPost ? 'Aporte de la comunidad' : 'Inglés Real'}
                   </span>
                   {shareTargetPost && (
                     <span className="text-slate-400">Por {shareTargetPost.author}</span>
