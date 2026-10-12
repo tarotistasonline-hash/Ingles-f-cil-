@@ -90,7 +90,7 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
         <div className="max-w-3xl mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-semibold mb-3">
             <Coffee className="w-3.5 h-3.5 text-amber-400" />
-            <span>Inglés Real · Una Forma Sencilla de Aprender</span>
+            <span>Inglés Fácil y Fluido · Una Forma Sencilla de Aprender</span>
           </div>
           <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
             El inglés que se habla en zapatillas y con una taza en la mano

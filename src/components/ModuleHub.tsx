@@ -229,7 +229,7 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule }) => {
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-amber-400">
               <Compass className="w-4 h-4 text-amber-400" />
-              <span>Centro de Aprendizaje · Inglés Real</span>
+              <span>Centro de Aprendizaje · Inglés Fácil y Fluido</span>
             </div>
             <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
               ¿Por dónde quieres empezar hoy?

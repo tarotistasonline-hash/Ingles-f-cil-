@@ -79,7 +79,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Main Centralized Hero Header */}
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12] text-balance">
-            Inglés Real
+            Inglés Fácil y Fluido
             <span className="block text-2xl sm:text-3xl lg:text-4xl font-semibold text-amber-400 mt-2 sm:mt-3 font-subheading tracking-normal">
               Una forma sencilla de aprender el idioma y hablarlo con fluidez
             </span>

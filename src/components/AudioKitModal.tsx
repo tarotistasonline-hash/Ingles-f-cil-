@@ -143,7 +143,7 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
               className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug"
             >
               El Audio-Kit de Bolsillo:{' '}
-              <span className="text-amber-400">Inglés Real Offline</span>
+              <span className="text-amber-400">Inglés Fácil y Fluido Offline</span>
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
