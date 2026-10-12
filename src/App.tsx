@@ -248,7 +248,7 @@ export default function App() {
               </div>
 
               {/* Level Switcher Bar */}
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 mb-8 sm:mb-12 relative z-20">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-10 sm:mb-12 relative z-20">
                 <LevelSelectorBar
                   currentLevel={activeLevel}
                   onSelectLevel={handleLevelSelect}
@@ -300,7 +300,7 @@ export default function App() {
             </div>
 
             {/* Global Level Switcher Sticky / Prominent Bar */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 mb-8 sm:mb-12 relative z-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-10 sm:mb-12 relative z-20">
               <LevelSelectorBar
                 currentLevel={activeLevel}
                 onSelectLevel={handleLevelSelect}

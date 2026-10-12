@@ -361,7 +361,7 @@ export const CommunityBlog: React.FC<CommunityBlogProps> = () => {
 
   return (
     <section className="py-12 sm:py-16 bg-gradient-to-b from-[#0C0A1D] via-[#100D26] to-[#0A0819] text-slate-100 relative">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Header Hero */}
         <div className="text-center sm:text-left space-y-4">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs font-bold uppercase tracking-wider text-amber-400">

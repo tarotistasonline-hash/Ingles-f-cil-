@@ -154,8 +154,8 @@ export const ModuleNavBar: React.FC<ModuleNavBarProps> = ({
   };
 
   return (
-    <div className="sticky top-16 z-30 bg-[#0F0C24]/95 backdrop-blur-md border-b border-[#2B215E] py-2.5 px-4 sm:px-6 shadow-md transition-all">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <div className="sticky top-16 z-30 bg-[#0F0C24]/95 backdrop-blur-md border-b border-[#2B215E] py-2.5 shadow-md transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3">
         {/* Left: Back to Home / Hub */}
         <div className="flex items-center gap-3">
           <button

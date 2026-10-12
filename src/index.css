@@ -8,9 +8,20 @@
   }
 }
 
-.font-display {
-  font-family: 'Bricolage Grotesque', 'Outfit', system-ui, sans-serif;
+.font-display,
+.font-heading {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.025em;
+}
+
+.font-subheading {
+  font-family: 'Lexend', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: -0.015em;
+}
+
+.font-serif-display {
+  font-family: 'Fraunces', Georgia, serif;
+  letter-spacing: -0.02em;
 }
 
 .font-sans-clean {
