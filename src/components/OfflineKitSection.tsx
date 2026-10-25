@@ -898,58 +898,39 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 </div>
               </div>
 
-              {/* Solución 2: Automática para futuros compradores (Web / PC) o WhatsApp */}
-              <div className="bg-[#0B081E] border border-[#2F2360] rounded-xl p-3.5 space-y-3 text-xs text-slate-300">
+              {/* Solución 2: Automática para futuros compradores */}
+              <div className="bg-[#0B081E] border border-[#2F2360] rounded-xl p-3.5 space-y-2.5 text-xs text-slate-300">
                 <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4" />
-                  <span>¿Por qué no te aparece "Modo avanzado" en Mercado Pago?</span>
+                  <span>Paso 2: Automatizar la entrega en Mercado Pago para futuras compras</span>
                 </span>
-                
-                <div className="p-2.5 rounded-lg bg-amber-400/10 border border-amber-400/20 text-slate-300 space-y-1.5 text-[11px] leading-relaxed">
-                  <p>
-                    ⚠️ <strong className="text-amber-300">Si estás usando la aplicación de Mercado Pago en tu celular:</strong> Mercado Pago oculta deliberadamente las "Opciones avanzadas" y la redirección en la app móvil. Solo muestra título y precio.
-                  </p>
-                  <p>
-                    💻 <strong className="text-white">Para que aparezca la opción:</strong> Tenés que entrar desde una <strong className="text-white">computadora</strong> en <span className="text-sky-300 font-mono">mercadopago.com.ar</span> (o abrir Chrome en el celular y activar los 3 puntitos &gt; <em>"Sitio para computadoras"</em>).
-                  </p>
-                </div>
-
-                <div className="space-y-2 pt-1 text-[11px]">
-                  <strong className="text-emerald-400 block font-bold">
-                    🚀 Las 2 formas más sencillas de entregar sin complicarte con Mercado Pago:
-                  </strong>
-                  
-                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
-                    <strong className="text-white block font-semibold">Método 1 (Inmediato - Sin configurar nada):</strong>
-                    <span>Cuando un cliente te pague, Mercado Pago te avisa a tu celular. Tocás el botón verde de arriba <strong className="text-emerald-300">"Copiar Mensaje para WhatsApp"</strong> y se lo pegás por chat o email. ¡Le llega el link y descarga al instante!</span>
-                  </div>
-
-                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
-                    <strong className="text-white block font-semibold">Método 2 (El comprador descarga directo desde la web):</strong>
-                    <span>En esta misma aplicación web ya dejamos un botón visible en la cabecera y en la sección del Kit: <strong className="text-white">"¿Ya compraste? [Descargar mi Pack]"</strong>. Le decís a la persona: <em>"Entrá a la página y tocá 'Descargar mi Pack'"</em> y se le abre la bóveda completa de inmediato.</span>
-                  </div>
-
-                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1.5">
-                    <strong className="text-white block font-semibold">Método 3 (Si querés la redirección automática desde la PC):</strong>
-                    <ol className="list-decimal list-inside space-y-1 pl-1 text-slate-300">
-                      <li>Entrá en <span className="text-sky-300 font-mono">mercadopago.com.ar</span> desde tu computadora.</li>
-                      <li>Andá a <strong>Links de pago</strong> &gt; Editá tu link.</li>
-                      <li>Hacé clic en <strong>"Más opciones"</strong> abajo del precio y activá <strong>"Redireccionar al finalizar la compra"</strong>.</li>
-                      <li>Pegá esta URL:
-                        <div className="mt-1 flex items-center gap-2 p-1.5 rounded bg-black/60 border border-slate-800 text-[10px] font-mono text-emerald-400 overflow-x-auto">
-                          <span className="truncate">{getDeliveryUrl()}</span>
-                          <button
-                            type="button"
-                            onClick={handleCopyRedirectUrl}
-                            className="text-xs px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded shrink-0 cursor-pointer"
-                          >
-                            {copiedRedirectUrl ? 'Copiado' : 'Copiar'}
-                          </button>
-                        </div>
-                      </li>
-                    </ol>
-                  </div>
-                </div>
+                <ol className="list-decimal list-inside space-y-1.5 text-[11px] leading-relaxed text-slate-300 pl-0.5">
+                  <li>
+                    Entrá a tu app o web de Mercado Pago y andá a <strong className="text-white">"Links de pago"</strong>.
+                  </li>
+                  <li>
+                    Editá tu link <code className="text-amber-300 bg-black/50 px-1 py-0.5 rounded">mpago.li/1PhcDv4</code> ($9.990 ARS).
+                  </li>
+                  <li>
+                    Buscá la sección <strong className="text-white">"Opciones avanzadas"</strong> y activá <strong className="text-white">"Redireccionar al finalizar la compra"</strong>.
+                  </li>
+                  <li>
+                    Pegá exactamente esta URL de redirección:
+                    <div className="mt-1 flex items-center gap-2 p-1.5 rounded bg-black/60 border border-slate-800 text-[10px] font-mono text-emerald-400 overflow-x-auto">
+                      <span className="truncate">{getDeliveryUrl()}</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyRedirectUrl}
+                        className="text-xs px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded shrink-0 cursor-pointer"
+                      >
+                        {copiedRedirectUrl ? 'Copiado' : 'Copiar'}
+                      </button>
+                    </div>
+                  </li>
+                  <li>
+                    Guardás el link en Mercado Pago. ¡Listo! A partir de ese momento, cada comprador será enviado directamente a la pantalla de descarga inmediata.
+                  </li>
+                </ol>
               </div>
             </div>
 
