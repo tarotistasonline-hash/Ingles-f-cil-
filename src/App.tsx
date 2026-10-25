@@ -18,11 +18,13 @@ import { CommunityBlog } from './components/CommunityBlog';
 import { OfflineKitSection } from './components/OfflineKitSection';
 import { AudioKitModal } from './components/AudioKitModal';
 import { AudioKitFloatingTrigger } from './components/AudioKitFloatingTrigger';
+import { PackDownloadVaultModal } from './components/PackDownloadVaultModal';
 import { Footer } from './components/Footer';
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
 import { SkillLevel } from './types';
 
 export default function App() {
+  const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
@@ -207,6 +209,7 @@ export default function App() {
             <OfflineKitSection
               onNavigateHome={() => navigateTo('hero')}
               onNavigateToGym={() => navigateTo('gym')}
+              onOpenVault={() => setIsVaultModalOpen(true)}
             />
           </div>
         );
@@ -227,6 +230,7 @@ export default function App() {
         viewMode={viewMode}
         onToggleViewMode={toggleViewMode}
         onOpenKitModal={() => setIsKitModalOpen(true)}
+        onOpenVault={() => setIsVaultModalOpen(true)}
       />
 
       <main className="flex-1">
@@ -383,6 +387,7 @@ export default function App() {
               <OfflineKitSection
                 onNavigateHome={() => navigateTo('hero')}
                 onNavigateToGym={() => navigateTo('gym')}
+                onOpenVault={() => setIsVaultModalOpen(true)}
               />
             </div>
           </>
@@ -403,6 +408,13 @@ export default function App() {
           setIsKitModalOpen(false);
           navigateTo('kit');
         }}
+        onOpenVault={() => setIsVaultModalOpen(true)}
+      />
+
+      {/* Delivery & Instant Download Vault Modal for Buyers */}
+      <PackDownloadVaultModal
+        isOpen={isVaultModalOpen}
+        onClose={() => setIsVaultModalOpen(false)}
       />
     </div>
   );

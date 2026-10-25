@@ -19,10 +19,21 @@ import {
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
+import {
+  generateAndDownloadZipPackage,
+  downloadTextFile,
+  generateMasterPdfHtml,
+  generateTextCheatsheet,
+  generateCsvFlashcards,
+  generateStudyPlan,
+  generateOfflinePocketPlayerHtml,
+} from '../utils/packGenerator';
+import { Loader2, Printer } from 'lucide-react';
 
 interface OfflineKitSectionProps {
   onNavigateHome?: () => void;
   onNavigateToGym?: () => void;
+  onOpenVault?: () => void;
 }
 
 interface AudioSample {
@@ -61,9 +72,11 @@ const AUDIO_SAMPLES: AudioSample[] = [
   },
 ];
 
+export const OFFICIAL_MERCADO_PAGO_URL = 'https://mpago.li/1PhcDv4';
+
 const CURRENCIES = [
   { code: 'USD', symbol: '$', price: '9', note: 'Dólares (Pago único)' },
-  { code: 'ARS', symbol: '$', price: '10.500', note: 'Pesos Argentinos aprox.' },
+  { code: 'ARS', symbol: '$', price: '9.900', note: 'Pesos Argentinos (Oferta Especial de Lanzamiento)' },
   { code: 'MXN', symbol: '$', price: '180', note: 'Pesos Mexicanos aprox.' },
   { code: 'EUR', symbol: '€', price: '8,50', note: 'Euros' },
   { code: 'COP', symbol: '$', price: '38.000', note: 'Pesos Colombianos aprox.' },
@@ -72,14 +85,16 @@ const CURRENCIES = [
 export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
   onNavigateHome,
   onNavigateToGym,
+  onOpenVault,
 }) => {
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [selectedCurrency, setSelectedCurrency] = useState('ARS');
   const [playingSampleId, setPlayingSampleId] = useState<string | null>(null);
   const [customCheckoutUrl, setCustomCheckoutUrl] = useState<string>(() => {
     try {
-      return localStorage.getItem('vibe_custom_checkout_url') || '';
+      const stored = localStorage.getItem('vibe_custom_checkout_url');
+      return stored && stored.trim() ? stored : OFFICIAL_MERCADO_PAGO_URL;
     } catch {
-      return '';
+      return OFFICIAL_MERCADO_PAGO_URL;
     }
   });
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -135,6 +150,65 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
     }
   };
 
+  const [isZipping, setIsZipping] = useState(false);
+  const [zipProgress, setZipProgress] = useState(0);
+  const [zipStepText, setZipStepText] = useState('');
+  const [downloadSuccessItem, setDownloadSuccessItem] = useState<string | null>(null);
+
+  const handleDownloadFullZip = async () => {
+    setIsZipping(true);
+    setZipProgress(10);
+    setZipStepText('Iniciando empaquetado...');
+    try {
+      await generateAndDownloadZipPackage((percent, text) => {
+        setZipProgress(percent);
+        setZipStepText(text);
+      });
+      triggerConfetti({ particleCount: 75, spread: 80 });
+      setDownloadSuccessItem('Pack Completo (.ZIP)');
+      setTimeout(() => setDownloadSuccessItem(null), 6000);
+    } catch (err) {
+      console.error('Error generating zip:', err);
+    } finally {
+      setIsZipping(false);
+    }
+  };
+
+  const handleDownloadMasterHtml = () => {
+    const html = generateMasterPdfHtml();
+    downloadTextFile(html, '01_Guia_Maestra_Ingles_Facil_y_Fluido_Imprimible.html', 'text/html;charset=utf-8');
+    setDownloadSuccessItem('Guía Maestra Imprimible (.HTML)');
+    setTimeout(() => setDownloadSuccessItem(null), 5000);
+  };
+
+  const handleDownloadCheatsheet = () => {
+    const txt = generateTextCheatsheet();
+    downloadTextFile(txt, '02_100_Bloques_Conversacionales_Cheatsheet.txt');
+    setDownloadSuccessItem('Cheatsheet 100 Bloques (.TXT)');
+    setTimeout(() => setDownloadSuccessItem(null), 5000);
+  };
+
+  const handleDownloadCsv = () => {
+    const csv = generateCsvFlashcards();
+    downloadTextFile(csv, '04_Tarjetas_Flashcards_Anki_Excel.csv', 'text/csv;charset=utf-8');
+    setDownloadSuccessItem('Flashcards Anki & Excel (.CSV)');
+    setTimeout(() => setDownloadSuccessItem(null), 5000);
+  };
+
+  const handleDownloadStudyPlan = () => {
+    const plan = generateStudyPlan();
+    downloadTextFile(plan, '05_Plan_de_Accion_30_Dias_Fluidez.txt');
+    setDownloadSuccessItem('Plan de Acción 30 Días (.TXT)');
+    setTimeout(() => setDownloadSuccessItem(null), 5000);
+  };
+
+  const handleDownloadOfflinePlayer = () => {
+    const playerHtml = generateOfflinePocketPlayerHtml();
+    downloadTextFile(playerHtml, '06_Reproductor_Audio_Offline_De_Bolsillo.html', 'text/html;charset=utf-8');
+    setDownloadSuccessItem('Reproductor Offline de Bolsillo (.HTML)');
+    setTimeout(() => setDownloadSuccessItem(null), 5000);
+  };
+
   const handleSimulatePurchase = () => {
     try {
       localStorage.setItem('vibe_kit_purchased', 'true');
@@ -188,7 +262,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
           <span aria-hidden="true" className="hidden sm:inline text-slate-600">·</span>
           <div className="flex items-center gap-1.5 text-emerald-400">
             <CheckCircle2 className="w-4 h-4" />
-            <span className="font-medium text-slate-200">Descarga inmediata en MP3 y PDF</span>
+            <span className="font-medium text-slate-200">Descarga inmediata en ZIP, MP3 y PDF</span>
           </div>
           <span aria-hidden="true" className="hidden sm:inline text-slate-600">·</span>
           <div className="flex items-center gap-1.5 text-emerald-400">
@@ -196,7 +270,123 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
             <span className="font-medium text-slate-200">Para siempre en tu celular</span>
           </div>
         </div>
+
+        {/* Action Button to Test / Download Pack */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => {
+              handleSimulatePurchase();
+            }}
+            className="px-5 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 font-bold text-xs flex items-center gap-2 cursor-pointer transition-all shadow-sm"
+          >
+            <Download className="w-4 h-4 text-emerald-400" />
+            <span>{hasPurchasedMock ? '📦 Acceder a Descargas de tu Pack' : '📦 Probar Descarga del Pack de Entrega'}</span>
+          </button>
+        </div>
       </section>
+
+      {/* Persistent Buyer Vault if Purchased */}
+      {hasPurchasedMock && (
+        <section className="bg-gradient-to-r from-emerald-950/80 via-[#10242E] to-[#121B3B] border-2 border-emerald-400/60 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl animate-fade-in">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-emerald-500/20">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>Pack Habilitado · Descargas Oficiales</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white">
+                Archivos del Pack Listos para Descarga
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300">
+                Tu compra te da acceso permanente a todos los archivos. Podés descargarlos cuantas veces quieras a tus dispositivos.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDownloadFullZip}
+                disabled={isZipping}
+                className="px-5 py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-400/25 disabled:opacity-50"
+              >
+                {isZipping ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Empaquetando ({zipProgress}%)...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    <span>Descargar Todo en ZIP</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Individual Deliverables Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <button
+              onClick={handleDownloadMasterHtml}
+              className="p-3.5 rounded-xl bg-[#0B1524] border border-[#234257] hover:border-amber-400 text-left space-y-1.5 cursor-pointer transition-all hover:scale-101"
+            >
+              <div className="flex items-center justify-between">
+                <FileText className="w-4 h-4 text-amber-400" />
+                <span className="text-[10px] text-amber-300 font-bold">PDF / HTML</span>
+              </div>
+              <p className="text-xs font-bold text-white leading-tight">Guía Maestra 100 Bloques</p>
+              <span className="text-[11px] text-slate-400 block">Con fonética y ejemplos</span>
+            </button>
+
+            <button
+              onClick={handleDownloadOfflinePlayer}
+              className="p-3.5 rounded-xl bg-[#0B1524] border border-[#234257] hover:border-emerald-400 text-left space-y-1.5 cursor-pointer transition-all hover:scale-101"
+            >
+              <div className="flex items-center justify-between">
+                <Smartphone className="w-4 h-4 text-emerald-400" />
+                <span className="text-[10px] text-emerald-300 font-bold">App Offline</span>
+              </div>
+              <p className="text-xs font-bold text-white leading-tight">Reproductor de Bolsillo</p>
+              <span className="text-[11px] text-slate-400 block">100% sin internet</span>
+            </button>
+
+            <button
+              onClick={handleDownloadCsv}
+              className="p-3.5 rounded-xl bg-[#0B1524] border border-[#234257] hover:border-blue-400 text-left space-y-1.5 cursor-pointer transition-all hover:scale-101"
+            >
+              <div className="flex items-center justify-between">
+                <Download className="w-4 h-4 text-blue-400" />
+                <span className="text-[10px] text-blue-300 font-bold">Anki / Excel</span>
+              </div>
+              <p className="text-xs font-bold text-white leading-tight">Tarjetas Flashcards</p>
+              <span className="text-[11px] text-slate-400 block">CSV formateado UTF-8</span>
+            </button>
+
+            <button
+              onClick={handleDownloadCheatsheet}
+              className="p-3.5 rounded-xl bg-[#0B1524] border border-[#234257] hover:border-violet-400 text-left space-y-1.5 cursor-pointer transition-all hover:scale-101"
+            >
+              <div className="flex items-center justify-between">
+                <FileText className="w-4 h-4 text-violet-400" />
+                <span className="text-[10px] text-violet-300 font-bold">Texto Plano</span>
+              </div>
+              <p className="text-xs font-bold text-white leading-tight">Cheatsheet 100 Bloques</p>
+              <span className="text-[11px] text-slate-400 block">Para notas del celular</span>
+            </button>
+
+            <button
+              onClick={handleDownloadStudyPlan}
+              className="p-3.5 rounded-xl bg-[#0B1524] border border-[#234257] hover:border-rose-400 text-left space-y-1.5 cursor-pointer transition-all hover:scale-101"
+            >
+              <div className="flex items-center justify-between">
+                <Download className="w-4 h-4 text-rose-400" />
+                <span className="text-[10px] text-rose-300 font-bold">30 Días</span>
+              </div>
+              <p className="text-xs font-bold text-white leading-tight">Plan de Acción Diario</p>
+              <span className="text-[11px] text-slate-400 block">10 min/día guiados</span>
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* 2. What is inside the Kit (The 3 Pillars) */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -415,18 +605,26 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
 
           {/* Action Buy Button */}
           <div className="pt-2 flex flex-col items-center gap-3">
-            <button
-              onClick={handleBuyClick}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-extrabold text-base sm:text-lg shadow-xl shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer"
+            <a
+              href={customCheckoutUrl || OFFICIAL_MERCADO_PAGO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-extrabold text-base sm:text-lg shadow-xl shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer text-center no-underline"
             >
-              <span>Obtener el Audio-Kit de Bolsillo</span>
+              <span>Obtener el Audio-Kit con Mercado Pago ($9.900)</span>
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </a>
 
-            {/* Micro reassurance */}
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Compra 100% segura · Entrega automática por email al instante</span>
+            {/* Micro reassurance & verified link notice */}
+            <div className="space-y-1 text-center">
+              <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Compra 100% protegida por Mercado Pago · Entrega inmediata</span>
+              </div>
+              <div className="text-[11px] text-emerald-400 font-mono flex items-center justify-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Link oficial conectado: mpago.li/1PhcDv4</span>
+              </div>
             </div>
           </div>
 
@@ -534,32 +732,89 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               </button>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Pegá el link del producto creado en tu plataforma favorita (
-              <strong className="text-amber-300">Mercado Pago</strong>,{' '}
-              <strong className="text-amber-300">Gumroad</strong>,{' '}
-              <strong className="text-amber-300">Lemon Squeezy</strong>,{' '}
-              <strong className="text-amber-300">Hotmart</strong> o{' '}
-              <strong className="text-amber-300">Stripe Payment Link</strong>).
-              Cuando tus visitantes hagan clic en "Obtener el Audio-Kit", serán redirigidos
-              directamente allí para pagar.
-            </p>
+            {/* Quick Explanation: Pesos vs Dólares */}
+            <div className="bg-[#0B081E] border border-[#2B205D] rounded-xl p-3.5 space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-amber-300 font-bold">
+                <span>💡 ¿Cómo funciona Mercado Pago para cobrar $9 USD o Pesos?</span>
+              </div>
+              <p className="text-slate-300 leading-relaxed">
+                Mercado Pago Argentina procesa las transacciones en <strong className="text-white">Pesos Argentinos (ARS)</strong>. Para cobrar los <strong className="text-amber-300">$9 USD</strong>, en Mercado Pago creás el link por el equivalente en pesos (configurado en <strong className="text-emerald-400">$9.900 ARS</strong> de oferta lanzamiento).
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] text-slate-300">
+                <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
+                  <strong className="text-white block mb-0.5">🇦🇷 Si pagan en Pesos:</strong>
+                  Pagan con débito, crédito o dinero en cuenta de Mercado Pago ($9.900 ARS).
+                </div>
+                <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
+                  <strong className="text-white block mb-0.5">🌎 Si pagan desde el exterior en USD:</strong>
+                  Pagan con tarjeta internacional (Visa/Mastercard); su banco hace la conversión de divisas automáticamente.
+                </div>
+              </div>
+            </div>
 
-            <form onSubmit={handleSaveCheckoutUrl} className="space-y-4">
+            {/* Step-by-Step Instructions */}
+            <div className="space-y-2 text-xs text-slate-300">
+              <span className="font-bold text-white text-xs uppercase tracking-wider block">
+                Paso a Paso para Generar tu Link en 3 Minutos:
+              </span>
+              <ol className="list-decimal list-inside space-y-1.5 pl-1 leading-relaxed">
+                <li>
+                  Abrí la app de <strong className="text-white">Mercado Pago</strong> o entrá en <span className="text-sky-300 font-mono">mercadopago.com.ar</span>.
+                </li>
+                <li>
+                  Hacé clic en el menú y elegí <strong className="text-white">"Cobrar con link de pago"</strong>.
+                </li>
+                <li>
+                  Escribí el título: <span className="text-amber-300 font-medium">"Audio-Kit de Bolsillo: Inglés Fácil y Fluido"</span>.
+                </li>
+                <li>
+                  Ingresá el precio en pesos (fijado en <strong className="text-emerald-400">$9.900 ARS</strong> para representar los $9 USD).
+                </li>
+                <li>
+                  <em>(Opcional)</em> En "Opciones avanzadas", activá "Redireccionar a tu sitio" y pegá el enlace de esta app para que vuelvan a descargar el pack.
+                </li>
+                <li>
+                  Hacé clic en <strong className="text-white">"Crear link de pago"</strong> y copiá el enlace que empieza con <code className="text-amber-400 bg-black/40 px-1 py-0.5 rounded">https://mpago.la/...</code>.
+                </li>
+                <li>
+                  Pegalo abajo y hacé clic en <strong className="text-white">"Guardar Enlace"</strong>.
+                </li>
+              </ol>
+            </div>
+
+            <form onSubmit={handleSaveCheckoutUrl} className="space-y-4 pt-1 border-t border-[#2B205D]">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  URL de Checkout / Enlace de Pago:
+                  Tu Enlace de Mercado Pago (o pasarela internacional):
                 </label>
                 <input
                   type="url"
-                  placeholder="https://mpago.la/... o https://gumroad.com/l/..."
+                  placeholder="https://mpago.la/abc1234"
                   value={tempCheckoutUrl}
                   onChange={(e) => setTempCheckoutUrl(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
                 />
               </div>
 
-              <div className="flex items-center justify-between pt-2">
+              {tempCheckoutUrl && (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-emerald-400 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    Enlace listo para guardar
+                  </span>
+                  <a
+                    href={tempCheckoutUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-300 hover:underline flex items-center gap-1 font-semibold"
+                  >
+                    <span>Probar enlace en nueva pestaña</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -567,7 +822,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                   }}
                   className="text-xs text-rose-400 hover:underline cursor-pointer"
                 >
-                  Restablecer por defecto
+                  Restablecer
                 </button>
                 <div className="flex items-center gap-2">
                   <button
@@ -579,7 +834,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 cursor-pointer shadow-md"
                   >
                     Guardar Enlace
                   </button>
@@ -628,22 +883,86 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               </ul>
             </div>
 
+            {/* Download Progress or Status */}
+            {isZipping && (
+              <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/30 space-y-1.5 text-center">
+                <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-300">
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                  <span>{zipStepText || 'Comprimiendo paquete...'}</span>
+                </div>
+                <div className="w-full bg-black/50 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-emerald-400 h-full transition-all duration-300"
+                    style={{ width: `${zipProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {downloadSuccessItem && (
+              <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-xs font-bold text-emerald-300 flex items-center justify-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span>¡Descargado con éxito: {downloadSuccessItem}!</span>
+              </div>
+            )}
+
             <div className="space-y-2">
               <button
-                onClick={() => {
-                  alert(
-                    '¡Simulación exitosa! En producción, este botón descarga directamente el paquete ZIP y el PDF de tu hosting o drive seguro.'
-                  );
-                }}
-                className="w-full py-3 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-400/20"
+                onClick={handleDownloadFullZip}
+                disabled={isZipping}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-sm flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-400/25 disabled:opacity-50 transition-all"
               >
-                <Download className="w-4 h-4" />
-                <span>Descargar Paquete Completo (.ZIP)</span>
+                {isZipping ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Generando ZIP ({zipProgress}%)...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    <span>Descargar Paquete Completo (.ZIP)</span>
+                  </>
+                )}
               </button>
+
+              {/* Individual Deliverable Fast Downloads */}
+              <div className="grid grid-cols-2 gap-2 pt-1 text-left">
+                <button
+                  onClick={handleDownloadMasterHtml}
+                  className="p-2 rounded-lg bg-slate-900 border border-slate-700 hover:border-amber-400/50 text-[11px] font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="truncate">Guía Maestra PDF</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadOfflinePlayer}
+                  className="p-2 rounded-lg bg-slate-900 border border-slate-700 hover:border-emerald-400/50 text-[11px] font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">App Offline (.html)</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadCsv}
+                  className="p-2 rounded-lg bg-slate-900 border border-slate-700 hover:border-blue-400/50 text-[11px] font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <span className="truncate">Flashcards CSV</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadCheatsheet}
+                  className="p-2 rounded-lg bg-slate-900 border border-slate-700 hover:border-violet-400/50 text-[11px] font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+                  <span className="truncate">Cheatsheet TXT</span>
+                </button>
+              </div>
 
               <button
                 onClick={() => setShowSuccessModal(false)}
-                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+                className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer transition-colors mt-2"
               >
                 Cerrar Ventana
               </button>

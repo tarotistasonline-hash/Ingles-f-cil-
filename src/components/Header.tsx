@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, Sparkles, Gauge, LayoutGrid, ScrollText, Headphones } from 'lucide-react';
+import { Volume2, Sparkles, Gauge, LayoutGrid, ScrollText, Headphones, Download } from 'lucide-react';
 import { SPEED_LEVELS } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
 
@@ -12,6 +12,7 @@ interface HeaderProps {
   viewMode?: 'modular' | 'full';
   onToggleViewMode?: () => void;
   onOpenKitModal?: () => void;
+  onOpenVault?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -23,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   viewMode = 'modular',
   onToggleViewMode,
   onOpenKitModal,
+  onOpenVault,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-[#0C0A1D]/85 backdrop-blur-md border-b border-[#281F54]/80 shadow-md">
@@ -200,6 +202,18 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
             </div>
           </div>
+
+          {onOpenVault && (
+            <button
+              onClick={onOpenVault}
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-bold text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs hover:scale-102"
+              title="Descargar el pack de materiales que le llega al comprador (ZIP, PDF, audios)"
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden md:inline">Descargar Pack</span>
+              <span className="md:hidden">Pack</span>
+            </button>
+          )}
 
           <button
             onClick={onOpenKitModal || (() => setActiveTab('kit'))}

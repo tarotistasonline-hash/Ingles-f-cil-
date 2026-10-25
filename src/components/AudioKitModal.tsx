@@ -13,12 +13,22 @@ import {
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
+import {
+  generateAndDownloadZipPackage,
+  downloadTextFile,
+  generateMasterPdfHtml,
+  generateOfflinePocketPlayerHtml,
+} from '../utils/packGenerator';
+import { Loader2 } from 'lucide-react';
 
 interface AudioKitModalProps {
   isOpen: boolean;
   onClose: () => void;
   onGoToFullKit: () => void;
+  onOpenVault?: () => void;
 }
+
+const OFFICIAL_MERCADO_PAGO_URL = 'https://mpago.li/1PhcDv4';
 
 const POPUP_SAMPLES = [
   {
@@ -45,8 +55,8 @@ const POPUP_SAMPLES = [
 ];
 
 const CURRENCIES = [
+  { code: 'ARS', symbol: '$', price: '9.900', note: 'Pesos Argentinos (Oferta Lanzamiento)' },
   { code: 'USD', symbol: '$', price: '9', note: 'Dólares (Pago único)' },
-  { code: 'ARS', symbol: '$', price: '10.500', note: 'Pesos Argentinos aprox.' },
   { code: 'MXN', symbol: '$', price: '180', note: 'Pesos Mexicanos aprox.' },
   { code: 'EUR', symbol: '€', price: '8,50', note: 'Euros' },
   { code: 'COP', symbol: '$', price: '38.000', note: 'Pesos Colombianos aprox.' },
@@ -56,11 +66,14 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
   isOpen,
   onClose,
   onGoToFullKit,
+  onOpenVault,
 }) => {
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [selectedCurrency, setSelectedCurrency] = useState('ARS');
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [showDirectDownloadSuccess, setShowDirectDownloadSuccess] = useState(false);
+  const [isZipping, setIsZipping] = useState(false);
+  const [zipProgress, setZipProgress] = useState(0);
 
   const activeCurrencyObj =
     CURRENCIES.find((c) => c.code === selectedCurrency) || CURRENCIES[0];
@@ -92,15 +105,37 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
     }
   };
 
+  const handleDownloadZip = async () => {
+    setIsZipping(true);
+    try {
+      await generateAndDownloadZipPackage((percent) => setZipProgress(percent));
+      triggerConfetti({ particleCount: 75, spread: 80 });
+    } catch (err) {
+      console.error('Error generating zip:', err);
+    } finally {
+      setIsZipping(false);
+    }
+  };
+
+  const handleDownloadPdf = () => {
+    const html = generateMasterPdfHtml();
+    downloadTextFile(html, '01_Guia_Maestra_Ingles_Facil_y_Fluido_Imprimible.html', 'text/html;charset=utf-8');
+  };
+
   const handleActionClick = () => {
     const customUrl = localStorage.getItem('vibe_custom_checkout_url');
     if (customUrl) {
       window.open(customUrl, '_blank', 'noopener,noreferrer');
       return;
     }
+    try {
+      localStorage.setItem('vibe_kit_purchased', 'true');
+    } catch {
+      // ignore
+    }
     // Simulate purchase & celebration
     setShowDirectDownloadSuccess(true);
-    triggerConfetti({ particleCount: 70, spread: 80 });
+    triggerConfetti({ particleCount: 80, spread: 85 });
   };
 
   return (
@@ -291,28 +326,65 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
             </div>
           </div>
 
-          {/* Direct Download Simulation Message if triggered */}
+          {/* Direct Download Active Card */}
           {showDirectDownloadSuccess && (
-            <div className="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 space-y-2 animate-fade-in">
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-emerald-400" />
-                <span className="text-sm font-bold text-white">
-                  ¡Acceso al Audio-Kit Activado!
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/90 via-[#0E262A] to-[#141F3B] border border-emerald-400/50 text-emerald-200 space-y-3 animate-fade-in shadow-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <span className="text-sm sm:text-base font-extrabold text-white">
+                    ¡Acceso al Pack Habilitado!
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-400/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400/30">
+                  Listo para Descargar
                 </span>
               </div>
-              <p className="text-xs text-emerald-300/90 leading-relaxed">
-                El pack está disponible para descarga directa. También puedes configurarlo con tu propia pasarela (Mercado Pago, Stripe, Gumroad) en la sección completa.
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Descargá el paquete completo con los 120 audios, la Guía Maestra en PDF, los 100 bloques y las flashcards para tu celular.
               </p>
-              <button
-                onClick={() => {
-                  onClose();
-                  onGoToFullKit();
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-white underline decoration-emerald-400 hover:text-emerald-300 cursor-pointer pt-1"
-              >
-                <span>Ir al panel de descargas del kit</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+
+              <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">
+                <button
+                  onClick={handleDownloadZip}
+                  disabled={isZipping}
+                  className="w-full sm:flex-1 py-2.5 px-4 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-400/20 disabled:opacity-50 transition-all"
+                >
+                  {isZipping ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Empaquetando ({zipProgress}%)...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      <span>Descargar Pack (.ZIP)</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={handleDownloadPdf}
+                  className="w-full sm:w-auto py-2.5 px-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-400 text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Guía PDF</span>
+                </button>
+
+                {onOpenVault && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenVault();
+                    }}
+                    className="w-full sm:w-auto py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <span>Ver Todo</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -347,13 +419,15 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
                 Ver Detalles
               </button>
 
-              <button
-                onClick={handleActionClick}
-                className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              <a
+                href={localStorage.getItem('vibe_custom_checkout_url') || OFFICIAL_MERCADO_PAGO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer no-underline text-center"
               >
-                <Download className="w-4 h-4" />
-                <span>Adquirir Pack ($9)</span>
-              </button>
+                <ExternalLink className="w-4 h-4" />
+                <span>Pagar con Mercado Pago ($9.900)</span>
+              </a>
             </div>
           </div>
         </div>
