@@ -21,6 +21,7 @@ import { AudioKitFloatingTrigger } from './components/AudioKitFloatingTrigger';
 import { PackDownloadVaultModal } from './components/PackDownloadVaultModal';
 import { WhatsAppHelpButton } from './components/WhatsAppHelpButton';
 import { Footer } from './components/Footer';
+import { triggerConfetti } from './utils/confetti';
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
 import { SkillLevel } from './types';
 
@@ -57,8 +58,46 @@ export default function App() {
   const [isKitModalOpen, setIsKitModalOpen] = useState(false);
 
   React.useEffect(() => {
+    // Check if user arrived from Mercado Pago payment approval or direct delivery link
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const hash = window.location.hash.replace('#', '');
+      const isPostPaymentOrDelivery =
+        params.get('collection_status') === 'approved' ||
+        params.get('status') === 'approved' ||
+        params.get('pago') === 'exitoso' ||
+        params.get('entrega') === 'pack' ||
+        params.get('download') === 'pack' ||
+        params.has('payment_id') ||
+        hash === 'descarga' ||
+        hash === 'pack' ||
+        hash === 'entrega';
+
+      if (isPostPaymentOrDelivery) {
+        try {
+          localStorage.setItem('vibe_kit_purchased', 'true');
+        } catch {
+          // ignore
+        }
+        setIsVaultModalOpen(true);
+        setActiveTab('kit');
+        triggerConfetti({ particleCount: 100, spread: 90 });
+      }
+    }
+
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
+      if (hash === 'descarga' || hash === 'pack' || hash === 'entrega') {
+        try {
+          localStorage.setItem('vibe_kit_purchased', 'true');
+        } catch {
+          // ignore
+        }
+        setIsVaultModalOpen(true);
+        setActiveTab('kit');
+        return;
+      }
+
       const validTabs = [
         'hero',
         'desde-cero',
@@ -233,6 +272,28 @@ export default function App() {
         onOpenKitModal={() => setIsKitModalOpen(true)}
         onOpenVault={() => setIsVaultModalOpen(true)}
       />
+
+      {/* Mobile-Friendly Quick Download Bar for Buyers */}
+      <div className="bg-gradient-to-r from-emerald-950 via-[#0F261E] to-emerald-950 border-b border-emerald-500/40 px-3 py-2 text-center text-xs text-white sticky top-16 z-30 shadow-md">
+        <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <span className="flex items-center gap-1.5 font-bold text-emerald-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>¿Ya pagaste tu Audio-Kit ($9.990)?</span>
+          </span>
+          <span className="hidden sm:inline text-slate-300 text-[11px]">
+            Descargá el ZIP con los 120 audios MP3 y la Guía Maestra PDF a tu celular:
+          </span>
+          <button
+            onClick={() => {
+              setIsVaultModalOpen(true);
+              triggerConfetti({ particleCount: 50, spread: 60 });
+            }}
+            className="px-3 py-1 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs cursor-pointer shadow-sm transition-all flex items-center gap-1 active:scale-95"
+          >
+            <span>📥 Descargar mis Archivos</span>
+          </button>
+        </div>
+      </div>
 
       <main className="flex-1">
         {/* MODULAR VIEW (Default: Compact, fast, non-overwhelming) */}

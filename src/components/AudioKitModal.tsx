@@ -430,6 +430,24 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
               </a>
             </div>
           </div>
+
+          {/* Already Paid Quick Access */}
+          <div className="pt-2 text-center border-t border-white/5">
+            <button
+              onClick={() => {
+                onClose();
+                if (onOpenVault) {
+                  onOpenVault();
+                } else {
+                  setShowDirectDownloadSuccess(true);
+                }
+              }}
+              className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold inline-flex items-center gap-1.5 hover:underline cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>¿Ya compraste y necesitás descargar tu pack? Hacé clic acá</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

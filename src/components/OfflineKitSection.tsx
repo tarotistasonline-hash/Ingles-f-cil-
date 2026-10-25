@@ -17,6 +17,8 @@ import {
   RefreshCw,
   Gift,
   MessageCircle,
+  Copy,
+  CheckCheck,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
@@ -77,7 +79,7 @@ export const OFFICIAL_MERCADO_PAGO_URL = 'https://mpago.li/1PhcDv4';
 
 const CURRENCIES = [
   { code: 'USD', symbol: '$', price: '9', note: 'Dólares (Pago único)' },
-  { code: 'ARS', symbol: '$', price: '9.900', note: 'Pesos Argentinos (Oferta Especial de Lanzamiento)' },
+  { code: 'ARS', symbol: '$', price: '9.990', note: 'Pesos Argentinos (Oferta Especial de Lanzamiento)' },
   { code: 'MXN', symbol: '$', price: '180', note: 'Pesos Mexicanos aprox.' },
   { code: 'EUR', symbol: '€', price: '8,50', note: 'Euros' },
   { code: 'COP', symbol: '$', price: '38.000', note: 'Pesos Colombianos aprox.' },
@@ -100,6 +102,41 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
   });
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [tempCheckoutUrl, setTempCheckoutUrl] = useState(customCheckoutUrl);
+  const [copiedDeliveryMsg, setCopiedDeliveryMsg] = useState(false);
+  const [copiedRedirectUrl, setCopiedRedirectUrl] = useState(false);
+
+  const getDeliveryUrl = () => {
+    if (typeof window !== 'undefined' && window.location && window.location.origin) {
+      return `${window.location.origin}/?pago=exitoso#descarga`;
+    }
+    return 'https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/?pago=exitoso#descarga';
+  };
+
+  const getWhatsAppDeliveryMessage = () => {
+    const url = getDeliveryUrl();
+    return `¡Hola! Muchas gracias por tu compra del Audio-Kit de Inglés Fácil y Fluido ($9.990 ARS). 🚀\n\nAcá tenés tu enlace exclusivo y directo para descargar todo el material a tu celular o compu:\n👉 ${url}\n\nAl ingresar vas a tener acceso inmediato para descargar el paquete ZIP completo (audios MP3 pausados y velocidad real), la Guía Maestra PDF, la App Offline y el plan de estudio de 30 días. ¡Que lo disfrutes mucho!`;
+  };
+
+  const handleCopyDeliveryMsg = async () => {
+    try {
+      await navigator.clipboard.writeText(getWhatsAppDeliveryMessage());
+      setCopiedDeliveryMsg(true);
+      setTimeout(() => setCopiedDeliveryMsg(false), 3000);
+    } catch {
+      // fallback
+    }
+  };
+
+  const handleCopyRedirectUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(getDeliveryUrl());
+      setCopiedRedirectUrl(true);
+      setTimeout(() => setCopiedRedirectUrl(false), 3000);
+    } catch {
+      // fallback
+    }
+  };
+
   const [hasPurchasedMock, setHasPurchasedMock] = useState<boolean>(() => {
     try {
       return localStorage.getItem('vibe_kit_purchased') === 'true';
@@ -660,6 +697,37 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 ✓ Además podés usar directamente la Mini-App Offline en tu navegador sin descomprimir nada.
               </p>
             </div>
+
+            {/* Buyer Download Access Bar */}
+            <div className="w-full max-w-xl mx-auto p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                  <Download className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                    <span>¿Ya compraste y necesitás tu pack?</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950 font-black">DESCARGA INMEDIATA</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-300">
+                    Abrí tu bóveda para bajar el ZIP completo, la Guía Maestra PDF y audios MP3.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  if (onOpenVault) {
+                    onOpenVault();
+                  } else {
+                    setShowSuccessModal(true);
+                  }
+                }}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 text-xs font-black shrink-0 transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Descargar mi Pack</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Creator Configuration Helper */}
@@ -749,21 +817,140 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
         </div>
       </section>
 
-      {/* 6. Settings Modal for Creator Payment Gateway URL */}
+      {/* 6. Settings Modal for Creator Payment Gateway URL & Buyer Delivery Tools */}
       {showConfigModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#140F33] border border-[#3C2E75] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-white font-bold text-lg">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-[#140F33] border border-[#3C2E75] rounded-2xl max-w-xl w-full p-5 sm:p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[#2B205D]">
+              <div className="flex items-center gap-2 text-white font-bold text-base sm:text-lg">
                 <Settings className="w-5 h-5 text-amber-400" />
-                <span>Configurar Pasarela de Pago</span>
+                <span>Gestión de Ventas y Entrega de Packs</span>
               </div>
               <button
                 onClick={() => setShowConfigModal(false)}
-                className="text-slate-400 hover:text-white cursor-pointer text-sm font-bold"
+                className="text-slate-400 hover:text-white cursor-pointer text-sm font-bold p-1 rounded-lg hover:bg-slate-800"
               >
                 ✕
               </button>
+            </div>
+
+            {/* SECCIÓN URGENTE: Cliente que ya pagó */}
+            <div className="bg-gradient-to-br from-amber-950/40 via-[#1F1735] to-emerald-950/30 border-2 border-amber-400/50 rounded-2xl p-4 sm:p-5 space-y-4">
+              <div className="flex items-start gap-2.5">
+                <span className="text-xl">🚨</span>
+                <div>
+                  <h3 className="text-sm font-black text-white">
+                    ¿A una persona que compró no le llegó el pack?
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    <strong className="text-amber-300">¿Por qué sucede?</strong> Mercado Pago únicamente cobra el dinero; no aloja ni envía archivos por sí solo salvo que le indiques a dónde redirigir al comprador al finalizar la compra.
+                  </p>
+                </div>
+              </div>
+
+              {/* Solución 1: Inmediata para el cliente actual */}
+              <div className="bg-[#0B081E] border border-[#2F2360] rounded-xl p-3.5 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Paso 1: Enviale este mensaje ahora mismo por WhatsApp o Email</span>
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-black/60 border border-slate-800 text-[11px] text-slate-300 font-mono leading-relaxed select-all">
+                  {getWhatsAppDeliveryMessage()}
+                </div>
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleCopyDeliveryMsg}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+                  >
+                    {copiedDeliveryMsg ? (
+                      <>
+                        <CheckCheck className="w-3.5 h-3.5 text-slate-950" />
+                        <span>¡Mensaje Copiado!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copiar Mensaje para WhatsApp</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyRedirectUrl}
+                    className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
+                  >
+                    {copiedRedirectUrl ? (
+                      <>
+                        <CheckCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>¡Enlace Copiado!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copiar sólo Link de Descarga</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Solución 2: Automática para futuros compradores (Web / PC) o WhatsApp */}
+              <div className="bg-[#0B081E] border border-[#2F2360] rounded-xl p-3.5 space-y-3 text-xs text-slate-300">
+                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4" />
+                  <span>¿Por qué no te aparece "Modo avanzado" en Mercado Pago?</span>
+                </span>
+                
+                <div className="p-2.5 rounded-lg bg-amber-400/10 border border-amber-400/20 text-slate-300 space-y-1.5 text-[11px] leading-relaxed">
+                  <p>
+                    ⚠️ <strong className="text-amber-300">Si estás usando la aplicación de Mercado Pago en tu celular:</strong> Mercado Pago oculta deliberadamente las "Opciones avanzadas" y la redirección en la app móvil. Solo muestra título y precio.
+                  </p>
+                  <p>
+                    💻 <strong className="text-white">Para que aparezca la opción:</strong> Tenés que entrar desde una <strong className="text-white">computadora</strong> en <span className="text-sky-300 font-mono">mercadopago.com.ar</span> (o abrir Chrome en el celular y activar los 3 puntitos &gt; <em>"Sitio para computadoras"</em>).
+                  </p>
+                </div>
+
+                <div className="space-y-2 pt-1 text-[11px]">
+                  <strong className="text-emerald-400 block font-bold">
+                    🚀 Las 2 formas más sencillas de entregar sin complicarte con Mercado Pago:
+                  </strong>
+                  
+                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
+                    <strong className="text-white block font-semibold">Método 1 (Inmediato - Sin configurar nada):</strong>
+                    <span>Cuando un cliente te pague, Mercado Pago te avisa a tu celular. Tocás el botón verde de arriba <strong className="text-emerald-300">"Copiar Mensaje para WhatsApp"</strong> y se lo pegás por chat o email. ¡Le llega el link y descarga al instante!</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
+                    <strong className="text-white block font-semibold">Método 2 (El comprador descarga directo desde la web):</strong>
+                    <span>En esta misma aplicación web ya dejamos un botón visible en la cabecera y en la sección del Kit: <strong className="text-white">"¿Ya compraste? [Descargar mi Pack]"</strong>. Le decís a la persona: <em>"Entrá a la página y tocá 'Descargar mi Pack'"</em> y se le abre la bóveda completa de inmediato.</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1.5">
+                    <strong className="text-white block font-semibold">Método 3 (Si querés la redirección automática desde la PC):</strong>
+                    <ol className="list-decimal list-inside space-y-1 pl-1 text-slate-300">
+                      <li>Entrá en <span className="text-sky-300 font-mono">mercadopago.com.ar</span> desde tu computadora.</li>
+                      <li>Andá a <strong>Links de pago</strong> &gt; Editá tu link.</li>
+                      <li>Hacé clic en <strong>"Más opciones"</strong> abajo del precio y activá <strong>"Redireccionar al finalizar la compra"</strong>.</li>
+                      <li>Pegá esta URL:
+                        <div className="mt-1 flex items-center gap-2 p-1.5 rounded bg-black/60 border border-slate-800 text-[10px] font-mono text-emerald-400 overflow-x-auto">
+                          <span className="truncate">{getDeliveryUrl()}</span>
+                          <button
+                            type="button"
+                            onClick={handleCopyRedirectUrl}
+                            className="text-xs px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded shrink-0 cursor-pointer"
+                          >
+                            {copiedRedirectUrl ? 'Copiado' : 'Copiar'}
+                          </button>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Quick Explanation: Pesos vs Dólares */}
@@ -772,7 +959,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 <span>💡 ¿Cómo funciona Mercado Pago para cobrar $9 USD o Pesos?</span>
               </div>
               <p className="text-slate-300 leading-relaxed">
-                Mercado Pago Argentina procesa las transacciones en <strong className="text-white">Pesos Argentinos (ARS)</strong>. Para cobrar los <strong className="text-amber-300">$9 USD</strong>, en Mercado Pago creás el link por el equivalente en pesos (configurado en <strong className="text-emerald-400">$9.990 ARS</strong> de oferta lanzamiento).
+                Mercado Pago Argentina procesa las transacciones en <strong className="text-white">Pesos Argentinos (ARS)</strong>. Para cobrar los <strong className="text-amber-300">$9 USD</strong>, en Mercado Pago creás el link por el equivalente en pesos (fijado en <strong className="text-emerald-400">$9.990 ARS</strong>).
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] text-slate-300">
                 <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
@@ -784,36 +971,6 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                   Pagan con tarjeta internacional (Visa/Mastercard); su banco hace la conversión de divisas automáticamente.
                 </div>
               </div>
-            </div>
-
-            {/* Step-by-Step Instructions */}
-            <div className="space-y-2 text-xs text-slate-300">
-              <span className="font-bold text-white text-xs uppercase tracking-wider block">
-                Paso a Paso para Generar tu Link en 3 Minutos:
-              </span>
-              <ol className="list-decimal list-inside space-y-1.5 pl-1 leading-relaxed">
-                <li>
-                  Abrí la app de <strong className="text-white">Mercado Pago</strong> o entrá en <span className="text-sky-300 font-mono">mercadopago.com.ar</span>.
-                </li>
-                <li>
-                  Hacé clic en el menú y elegí <strong className="text-white">"Cobrar con link de pago"</strong>.
-                </li>
-                <li>
-                  Escribí el título: <span className="text-amber-300 font-medium">"Audio-Kit de Bolsillo: Inglés Fácil y Fluido"</span>.
-                </li>
-                <li>
-                  Ingresá el precio en pesos (fijado en <strong className="text-emerald-400">$9.990 ARS</strong> para representar los $9 USD).
-                </li>
-                <li>
-                  <em>(Opcional)</em> En "Opciones avanzadas", activá "Redireccionar a tu sitio" y pegá el enlace de esta app para que vuelvan a descargar el pack.
-                </li>
-                <li>
-                  Hacé clic en <strong className="text-white">"Crear link de pago"</strong> y copiá el enlace que empieza con <code className="text-amber-400 bg-black/40 px-1 py-0.5 rounded">https://mpago.la/...</code>.
-                </li>
-                <li>
-                  Pegalo abajo y hacé clic en <strong className="text-white">"Guardar Enlace"</strong>.
-                </li>
-              </ol>
             </div>
 
             <form onSubmit={handleSaveCheckoutUrl} className="space-y-4 pt-1 border-t border-[#2B205D]">
