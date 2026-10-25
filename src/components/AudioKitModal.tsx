@@ -55,7 +55,7 @@ const POPUP_SAMPLES = [
 ];
 
 const CURRENCIES = [
-  { code: 'ARS', symbol: '$', price: '9.900', note: 'Pesos Argentinos (Oferta Lanzamiento)' },
+  { code: 'ARS', symbol: '$', price: '9.990', note: 'Pesos Argentinos (Oferta Lanzamiento)' },
   { code: 'USD', symbol: '$', price: '9', note: 'Dólares (Pago único)' },
   { code: 'MXN', symbol: '$', price: '180', note: 'Pesos Mexicanos aprox.' },
   { code: 'EUR', symbol: '€', price: '8,50', note: 'Euros' },
@@ -426,7 +426,7 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
                 className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-amber-400/20 transition-all flex items-center justify-center gap-2 cursor-pointer no-underline text-center"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>Pagar con Mercado Pago ($9.900)</span>
+                <span>Pagar con Mercado Pago ($9.990)</span>
               </a>
             </div>
           </div>

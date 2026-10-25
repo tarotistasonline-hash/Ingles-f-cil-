@@ -16,6 +16,7 @@ import {
   ArrowRight,
   RefreshCw,
   Gift,
+  MessageCircle,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
@@ -611,12 +612,24 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               rel="noopener noreferrer"
               className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-extrabold text-base sm:text-lg shadow-xl shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer text-center no-underline"
             >
-              <span>Obtener el Audio-Kit con Mercado Pago ($9.900)</span>
+              <span>Obtener el Audio-Kit con Mercado Pago ($9.990)</span>
               <ArrowRight className="w-5 h-5" />
             </a>
 
-            {/* Micro reassurance & verified link notice */}
-            <div className="space-y-1 text-center">
+            {/* WhatsApp direct help & reassurance */}
+            <div className="space-y-2 text-center pt-1">
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href="https://wa.me/?text=%C2%A1Hola!%20Tengo%20una%20consulta%20sobre%20el%20Audio-Kit%20de%20Ingl%C3%A9s%20F%C3%A1cil%20y%20Fluido%20($9.990)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-xs font-semibold transition-colors no-underline cursor-pointer"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>¿Dudas antes de pagar? Consultanos por WhatsApp</span>
+                </a>
+              </div>
+
               <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>Compra 100% protegida por Mercado Pago · Entrega inmediata</span>
@@ -625,6 +638,27 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Link oficial conectado: mpago.li/1PhcDv4</span>
               </div>
+            </div>
+
+            {/* Mini-guía visual: Cómo abrir el pack en tu celular */}
+            <div className="mt-4 p-4 rounded-2xl bg-[#0E0A22] border border-[#2B205D] text-left space-y-2.5 max-w-xl mx-auto w-full">
+              <div className="flex items-center gap-2 text-xs font-bold text-white">
+                <Smartphone className="w-4 h-4 text-amber-400" />
+                <span>📱 ¿Cómo se abre el pack en tu celular? (En 2 toques simples)</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-300">
+                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
+                  <strong className="text-white block font-semibold">🍏 En iPhone / iPad:</strong>
+                  <span>Tocás el archivo descargado y Safari lo abre directo en tu app <em>Archivos</em> listo para reproducir.</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
+                  <strong className="text-white block font-semibold">🤖 En Android:</strong>
+                  <span>Se guarda en tu carpeta <em>Descargas</em> y se abre con la app <em>Files de Google</em> o tu reproductor habitual.</span>
+                </div>
+              </div>
+              <p className="text-[10px] text-emerald-400/90 font-medium text-center pt-1 border-t border-[#231A4D]">
+                ✓ Además podés usar directamente la Mini-App Offline en tu navegador sin descomprimir nada.
+              </p>
             </div>
           </div>
 
@@ -738,12 +772,12 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 <span>💡 ¿Cómo funciona Mercado Pago para cobrar $9 USD o Pesos?</span>
               </div>
               <p className="text-slate-300 leading-relaxed">
-                Mercado Pago Argentina procesa las transacciones en <strong className="text-white">Pesos Argentinos (ARS)</strong>. Para cobrar los <strong className="text-amber-300">$9 USD</strong>, en Mercado Pago creás el link por el equivalente en pesos (configurado en <strong className="text-emerald-400">$9.900 ARS</strong> de oferta lanzamiento).
+                Mercado Pago Argentina procesa las transacciones en <strong className="text-white">Pesos Argentinos (ARS)</strong>. Para cobrar los <strong className="text-amber-300">$9 USD</strong>, en Mercado Pago creás el link por el equivalente en pesos (configurado en <strong className="text-emerald-400">$9.990 ARS</strong> de oferta lanzamiento).
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] text-slate-300">
                 <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
                   <strong className="text-white block mb-0.5">🇦🇷 Si pagan en Pesos:</strong>
-                  Pagan con débito, crédito o dinero en cuenta de Mercado Pago ($9.900 ARS).
+                  Pagan con débito, crédito o dinero en cuenta de Mercado Pago ($9.990 ARS).
                 </div>
                 <div className="p-2 rounded bg-slate-900/80 border border-slate-800">
                   <strong className="text-white block mb-0.5">🌎 Si pagan desde el exterior en USD:</strong>
@@ -768,7 +802,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                   Escribí el título: <span className="text-amber-300 font-medium">"Audio-Kit de Bolsillo: Inglés Fácil y Fluido"</span>.
                 </li>
                 <li>
-                  Ingresá el precio en pesos (fijado en <strong className="text-emerald-400">$9.900 ARS</strong> para representar los $9 USD).
+                  Ingresá el precio en pesos (fijado en <strong className="text-emerald-400">$9.990 ARS</strong> para representar los $9 USD).
                 </li>
                 <li>
                   <em>(Opcional)</em> En "Opciones avanzadas", activá "Redireccionar a tu sitio" y pegá el enlace de esta app para que vuelvan a descargar el pack.

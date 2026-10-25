@@ -407,6 +407,27 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Mini-guía visual: Cómo abrir el pack en tu celular */}
+          <div className="p-4 rounded-xl bg-[#0F0B24] border border-[#2B205D] text-left space-y-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-white">
+              <Smartphone className="w-4 h-4 text-amber-400" />
+              <span>📱 ¿Cómo se abre el pack en tu celular? (Guía rápida de 2 toques)</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-300">
+              <div className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1">
+                <strong className="text-white block font-semibold">🍏 En iPhone / iPad:</strong>
+                <span>Tocás el archivo descargado y Safari lo abre directo en tu app <em>Archivos</em> listo para reproducir.</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1">
+                <strong className="text-white block font-semibold">🤖 En Android:</strong>
+                <span>Se guarda en tu carpeta <em>Descargas</em> y se abre con la app <em>Files de Google</em> o tu reproductor habitual.</span>
+              </div>
+            </div>
+            <p className="text-[10px] text-emerald-400 font-medium text-center pt-1 border-t border-[#231A4D]">
+              ✓ Consejo: Podés abrir directamente el archivo <em>06_Reproductor_Audio_Offline_De_Bolsillo.html</em> en tu navegador móvil sin necesidad de descomprimir nada.
+            </p>
+          </div>
         </div>
 
         {/* Modal Footer */}

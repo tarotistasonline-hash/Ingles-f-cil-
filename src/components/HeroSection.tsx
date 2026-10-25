@@ -199,7 +199,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 title="Descargá el pack de 120 audios en MP3 y la guía para tu celular"
               >
                 <Headphones className="w-4 h-4 text-amber-400 animate-bounce" />
-                <span>🎧 Audio-Kit de Bolsillo ($9)</span>
+                <span>🎧 Audio-Kit de Bolsillo ($9.990)</span>
               </button>
             )}
           </div>

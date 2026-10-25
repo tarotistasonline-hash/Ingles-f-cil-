@@ -42,108 +42,61 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </button>
 
-        {/* Zone 2: 4-6 clean text navigation links */}
-        <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-300">
+        {/* Zone 2: 4-5 clean, high-impact navigation links (Decongested) */}
+        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
           <button
             onClick={() => setActiveTab('desde-cero')}
-            className={`transition-colors hover:text-emerald-300 flex items-center gap-1 ${
+            className={`transition-colors hover:text-emerald-300 flex items-center gap-1.5 py-1 ${
               activeTab === 'desde-cero'
-                ? 'text-emerald-400 font-semibold underline decoration-2 underline-offset-4'
+                ? 'text-emerald-400 font-bold underline decoration-2 underline-offset-4'
                 : 'text-emerald-300/90'
             }`}
           >
-            🌱 Desde Cero
+            <span>🌱</span>
+            <span>Desde Cero</span>
           </button>
           <button
             onClick={() => setActiveTab('entrecasa')}
-            className={`transition-colors hover:text-white ${
-              activeTab === 'entrecasa'
-                ? 'text-amber-400 font-semibold underline decoration-2 underline-offset-4'
+            className={`transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
+              activeTab === 'entrecasa' || activeTab === 'simulator' || activeTab === 'chunks'
+                ? 'text-amber-400 font-bold underline decoration-2 underline-offset-4'
                 : ''
             }`}
           >
-            Vida Cotidiana
-          </button>
-          <button
-            onClick={() => setActiveTab('simulator')}
-            className={`transition-colors hover:text-white ${
-              activeTab === 'simulator'
-                ? 'text-amber-400 font-semibold underline decoration-2 underline-offset-4'
-                : ''
-            }`}
-          >
-            Simulador de Voz
-          </button>
-          <button
-            onClick={() => setActiveTab('method')}
-            className={`transition-colors hover:text-white ${
-              activeTab === 'method'
-                ? 'text-amber-400 font-semibold underline decoration-2 underline-offset-4'
-                : ''
-            }`}
-          >
-            Método Sin Reglas
-          </button>
-          <button
-            onClick={() => setActiveTab('tweak')}
-            className={`transition-colors hover:text-white ${
-              activeTab === 'tweak'
-                ? 'text-amber-400 font-semibold underline decoration-2 underline-offset-4'
-                : ''
-            }`}
-          >
-            Habla Coloquial
-          </button>
-          <button
-            onClick={() => setActiveTab('chunks')}
-            className={`transition-colors hover:text-white ${
-              activeTab === 'chunks'
-                ? 'text-amber-400 font-semibold underline decoration-2 underline-offset-4'
-                : ''
-            }`}
-          >
-            Bloques de Poder
+            <span>☕</span>
+            <span>Vida Real & Práctica</span>
           </button>
           <button
             onClick={() => setActiveTab('gym')}
-            className={`transition-colors hover:text-white ${
+            className={`transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
               activeTab === 'gym'
-                ? 'text-amber-400 font-semibold underline decoration-2 underline-offset-4'
+                ? 'text-amber-400 font-bold underline decoration-2 underline-offset-4'
                 : ''
             }`}
           >
-            Reflejos en 5s
+            <span>⚡</span>
+            <span>Reflejos 5s</span>
           </button>
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`transition-colors hover:text-white flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-400/10 border border-amber-400/25 ${
+            className={`transition-colors hover:text-white flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400/10 border border-amber-400/25 ${
               activeTab === 'dashboard'
-                ? 'text-amber-400 font-semibold border-amber-400/60'
+                ? 'text-amber-400 font-bold border-amber-400/60'
                 : 'text-amber-300'
             }`}
           >
-            <span>📊 Progreso Easy</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('blog')}
-            className={`transition-colors hover:text-white flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/25 ${
-              activeTab === 'blog'
-                ? 'text-rose-300 font-semibold border-rose-400/60'
-                : 'text-rose-300/80 hover:text-rose-200'
-            }`}
-          >
-            <span>💬 Blog & Sugerencias</span>
+            <span>📊 Progreso</span>
           </button>
           <button
             onClick={onOpenKitModal || (() => setActiveTab('kit'))}
-            className={`transition-colors hover:text-white flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/40 hover:border-amber-400 text-amber-300 font-bold shadow-xs ${
+            className={`transition-colors hover:text-white flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/40 hover:border-amber-400 text-amber-300 font-bold shadow-xs ${
               activeTab === 'kit'
                 ? 'ring-2 ring-amber-400 text-white'
                 : 'hover:text-amber-200'
             }`}
           >
             <Headphones className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>🎧 Audio-Kit ($9)</span>
+            <span>🎧 Audio-Kit ($9.990)</span>
           </button>
         </nav>
 
@@ -223,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Headphones className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
             <span className="hidden sm:inline">Audio-Kit</span>
             <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded font-extrabold uppercase">
-              $9
+              $9.990
             </span>
           </button>
 

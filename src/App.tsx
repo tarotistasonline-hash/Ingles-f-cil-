@@ -19,6 +19,7 @@ import { OfflineKitSection } from './components/OfflineKitSection';
 import { AudioKitModal } from './components/AudioKitModal';
 import { AudioKitFloatingTrigger } from './components/AudioKitFloatingTrigger';
 import { PackDownloadVaultModal } from './components/PackDownloadVaultModal';
+import { WhatsAppHelpButton } from './components/WhatsAppHelpButton';
 import { Footer } from './components/Footer';
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
 import { SkillLevel } from './types';
@@ -416,6 +417,9 @@ export default function App() {
         isOpen={isVaultModalOpen}
         onClose={() => setIsVaultModalOpen(false)}
       />
+
+      {/* Floating WhatsApp Quick Consultation Button */}
+      <WhatsAppHelpButton />
     </div>
   );
 }
