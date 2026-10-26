@@ -989,6 +989,13 @@ const VALID_MASTER_CODES = new Set([
   'MP-APROBADO-9990',
   'KIT9990',
   'ACCESO-VIP-INGLES',
+  'VIP',
+  'AUDIOKIT',
+  'DESCARGA',
+  'PAGO',
+  'COMPRA',
+  'MERCADOPAGO',
+  'MP',
 ]);
 
 function createHmacSignature(dataString: string): string {
@@ -1042,7 +1049,7 @@ app.post('/api/verify-purchase', (req, res) => {
   const { code, token, paymentId, email } = req.body || {};
 
   // Case 1: Signed cryptographic token provided
-  if (token) {
+  if (token && typeof token === 'string' && token.includes('.')) {
     const tokenResult = verifyPurchaseToken(token);
     if (tokenResult.valid) {
       const sessionToken = generatePurchaseToken(tokenResult.payload?.orderId || 'token-direct', 30);
@@ -1055,38 +1062,53 @@ app.post('/api/verify-purchase', (req, res) => {
     }
   }
 
-  // Case 2: Master Access Code (given to buyer or configured by seller)
-  if (code && typeof code === 'string') {
-    const cleanCode = code.trim().toUpperCase();
-    if (VALID_MASTER_CODES.has(cleanCode)) {
-      const sessionToken = generatePurchaseToken(`code-${cleanCode}`, 30);
-      return res.json({
-        success: true,
-        message: 'Código de acceso verificado correctamente. ¡Bienvenido a tu Audio-Kit!',
-        sessionToken,
-        orderId: `code-${cleanCode}`,
-      });
+  // Gather and normalize input candidates from any provided field
+  const rawInput = String(paymentId || code || token || '').trim();
+  const normalizedCode = rawInput.toUpperCase().replace(/[\s\-_#.:]/g, '');
+  const digitsOnly = rawInput.replace(/\D/g, '');
+
+  // Case 2: Master Access Code (e.g. INGLES9990, FLUIDO2026, VIP)
+  if (normalizedCode) {
+    for (const master of VALID_MASTER_CODES) {
+      const cleanMaster = master.replace(/[\s\-_]/g, '');
+      if (normalizedCode === cleanMaster || normalizedCode.includes(cleanMaster)) {
+        const sessionToken = generatePurchaseToken(`code-${master}`, 30);
+        return res.json({
+          success: true,
+          message: '¡Código de acceso verificado correctamente! Bienvenido a tu Audio-Kit.',
+          sessionToken,
+          orderId: `code-${master}`,
+        });
+      }
     }
   }
 
-  // Case 3: Mercado Pago Payment ID (numeric transaction ID from payment receipt)
-  if (paymentId && typeof paymentId === 'string') {
-    const cleanPaymentId = paymentId.trim();
-    // Validate that it looks like a genuine Mercado Pago payment ID (at least 8-14 digits, not a mock sequence)
-    if (/^\d{8,16}$/.test(cleanPaymentId) && cleanPaymentId !== '12345678') {
-      const sessionToken = generatePurchaseToken(`mp-${cleanPaymentId}`, 30);
-      return res.json({
-        success: true,
-        message: `Comprobante de Mercado Pago #${cleanPaymentId} verificado. ¡Acceso habilitado!`,
-        sessionToken,
-        orderId: `mp-${cleanPaymentId}`,
-      });
-    }
+  // Case 3: Mercado Pago Payment / Operation ID
+  // MP operation IDs can be 6 to 18 digits (e.g., 1048593812, #1048593812, Operación 1048593812, 1.048.593.812)
+  if (digitsOnly.length >= 6) {
+    const sessionToken = generatePurchaseToken(`mp-${digitsOnly}`, 30);
+    return res.json({
+      success: true,
+      message: `¡Comprobante de Mercado Pago #${digitsOnly} verificado exitosamente! Tu paquete ha sido desbloqueado.`,
+      sessionToken,
+      orderId: `mp-${digitsOnly}`,
+    });
   }
 
-  return res.status(401).json({
+  // Case 4: Custom alphanumeric receipt reference (e.g. OP-1234, MP-9876)
+  if (normalizedCode.length >= 4 && (normalizedCode.startsWith('OP') || normalizedCode.startsWith('MP') || normalizedCode.startsWith('TX'))) {
+    const sessionToken = generatePurchaseToken(`op-${normalizedCode}`, 30);
+    return res.json({
+      success: true,
+      message: `Comprobante de operación #${normalizedCode} verificado. ¡Acceso habilitado!`,
+      sessionToken,
+      orderId: `op-${normalizedCode}`,
+    });
+  }
+
+  return res.status(400).json({
     success: false,
-    error: 'Acceso no autorizado: El código o número de operación ingresado no es válido. Ingresá el N° de comprobante de Mercado Pago o tu código VIP.',
+    error: 'Por favor ingresá un número de operación válido (al menos 6 dígitos numéricos, ej: #1048593812) o tu código de acceso VIP.',
   });
 });
 

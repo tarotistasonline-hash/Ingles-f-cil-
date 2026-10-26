@@ -67,25 +67,39 @@ export const PACK_DELIVERABLES: PackFileItem[] = [
 ];
 
 /**
- * Triggers a browser file download from a Blob
+ * Triggers a browser file download from a Blob with mobile-safe lifetime
  */
-export function downloadBlob(blob: Blob, filename: string) {
+export function downloadBlob(blob: Blob, filename: string): string {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
+  a.target = '_self';
+  a.rel = 'noopener';
   document.body.appendChild(a);
-  a.click();
+  try {
+    a.click();
+  } catch (_e) {
+    // fallback
+  }
   document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // Keep ObjectURL alive for 60s so mobile browser download managers don't abort
+  setTimeout(() => {
+    try {
+      URL.revokeObjectURL(url);
+    } catch {
+      // ignore
+    }
+  }, 60000);
+  return url;
 }
 
 /**
  * Triggers download of raw text or HTML
  */
-export function downloadTextFile(content: string, filename: string, mimeType: string = 'text/plain;charset=utf-8') {
+export function downloadTextFile(content: string, filename: string, mimeType: string = 'text/plain;charset=utf-8'): string {
   const blob = new Blob([content], { type: mimeType });
-  downloadBlob(blob, filename);
+  return downloadBlob(blob, filename);
 }
 
 /**

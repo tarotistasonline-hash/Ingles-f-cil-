@@ -153,6 +153,22 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
       return false;
     }
   });
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        setHasPurchasedMock(localStorage.getItem('vibe_kit_purchased') === 'true');
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('vibe_purchase_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('vibe_purchase_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
