@@ -21,6 +21,11 @@ import {
   KeyRound,
   AlertCircle,
   MessageCircle,
+  Play,
+  Volume2,
+  Search,
+  HelpCircle,
+  BookOpen,
 } from 'lucide-react';
 import {
   generateAndDownloadZipPackage,
@@ -33,6 +38,8 @@ import {
   PACK_DELIVERABLES,
 } from '../utils/packGenerator';
 import { triggerConfetti } from '../utils/confetti';
+import { playEnglishVoice } from '../services/audio';
+import { POWER_CHUNKS, ENTRECASA_PHRASES } from '../data/defaultData';
 import {
   getStoredSessionToken,
   validateDownloadSession,
@@ -64,6 +71,23 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
   const [zipStepText, setZipStepText] = useState('');
   const [downloadSuccessItem, setDownloadSuccessItem] = useState<string | null>(null);
   const [showReaderPreview, setShowReaderPreview] = useState(false);
+
+  // Unzipped & Mobile Navigation State
+  const [vaultTab, setVaultTab] = useState<'no-zip' | 'live-audio' | 'zip' | 'mobile-help'>('no-zip');
+  const [audioSearch, setAudioSearch] = useState<string>('');
+  const [selectedSpeed, setSelectedSpeed] = useState<number>(0.8);
+  const [playingPhraseId, setPlayingPhraseId] = useState<string | null>(null);
+
+  const handlePlayVoice = async (id: string, text: string) => {
+    setPlayingPhraseId(id);
+    try {
+      await playEnglishVoice(text, 'Kore', selectedSpeed);
+    } catch (e) {
+      console.warn('Playback error', e);
+    } finally {
+      setPlayingPhraseId(null);
+    }
+  };
 
   // Validate session whenever modal opens
   useEffect(() => {
@@ -494,251 +518,502 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
             )}
 
             {/* Modal Scrollable Body */}
-            <div className="p-5 sm:p-6 space-y-6 overflow-y-auto custom-scrollbar">
-              {/* Main Action Banner: 1-Click ZIP Download */}
-              <div className="relative rounded-2xl p-5 sm:p-6 bg-gradient-to-r from-emerald-950/70 via-[#192A32] to-[#141F3B] border-2 border-emerald-400/50 shadow-xl overflow-hidden">
-                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5">
-                  <div className="space-y-2 text-center md:text-left">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-400/20 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      Opción Más Rápida y Recomendada
+            <div className="p-4 sm:p-6 space-y-5 overflow-y-auto custom-scrollbar">
+              {/* Navigation Tabs for Mobile vs ZIP */}
+              <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3">
+                <button
+                  type="button"
+                  onClick={() => setVaultTab('no-zip')}
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                    vaultTab === 'no-zip'
+                      ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                  }`}
+                >
+                  <Smartphone className="w-4 h-4" />
+                  <span>📱 Para Celular (Sin ZIP)</span>
+                  <span className="text-[10px] bg-slate-900/80 text-amber-300 px-1.5 py-0.5 rounded font-black tracking-wider uppercase">
+                    FÁCIL
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setVaultTab('live-audio')}
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                    vaultTab === 'live-audio'
+                      ? 'bg-emerald-400 text-slate-950 shadow-md shadow-emerald-400/20'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                  }`}
+                >
+                  <Volume2 className="w-4 h-4" />
+                  <span>🎧 Escuchar Audios Online</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setVaultTab('zip')}
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                    vaultTab === 'zip'
+                      ? 'bg-sky-400 text-slate-950 shadow-md shadow-sky-400/20'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                  }`}
+                >
+                  <FolderArchive className="w-4 h-4" />
+                  <span>📦 Paquete ZIP (Para PC)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setVaultTab('mobile-help')}
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                    vaultTab === 'mobile-help'
+                      ? 'bg-purple-400 text-slate-950 shadow-md shadow-purple-400/20'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                  }`}
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  <span>❓ Ayuda Celular</span>
+                </button>
+              </div>
+
+              {/* TAB 1: SIN DESCOMPRIMIR (PARA CELULAR) */}
+              {vaultTab === 'no-zip' && (
+                <div className="space-y-5 animate-fade-in">
+                  {/* Reassurance Banner */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-[#231A3E] to-emerald-500/15 border-2 border-amber-400/50 shadow-xl space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2.5 rounded-xl bg-amber-400/20 text-amber-300 shrink-0">
+                        <Sparkles className="w-5 h-5 text-amber-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-sm sm:text-base font-black text-white">
+                          ¿Tu celular no puede descomprimir el archivo .ZIP? ¡Cero problema!
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                          No necesitás descargar ninguna app como WinZip ni RAR. Tenés acceso a <strong className="text-white">todo el contenido directamente desde tu navegador</strong> con un solo toque:
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="text-lg sm:text-xl font-black text-white">
-                      Descargar Paquete Completo (.ZIP)
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-                      Incluye la <strong className="text-white">Guía Maestra Imprimible</strong>, los <strong className="text-white">100 Bloques en Cheatsheet</strong>, el <strong className="text-white">Reproductor de Bolsillo Offline</strong>, las <strong className="text-white">Flashcards Anki/Excel</strong> y el <strong className="text-white">Plan de 30 días</strong> en una sola carpeta lista para descomprimir.
-                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      <button
+                        onClick={() => setShowReaderPreview(true)}
+                        className="py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-400/20 cursor-pointer transition-all active:scale-98"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        <span>📖 Abrir y Leer Guía Maestra PDF</span>
+                      </button>
+
+                      <button
+                        onClick={() => setVaultTab('live-audio')}
+                        className="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-400/20 cursor-pointer transition-all active:scale-98"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                        <span>🎧 Escuchar Audios en la Web</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="w-full md:w-auto shrink-0 flex flex-col items-center">
-                    <button
-                      onClick={handleDownloadFullZip}
-                      disabled={isZipping}
-                      className="w-full md:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-sm shadow-lg shadow-emerald-400/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                    >
-                      {isZipping ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          <span>Empaquetando ({zipProgress}%)...</span>
-                        </>
-                      ) : (
-                        <>
-                          <FolderArchive className="w-5 h-5" />
-                          <span>Descargar Todo (.ZIP)</span>
-                        </>
-                      )}
-                    </button>
-                    <span className="text-[10px] text-slate-400 mt-1.5">
-                      Compatible con iPhone, Android y PC (Sin internet)
-                    </span>
+                  {/* Individual Deliverables Grid (Unzipped Direct Files) */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-emerald-400" />
+                        <span>Archivos Sueltos y Directos (Sin comprimir)</span>
+                      </h4>
+                      <span className="text-xs text-slate-400 hidden sm:inline">
+                        Tocá cualquier archivo para descargarlo solo
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {/* Deliverable 1: Master Guide */}
+                      <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-amber-400/40 transition-colors flex flex-col justify-between space-y-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
+                              Guía Maestra
+                            </span>
+                            <span className="text-xs text-slate-400">PDF / HTML</span>
+                          </div>
+                          <h5 className="text-sm font-bold text-white">
+                            Guía Maestra: 100 Bloques y Fonética
+                          </h5>
+                          <p className="text-xs text-slate-400 leading-snug">
+                            Diseñada en alta resolución con fonética transcripta al español para leer en el celular o imprimir.
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
+                          <button
+                            onClick={() => setShowReaderPreview(true)}
+                            className="flex-1 py-2 px-3 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 transition-colors cursor-pointer min-w-[120px]"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Leer / Ver PDF</span>
+                          </button>
+                          <button
+                            onClick={handleDownloadMasterHtml}
+                            className="py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
+                            title="Descargar archivo HTML directo para abrir sin internet"
+                          >
+                            <Download className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Bajar .HTML</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Deliverable 2: Offline Mini-App */}
+                      <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-emerald-400/40 transition-colors flex flex-col justify-between space-y-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
+                              App Offline
+                            </span>
+                            <span className="text-xs text-slate-400">HTML Autónomo</span>
+                          </div>
+                          <h5 className="text-sm font-bold text-white">
+                            Mini-App Reproductor de Bolsillo
+                          </h5>
+                          <p className="text-xs text-slate-400 leading-snug">
+                            Un solo archivo que se abre en Chrome o Safari. Funciona 100% sin internet con buscador y audio.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                          <button
+                            onClick={handleDownloadOfflinePlayer}
+                            className="w-full py-2.5 px-3 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-xs font-bold text-emerald-300 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Descargar Mini-App Directa (.HTML)</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Deliverable 3: 100 Blocks Cheatsheet */}
+                      <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-indigo-400/40 transition-colors flex flex-col justify-between space-y-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-400/10 px-2 py-0.5 rounded">
+                              Cheatsheet
+                            </span>
+                            <span className="text-xs text-slate-400">Texto Plano (.TXT)</span>
+                          </div>
+                          <h5 className="text-sm font-bold text-white">
+                            Hoja de Rescate: 100 Bloques Conversacionales
+                          </h5>
+                          <p className="text-xs text-slate-400 leading-snug">
+                            Texto limpio y rápido para copiar en WhatsApp o en las Notas de tu teléfono.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                          <button
+                            onClick={handleDownloadCheatsheet}
+                            className="w-full py-2.5 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
+                          >
+                            <Download className="w-3.5 h-3.5 text-indigo-400" />
+                            <span>Descargar Texto Plano (.TXT)</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Deliverable 4: Flashcards CSV */}
+                      <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-violet-400/40 transition-colors flex flex-col justify-between space-y-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400 bg-violet-400/10 px-2 py-0.5 rounded">
+                              Flashcards
+                            </span>
+                            <span className="text-xs text-slate-400">Anki & Excel (.CSV)</span>
+                          </div>
+                          <h5 className="text-sm font-bold text-white">
+                            Baraja de Tarjetas para Repetición Espaciada
+                          </h5>
+                          <p className="text-xs text-slate-400 leading-snug">
+                            Compatible con la app Anki, Quizlet o para estudiar desde Excel / Google Sheets.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                          <button
+                            onClick={handleDownloadCsv}
+                            className="w-full py-2.5 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
+                          >
+                            <Download className="w-3.5 h-3.5 text-violet-400" />
+                            <span>Descargar Tarjetas (.CSV)</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Deliverable 5: 30-Day Plan */}
+                      <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-sky-400/40 transition-colors flex flex-col justify-between space-y-3 md:col-span-2">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 bg-sky-400/10 px-2 py-0.5 rounded">
+                              Plan de Acción
+                            </span>
+                            <span className="text-xs text-slate-400">30 Días</span>
+                          </div>
+                          <h5 className="text-sm font-bold text-white">
+                            Ruta de 10 Minutos Diarios: Del Nivel 0 a Hablar Fluido
+                          </h5>
+                          <p className="text-xs text-slate-400 leading-snug">
+                            Cronograma estructurado día por día para instalar reflejos automáticos sin memorizar reglas.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                          <button
+                            onClick={handleDownloadStudyPlan}
+                            className="w-full py-2.5 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
+                          >
+                            <Calendar className="w-3.5 h-3.5 text-sky-400" />
+                            <span>Descargar Plan de 30 Días (.TXT)</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                {isZipping && (
-                  <div className="mt-4 pt-4 border-t border-emerald-500/30 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-semibold text-emerald-300">
-                      <span>{zipStepText || 'Generando archivo comprimido...'}</span>
-                      <span>{zipProgress}%</span>
+              {/* TAB 2: AUDIOS EN VIVO (REPRODUCTOR WEB) */}
+              {vaultTab === 'live-audio' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="p-4 rounded-2xl bg-[#140E35] border border-emerald-400/40 space-y-3">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div>
+                        <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                          <Volume2 className="w-4 h-4 text-emerald-400" />
+                          <span>Reproductor de Frases y Audios en la Web</span>
+                        </h3>
+                        <p className="text-xs text-slate-300">
+                          Escuchá con voz nativa en 3 velocidades sin descargar nada en tu celular.
+                        </p>
+                      </div>
+
+                      {/* Speed Selector */}
+                      <div className="flex items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-slate-700 shrink-0">
+                        <span className="text-[11px] text-slate-400 px-2 font-semibold">Velocidad:</span>
+                        {[
+                          { speed: 0.65, label: '0.65x Lento' },
+                          { speed: 0.8, label: '0.8x Pausado' },
+                          { speed: 1.0, label: '1.0x Nativo' },
+                        ].map((s) => (
+                          <button
+                            key={s.speed}
+                            onClick={() => setSelectedSpeed(s.speed)}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              selectedSpeed === s.speed
+                                ? 'bg-emerald-400 text-slate-950 shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            {s.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <div className="w-full bg-black/50 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-emerald-400 to-teal-300 h-full transition-all duration-300"
-                        style={{ width: `${zipProgress}%` }}
+
+                    {/* Search bar */}
+                    <div className="relative">
+                      <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Buscar frase, situación o palabra en español o inglés..."
+                        value={audioSearch}
+                        onChange={(e) => setAudioSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/50 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400"
                       />
                     </div>
                   </div>
-                )}
-              </div>
 
-              {/* Individual Deliverables Grid */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-amber-400" />
-                    <span>Descarga Individual de Entregables (Archivos Directos)</span>
-                  </h4>
-                  <span className="text-xs text-slate-400 hidden sm:inline">
-                    Tocá cualquier archivo para descargarlo solo
-                  </span>
-                </div>
+                  {/* List of Playable Phrases */}
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+                    {(() => {
+                      const query = audioSearch.toLowerCase().trim();
+                      const filtered = ENTRECASA_PHRASES.filter((p) => {
+                        if (!query) return true;
+                        return (
+                          p.entrecasaNative.toLowerCase().includes(query) ||
+                          p.spanishSituation.toLowerCase().includes(query) ||
+                          p.categoryLabel.toLowerCase().includes(query)
+                        );
+                      });
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {/* Deliverable 1: Master Guide PDF */}
-                  <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-amber-400/40 transition-colors flex flex-col justify-between space-y-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
-                          Guía Maestra
-                        </span>
-                        <span className="text-xs text-slate-400">PDF / HTML</span>
-                      </div>
-                      <h5 className="text-sm font-bold text-white">
-                        Guía Maestra: 100 Bloques y Fonética
-                      </h5>
-                      <p className="text-xs text-slate-400 leading-snug">
-                        Diseñada en alta resolución para leer en el celular o imprimir directo.
-                      </p>
-                    </div>
+                      if (filtered.length === 0) {
+                        return (
+                          <div className="p-8 text-center text-slate-400 text-xs">
+                            No se encontraron frases con "{audioSearch}".
+                          </div>
+                        );
+                      }
 
-                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
-                      <button
-                        onClick={handleDownloadMasterHtml}
-                        className="flex-1 py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700 min-w-[105px]"
-                      >
-                        <Download className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Bajar Archivo</span>
-                      </button>
-                      <button
-                        onClick={() => setShowReaderPreview(true)}
-                        className="py-2 px-3 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 text-xs font-bold text-amber-300 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-amber-400/30"
-                        title="Abrir lector visual para leer o guardar como PDF"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Leer / Ver PDF</span>
-                      </button>
-                      <button
-                        onClick={handlePrintMasterGuide}
-                        className="py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 hover:text-white flex items-center justify-center gap-1 transition-colors cursor-pointer border border-slate-700"
-                        title="Imprimir"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Imprimir</span>
-                      </button>
-                    </div>
-                  </div>
+                      return filtered.map((item) => {
+                        const isPlaying = playingPhraseId === item.id;
+                        return (
+                          <div
+                            key={item.id}
+                            className="p-3.5 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-emerald-400/40 transition-colors flex items-center justify-between gap-3"
+                          >
+                            <div className="space-y-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
+                                  {item.categoryLabel}
+                                </span>
+                                <span className="text-xs text-slate-400 truncate">
+                                  {item.spanishSituation}
+                                </span>
+                              </div>
+                              <p className="text-sm font-bold text-white tracking-wide">
+                                {item.entrecasaNative}
+                              </p>
+                              {item.phoneticEasy && (
+                                <p className="text-xs text-emerald-300 font-mono">
+                                  🗣 {item.phoneticEasy}
+                                </p>
+                              )}
+                            </div>
 
-                  {/* Deliverable 2: Offline Pocket App */}
-                  <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-emerald-400/40 transition-colors flex flex-col justify-between space-y-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
-                          App Offline
-                        </span>
-                        <span className="text-xs text-slate-400">HTML Autónomo</span>
-                      </div>
-                      <h5 className="text-sm font-bold text-white">
-                        Mini-App Reproductor de Bolsillo
-                      </h5>
-                      <p className="text-xs text-slate-400 leading-snug">
-                        Se abre en el navegador de tu celular sin internet, con buscador y audio.
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                      <button
-                        onClick={handleDownloadOfflinePlayer}
-                        className="w-full py-2 px-3 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-xs font-bold text-emerald-300 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Descargar Mini-App (.HTML)</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Deliverable 3: 100 Blocks Cheatsheet */}
-                  <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-indigo-400/40 transition-colors flex flex-col justify-between space-y-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-400/10 px-2 py-0.5 rounded">
-                          Cheatsheet
-                        </span>
-                        <span className="text-xs text-slate-400">Texto Plano (.TXT)</span>
-                      </div>
-                      <h5 className="text-sm font-bold text-white">
-                        Hoja de Rescate: 100 Bloques Conversacionales
-                      </h5>
-                      <p className="text-xs text-slate-400 leading-snug">
-                        Texto limpio y rápido para guardar en WhatsApp o en notas de tu teléfono.
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                      <button
-                        onClick={handleDownloadCheatsheet}
-                        className="w-full py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
-                      >
-                        <Download className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Bajar Cheatsheet (.TXT)</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Deliverable 4: Flashcards CSV */}
-                  <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-violet-400/40 transition-colors flex flex-col justify-between space-y-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400 bg-violet-400/10 px-2 py-0.5 rounded">
-                          Flashcards
-                        </span>
-                        <span className="text-xs text-slate-400">Anki & Excel (.CSV)</span>
-                      </div>
-                      <h5 className="text-sm font-bold text-white">
-                        Baraja de Tarjetas para Repetición Espaciada
-                      </h5>
-                      <p className="text-xs text-slate-400 leading-snug">
-                        Importable con 1 clic en Anki, Quizlet o para estudiar desde Excel.
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                      <button
-                        onClick={handleDownloadCsv}
-                        className="w-full py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
-                      >
-                        <Download className="w-3.5 h-3.5 text-violet-400" />
-                        <span>Bajar Flashcards (.CSV)</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Deliverable 5: 30-Day Plan */}
-                  <div className="p-4 rounded-xl bg-[#140E34] border border-[#2B1F5E] hover:border-sky-400/40 transition-colors flex flex-col justify-between space-y-3 md:col-span-2">
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 bg-sky-400/10 px-2 py-0.5 rounded">
-                          Plan de Acción
-                        </span>
-                        <span className="text-xs text-slate-400">30 Días</span>
-                      </div>
-                      <h5 className="text-sm font-bold text-white">
-                        Ruta de 10 Minutos Diarios: Del Nivel 0 a Hablar Fluido
-                      </h5>
-                      <p className="text-xs text-slate-400 leading-snug">
-                        Cronograma estructurado día por día para instalar reflejos automáticos sin memorizar reglas.
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                      <button
-                        onClick={handleDownloadStudyPlan}
-                        className="w-full py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
-                      >
-                        <Calendar className="w-3.5 h-3.5 text-sky-400" />
-                        <span>Bajar Plan de 30 Días (.TXT)</span>
-                      </button>
-                    </div>
+                            <button
+                              onClick={() => handlePlayVoice(item.id, item.entrecasaNative)}
+                              disabled={isPlaying}
+                              className={`p-3 rounded-xl flex items-center justify-center shrink-0 transition-all cursor-pointer ${
+                                isPlaying
+                                  ? 'bg-amber-400 text-slate-950 animate-pulse'
+                                  : 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 shadow-md shadow-emerald-400/20'
+                              }`}
+                              title="Reproducir frase en la velocidad seleccionada"
+                            >
+                              {isPlaying ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Play className="w-4 h-4 fill-current" />
+                              )}
+                            </button>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Instructions on how to extract and open */}
-              <div className="p-4 rounded-2xl bg-[#0D0922] border border-[#251A4D] space-y-2 text-xs text-slate-300">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <Smartphone className="w-4 h-4 text-amber-400" />
-                  <span>¿Cómo abrir los archivos en tu teléfono?</span>
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
-                  <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <strong className="text-white block font-semibold mb-0.5">🍏 En iPhone / iPad:</strong>
-                    Descargás el archivo, abrís la app <em>Archivos</em> y tocás el archivo para reproducir o leer de inmediato.
+              {/* TAB 3: PAQUETE ZIP (PARA COMPUTADORAS O CON APP) */}
+              {vaultTab === 'zip' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="relative rounded-2xl p-5 sm:p-6 bg-gradient-to-r from-emerald-950/70 via-[#192A32] to-[#141F3B] border-2 border-emerald-400/50 shadow-xl overflow-hidden">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5">
+                      <div className="space-y-2 text-center md:text-left">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-400/20 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
+                          <FolderArchive className="w-3.5 h-3.5 text-amber-400" />
+                          Opción para Computadora o App Descompresora
+                        </div>
+                        <h3 className="text-lg sm:text-xl font-black text-white">
+                          Descargar Paquete Completo (.ZIP)
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                          Descarga en un solo archivo comprimido todos los materiales: la Guía Maestra Imprimible, los 100 Bloques en Cheatsheet, el Reproductor Offline, las Flashcards Anki/Excel y el Plan de 30 días.
+                        </p>
+                      </div>
+
+                      <div className="w-full md:w-auto shrink-0 flex flex-col items-center">
+                        <button
+                          onClick={handleDownloadFullZip}
+                          disabled={isZipping}
+                          className="w-full md:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black text-sm shadow-lg shadow-emerald-400/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                        >
+                          {isZipping ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              <span>Empaquetando ({zipProgress}%)...</span>
+                            </>
+                          ) : (
+                            <>
+                              <FolderArchive className="w-5 h-5" />
+                              <span>Descargar Todo (.ZIP)</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {isZipping && (
+                      <div className="mt-4 pt-4 border-t border-emerald-500/30 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-semibold text-emerald-300">
+                          <span>{zipStepText || 'Generando archivo comprimido...'}</span>
+                          <span>{zipProgress}%</span>
+                        </div>
+                        <div className="w-full bg-black/50 h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-gradient-to-r from-emerald-400 to-teal-300 h-full transition-all duration-300"
+                            style={{ width: `${zipProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
-                    <strong className="text-white block font-semibold mb-0.5">🤖 En Android:</strong>
-                    Se guarda en la carpeta <em>Descargas</em> y lo abrís con la app <em>Files de Google</em> o tu lector preferido.
+
+                  <div className="p-4 rounded-xl bg-[#0F0A28] border border-slate-800 text-xs text-slate-400 space-y-1">
+                    <strong className="text-slate-200 block">¿Cómo descomprimir en PC o Mac?</strong>
+                    <p>En Windows: Hacé clic derecho sobre el archivo ZIP descargado y elegí "Extraer todo". En Mac: Hacé doble clic sobre el archivo ZIP y se descomprime solo.</p>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* TAB 4: AYUDA CELULAR PASO A PASO */}
+              {vaultTab === 'mobile-help' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="p-4 rounded-2xl bg-[#0D0922] border border-[#251A4D] space-y-3 text-xs text-slate-300">
+                    <span className="font-bold text-white text-sm flex items-center gap-2">
+                      <Smartphone className="w-4 h-4 text-amber-400" />
+                      <span>Cómo usar los archivos en tu celular sin aplicaciones raras</span>
+                    </span>
+
+                    <div className="space-y-3 pt-1">
+                      <div className="p-3.5 rounded-xl bg-[#140E34] border border-[#2B1F5E] space-y-1.5">
+                        <strong className="text-emerald-300 text-xs block font-bold">
+                          📱 Opción Más Fácil: No usar el archivo ZIP
+                        </strong>
+                        <p className="text-[11px] text-slate-300 leading-relaxed">
+                          En la pestaña <em>"Para Celular (Sin ZIP)"</em> tocá el botón amarillo <strong>"📖 Abrir y Leer Guía Maestra PDF"</strong> o el botón <strong>"🎧 Escuchar Audios en la Web"</strong>. ¡Todo funciona directamente en tu pantalla!
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-[#140E34] border border-[#2B1F5E] space-y-1.5">
+                        <strong className="text-sky-300 text-xs block font-bold">
+                          🤖 Si estás en un teléfono Android (Samsung, Motorola, Xiaomi):
+                        </strong>
+                        <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-300 leading-relaxed pl-1">
+                          <li>
+                            Si descargás el archivo <strong>.HTML</strong>, tocalo en la lista de descargas y elegí abrirlo con <strong>Google Chrome</strong>.
+                          </li>
+                          <li>
+                            Si ya descargaste el archivo <strong>.ZIP</strong>: abrís la app <strong>Files de Google</strong> (ya viene de fábrica en tu teléfono), vas a la carpeta <em>Descargas</em>, tocás el archivo .ZIP y tocás <strong>"Extraer"</strong>.
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-[#140E34] border border-[#2B1F5E] space-y-1.5">
+                        <strong className="text-amber-300 text-xs block font-bold">
+                          🍏 Si estás en un iPhone o iPad (Apple iOS):
+                        </strong>
+                        <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-300 leading-relaxed pl-1">
+                          <li>
+                            Al tocar <strong>"Leer / Ver PDF"</strong>, se abre el lector completo. Tocás el botón superior <strong>"Imprimir / Guardar PDF"</strong> para guardarlo en la app Libros o Archivos.
+                          </li>
+                          <li>
+                            Si descargaste el archivo <strong>.ZIP</strong>: abrís la app oficial <strong>Archivos</strong> de Apple, tocás <em>Descargas</em> y tocás el archivo .zip <strong>una sola vez</strong>. El iPhone lo descomprime solo en una carpeta normal.
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}

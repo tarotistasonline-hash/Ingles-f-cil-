@@ -123,7 +123,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
 
   const getWhatsAppDeliveryMessage = () => {
     const url = getDeliveryUrl();
-    return `¡Hola! Muchas gracias por tu compra del Audio-Kit de Inglés Fácil y Fluido ($9.990 ARS). 🚀\n\nTu Código de Acceso VIP para desbloquear los materiales es: INGLES9990\n\nAccedé a tu enlace seguro para descargar todos los archivos a tu celular:\n👉 ${url}\n\n(Al ingresar, tu acceso se valida de forma protegida en el servidor y se habilita la descarga del archivo ZIP con los 120 audios MP3 en velocidad pausada y real, la Guía Maestra PDF para imprimir y la App sin conexión). ¡Que lo disfrutes mucho!`;
+    return `¡Hola! Muchas gracias por tu compra del Audio-Kit de Inglés Fácil y Fluido ($9.990 ARS). 🚀\n\nTu Código de Acceso VIP para desbloquear los materiales es: INGLES9990\n\nAccedé a tu enlace seguro para ver y descargar todos los archivos a tu celular:\n👉 ${url}\n\n💡 NOTA IMPORTANTE PARA CELULARES:\nSi tu teléfono no tiene cómo abrir o descomprimir archivos .ZIP, ¡no te preocupes! En ese mismo enlace podés tocar "Abrir Guía Maestra PDF" y "Escuchar Audios en la Web" para usar todo directamente desde tu navegador sin instalar nada, o bajar cada archivo individual suelto. ¡Que lo disfrutes mucho!`;
   };
 
   const handleCopyDeliveryMsg = async () => {
@@ -395,8 +395,15 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
             </div>
           </div>
 
-          {/* Quick Individual Deliverables Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {/* Quick Individual Deliverables Bar (No ZIP required) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-amber-300 font-semibold">
+              <span className="flex items-center gap-1.5">
+                <Smartphone className="w-4 h-4 text-emerald-400" />
+                <span>¿No podés abrir archivos ZIP en tu celular? Tocá cualquier archivo para descargarlo suelto sin comprimir:</span>
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <button
               onClick={handleDownloadMasterHtml}
               className="p-3.5 rounded-xl bg-[#0B1524] border border-[#234257] hover:border-amber-400 text-left space-y-1.5 cursor-pointer transition-all hover:scale-101"
@@ -457,8 +464,9 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               <span className="text-[11px] text-slate-400 block">10 min/día guiados</span>
             </button>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+    )}
 
       {/* 2. What is inside the Kit (The 3 Pillars) */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
