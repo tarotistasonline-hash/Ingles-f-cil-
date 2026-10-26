@@ -11,6 +11,7 @@ import {
   Check,
   ExternalLink,
   Lock,
+  KeyRound,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
@@ -443,8 +444,8 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
               }}
               className="text-xs text-amber-300 hover:text-amber-200 font-semibold inline-flex items-center gap-1.5 hover:underline cursor-pointer"
             >
-              <Lock className="w-3.5 h-3.5 text-amber-400" />
-              <span>¿Ya compraste? Validar código de acceso para descargar</span>
+              <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+              <span>¿Ya pagaste en Mercado Pago? Desbloquear con tu N° de Operación</span>
             </button>
           </div>
         </div>

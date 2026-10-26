@@ -24,7 +24,6 @@ import { Footer } from './components/Footer';
 import { triggerConfetti } from './utils/confetti';
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
 import { SkillLevel } from './types';
-import { Lock, KeyRound } from 'lucide-react';
 import {
   verifyPurchaseOnServer,
   setVerifiedPurchaseSession,
@@ -299,30 +298,7 @@ export default function App() {
         viewMode={viewMode}
         onToggleViewMode={toggleViewMode}
         onOpenKitModal={() => setIsKitModalOpen(true)}
-        onOpenVault={() => setIsVaultModalOpen(true)}
       />
-
-      {/* Protected Access Bar with Verification Gate */}
-      <div className="bg-[#120E2C] border-b border-[#2C1F5C] px-3 py-2 text-center text-xs text-white sticky top-16 z-30 shadow-md">
-        <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-          <span className="flex items-center gap-1.5 font-bold text-amber-300">
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
-            <span>¿Ya pagaste en Mercado Pago ($9.990)?</span>
-          </span>
-          <span className="hidden sm:inline text-slate-300 text-[11px]">
-            Usá el <strong className="text-white">N° de Operación</strong> que te dio MP para desbloquear la descarga:
-          </span>
-          <button
-            onClick={() => {
-              setIsVaultModalOpen(true);
-            }}
-            className="px-3.5 py-1.5 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs cursor-pointer shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
-          >
-            <KeyRound className="w-3.5 h-3.5 text-slate-950" />
-            <span>Desbloquear con N° de Operación</span>
-          </button>
-        </div>
-      </div>
 
       <main className="flex-1">
         {/* MODULAR VIEW (Default: Compact, fast, non-overwhelming) */}
