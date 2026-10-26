@@ -212,7 +212,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs shadow-amber-400"></span>
-              <span>Audio pausado (0.65x) para principiantes</span>
+              <span>3 velocidades de audio (0.65x Lento · 0.8x Pausado · 1.0x Nativo)</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-xs shadow-sky-400"></span>

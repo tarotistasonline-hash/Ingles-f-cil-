@@ -179,9 +179,9 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
               explanation: 'Para quien arranca hoy, saber que "Where is the bathroom" suena "Uer is de baz-rum" evita que la mente se congele al intentar adivinar letras mudas.',
             },
             {
-              point: 'Usa el botón de Audio Ultra Lento (0.6x)',
-              highlight: 'Velocidad Tortuga',
-              explanation: 'Escucha la frase despacio tantas veces como quieras hasta que la boca imite la música natural de las palabras.',
+              point: 'Escucha en las 3 velocidades (0.65x Lento, 0.8x Pausado y 1.0x Nativo)',
+              highlight: 'Velocidad a tu medida',
+              explanation: 'Usa 0.65x para fijarte en cada letra y fonema sin apuro, 0.8x (pausado) para repetir con calma, y 1.0x para acostumbrar el oído a la velocidad nativa.',
             },
             {
               point: 'Aprende 1 o 2 frases por día',
@@ -309,23 +309,24 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
 
                     {/* Dual Audio Speed Buttons */}
                     <div className="flex items-center gap-1.5 shrink-0">
-                      {/* Ultra slow turtle button */}
+                      {/* Ultra slow button */}
                       <button
-                        onClick={() => handlePlayAudio(item.english, item.id, 0.6)}
+                        onClick={() => handlePlayAudio(item.english, item.id, 0.65)}
                         disabled={isPlaying}
                         className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-emerald-500/30 transition-colors flex items-center gap-1 cursor-pointer"
-                        title="Escuchar súper lento (0.6x)"
+                        title="Escuchar en cámara lenta (0.65x) para principiantes"
                       >
                         <Turtle className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">0.6x</span>
+                        <span className="hidden sm:inline">0.65x</span>
+                        <span className="sm:hidden">Lento</span>
                       </button>
 
                       {/* Normal conversational speed */}
                       <button
-                        onClick={() => handlePlayAudio(item.english, item.id, 0.85)}
+                        onClick={() => handlePlayAudio(item.english, item.id, currentSpeed)}
                         disabled={isPlaying}
                         className="px-2.5 py-1.5 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold hover:bg-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
-                        title="Escuchar a ritmo normal"
+                        title="Escuchar a velocidad pausada recomendada (0.8x)"
                       >
                         <Volume2 className="w-3.5 h-3.5" />
                         <span>Play</span>

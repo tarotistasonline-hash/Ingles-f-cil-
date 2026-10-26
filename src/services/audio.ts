@@ -5,11 +5,26 @@
  */
 import { recordAudioListenEvent } from './fluencyTracker';
 
-// Available playback speeds
+// Available playback speeds for audio
 export const SPEED_LEVELS = [
-  { value: 0.65, label: '0.65x', tag: 'Principiante (Muy Lento)' },
-  { value: 0.8, label: '0.8x', tag: 'Pausado (Recomendado)' },
-  { value: 1.0, label: '1.0x', tag: 'Nativo Real' },
+  {
+    value: 0.65,
+    label: '0.65x',
+    shortTag: 'Lento',
+    tag: '0.65x · Muy Lento (Para principiantes, captar cada fonema)',
+  },
+  {
+    value: 0.8,
+    label: '0.8x',
+    shortTag: 'Pausado',
+    tag: '0.8x · Pausado (Ritmo recomendado para aprender)',
+  },
+  {
+    value: 1.0,
+    label: '1.0x',
+    shortTag: 'Nativo',
+    tag: '1.0x · Nativo Real (Velocidad normal cotidiana)',
+  },
 ] as const;
 
 // Default speed set to 0.8x for learners (as requested by user)

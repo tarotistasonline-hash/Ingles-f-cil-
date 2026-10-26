@@ -224,23 +224,34 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
 
           {/* Speed & Confidence Score Trigger */}
           <div className="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
-            {/* Speed toggle for beginners */}
-            <div className="flex items-center gap-1.5 bg-[#14102E] px-3 py-1.5 rounded-xl border border-[#2D245A] text-xs text-slate-300 shadow-xs">
-              <span className="text-slate-400 font-medium">Velocidad:</span>
-              {SPEED_LEVELS.map((lvl) => (
-                <button
-                  key={lvl.value}
-                  onClick={() => onSpeedChange(lvl.value)}
-                  className={`px-2 py-0.5 rounded-md font-semibold transition-colors cursor-pointer ${
-                    currentSpeed === lvl.value
-                      ? 'bg-amber-400 text-slate-950 font-bold'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                  title={lvl.tag}
-                >
-                  {lvl.label}
-                </button>
-              ))}
+            {/* Speed toggle for beginners with explicit labels */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 bg-[#14102E] px-3 py-1.5 rounded-xl border border-[#2D245A] text-xs text-slate-300 shadow-xs">
+              <span className="text-amber-300 font-semibold flex items-center gap-1">
+                <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Velocidad de audio:</span>
+              </span>
+              <div className="flex items-center gap-1">
+                {SPEED_LEVELS.map((lvl) => {
+                  const isSelected = currentSpeed === lvl.value;
+                  return (
+                    <button
+                      key={lvl.value}
+                      onClick={() => onSpeedChange(lvl.value)}
+                      className={`px-2 py-0.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 ${
+                        isSelected
+                          ? 'bg-amber-400 text-slate-950 font-bold shadow-xs ring-1 ring-amber-300'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      }`}
+                      title={lvl.tag}
+                    >
+                      <span>{lvl.label}</span>
+                      <span className={`text-[10px] ${isSelected ? 'text-slate-950 font-bold' : 'text-slate-400'}`}>
+                        ({lvl.shortTag})
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Confidence Score Action Button */}

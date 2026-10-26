@@ -1,5 +1,5 @@
-import React from 'react';
-import { Volume2, LayoutGrid, ScrollText, Headphones } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Volume2, LayoutGrid, ScrollText, Headphones, HelpCircle, X, Check, Info } from 'lucide-react';
 import { SPEED_LEVELS } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
 
@@ -25,6 +25,31 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleViewMode,
   onOpenKitModal,
 }) => {
+  const [showSpeedHelp, setShowSpeedHelp] = useState(false);
+  const speedHelpRef = useRef<HTMLDivElement>(null);
+
+  // Close speed help popover if clicked outside or Esc key pressed
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (speedHelpRef.current && !speedHelpRef.current.contains(event.target as Node)) {
+        setShowSpeedHelp(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setShowSpeedHelp(false);
+      }
+    }
+    if (showSpeedHelp) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showSpeedHelp]);
+
   return (
     <header className="sticky top-0 z-40 bg-[#0C0A1D]/85 backdrop-blur-md border-b border-[#281F54]/80 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -131,28 +156,177 @@ export const Header: React.FC<HeaderProps> = ({
             <RealVisitsBadge compact={true} />
           </div>
 
-          {/* Beginner-friendly Speed Selector */}
-          <div className="flex items-center gap-1 bg-slate-900 border border-slate-700/80 px-2 py-1 rounded-xl shadow-xs">
-            <span className="text-[11px] text-amber-300/90 font-medium hidden sm:inline flex items-center gap-1 pl-1">
-              <Volume2 className="w-3 h-3 text-amber-400" />
-              Audio:
-            </span>
-            <div className="flex items-center gap-0.5">
-              {SPEED_LEVELS.map((lvl) => (
-                <button
-                  key={lvl.value}
-                  onClick={() => onSpeedChange(lvl.value)}
-                  className={`px-2 py-0.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                    currentSpeed === lvl.value
-                      ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-                  title={`${lvl.label} - ${lvl.tag}`}
-                >
-                  {lvl.label}
-                </button>
-              ))}
+          {/* Beginner-friendly Speed Selector with Clear Explanation Popover */}
+          <div className="relative" ref={speedHelpRef}>
+            <div className="flex items-center gap-1 sm:gap-1.5 bg-slate-900/95 border border-amber-400/30 px-2 py-1 rounded-xl shadow-xs">
+              {/* Informative Label & Help Button (Accessible on Mobile and Desktop) */}
+              <button
+                type="button"
+                onClick={() => setShowSpeedHelp((prev) => !prev)}
+                className="text-[11px] font-bold text-amber-300 hover:text-white flex items-center gap-1 pl-0.5 cursor-pointer transition-colors group"
+                title="Toca para ver qué significa 0.65x, 0.8x y 1.0x"
+                aria-label="Información sobre las velocidades de audio"
+              >
+                <Volume2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="hidden sm:inline">Velocidad:</span>
+                <span className="sm:hidden text-[10px]">Vel:</span>
+                <span className="w-4 h-4 rounded-full bg-amber-400/20 text-amber-300 hover:bg-amber-400 hover:text-slate-950 flex items-center justify-center text-[10px] font-black transition-colors">
+                  ?
+                </span>
+              </button>
+
+              {/* Speed Buttons with Clear Tags */}
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                {SPEED_LEVELS.map((lvl) => {
+                  const isSelected = currentSpeed === lvl.value;
+                  return (
+                    <button
+                      key={lvl.value}
+                      onClick={() => onSpeedChange(lvl.value)}
+                      className={`px-1.5 sm:px-2 py-0.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1 ${
+                        isSelected
+                          ? 'bg-amber-400 text-slate-950 font-black shadow-xs ring-1 ring-amber-300'
+                          : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      }`}
+                      title={lvl.tag}
+                    >
+                      <span>{lvl.label}</span>
+                      <span
+                        className={`text-[9px] hidden md:inline font-bold uppercase ${
+                          isSelected ? 'text-slate-950' : 'text-slate-400'
+                        }`}
+                      >
+                        {lvl.shortTag}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
+            {/* Explanatory Dropdown Popover (Works on Mobile without hover) */}
+            {showSpeedHelp && (
+              <div className="absolute right-0 top-full mt-2 w-76 sm:w-84 bg-[#110D2C] border-2 border-amber-400/70 rounded-2xl p-4 shadow-2xl z-50 animate-fade-in text-left">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-2 border-b border-[#2C215C] mb-2.5">
+                  <div className="flex items-center gap-1.5 text-xs font-black text-white">
+                    <Volume2 className="w-4 h-4 text-amber-400" />
+                    <span>¿Qué significan 0.65, 0.8 y 1.0?</span>
+                  </div>
+                  <button
+                    onClick={() => setShowSpeedHelp(false)}
+                    className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                    aria-label="Cerrar explicación"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <p className="text-[11px] text-slate-300 mb-3 leading-relaxed">
+                  Son las <strong>velocidades de reproducción</strong> de los audios nativos en toda la aplicación. Podés cambiarlas en cualquier momento según tu nivel:
+                </p>
+
+                {/* The 3 speeds with full explanations and tap to switch */}
+                <div className="space-y-2 text-xs">
+                  <button
+                    onClick={() => {
+                      onSpeedChange(0.65);
+                      setShowSpeedHelp(false);
+                    }}
+                    className={`w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer ${
+                      currentSpeed === 0.65
+                        ? 'bg-amber-400/20 border-amber-400 text-white shadow-sm'
+                        : 'bg-black/40 border-[#261E52] text-slate-300 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-amber-300 text-xs">
+                        🐢 0.65x — Muy Lento (Principiante)
+                      </span>
+                      {currentSpeed === 0.65 ? (
+                        <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded font-black">
+                          ACTIVO
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">Elegir</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                      Cámara lenta para captar cada letra, unión de palabras y pronunciación sin estrés.
+                    </p>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onSpeedChange(0.8);
+                      setShowSpeedHelp(false);
+                    }}
+                    className={`w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer ${
+                      currentSpeed === 0.8
+                        ? 'bg-emerald-400/20 border-emerald-400 text-white shadow-sm'
+                        : 'bg-black/40 border-[#261E52] text-slate-300 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-emerald-300 text-xs">
+                        🎯 0.8x — Pausado y Claro (Recomendado)
+                      </span>
+                      {currentSpeed === 0.8 ? (
+                        <span className="text-[10px] bg-emerald-400 text-slate-950 px-1.5 py-0.2 rounded font-black">
+                          ACTIVO
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">Elegir</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                      Ritmo óptimo: ni muy rápido ni muy lento. El más cómodo para repetir y hablar fluido.
+                    </p>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onSpeedChange(1.0);
+                      setShowSpeedHelp(false);
+                    }}
+                    className={`w-full text-left p-2.5 rounded-xl border transition-all cursor-pointer ${
+                      currentSpeed === 1.0
+                        ? 'bg-sky-400/20 border-sky-400 text-white shadow-sm'
+                        : 'bg-black/40 border-[#261E52] text-slate-300 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-sky-300 text-xs">
+                        ⚡ 1.0x — Nativo Real (Normal)
+                      </span>
+                      {currentSpeed === 1.0 ? (
+                        <span className="text-[10px] bg-sky-400 text-slate-950 px-1.5 py-0.2 rounded font-black">
+                          ACTIVO
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">Elegir</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                      Velocidad espontánea real tal como hablan los nativos en la calle, el trabajo y películas.
+                    </p>
+                  </button>
+                </div>
+
+                {/* Footer advice */}
+                <div className="mt-3 pt-2.5 border-t border-[#2C215C] flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-emerald-400 font-medium">
+                    ✓ Se guarda solo en tu celular
+                  </span>
+                  <button
+                    onClick={() => setShowSpeedHelp(false)}
+                    className="px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer shadow-xs"
+                  >
+                    Entendido
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
 
