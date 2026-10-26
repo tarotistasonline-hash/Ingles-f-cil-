@@ -24,6 +24,12 @@ import { Footer } from './components/Footer';
 import { triggerConfetti } from './utils/confetti';
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
 import { SkillLevel } from './types';
+import { Lock, KeyRound } from 'lucide-react';
+import {
+  verifyPurchaseOnServer,
+  setVerifiedPurchaseSession,
+  getStoredSessionToken,
+} from './services/purchaseVerification';
 
 export default function App() {
   const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
@@ -58,32 +64,55 @@ export default function App() {
   const [isKitModalOpen, setIsKitModalOpen] = useState(false);
 
   React.useEffect(() => {
-    // Check if user arrived from Mercado Pago payment approval or direct delivery link
-    if (typeof window !== 'undefined') {
+    // SECURE MIDDLEWARE & PURCHASE TOKEN VALIDATION
+    // Validates real purchase session tokens or codes and sanitizes URL to prevent unauthorized reuse
+    const validateIncomingAccess = async () => {
+      if (typeof window === 'undefined') return;
+
       const params = new URLSearchParams(window.location.search);
       const hash = window.location.hash.replace('#', '');
-      const isPostPaymentOrDelivery =
-        params.get('collection_status') === 'approved' ||
-        params.get('status') === 'approved' ||
-        params.get('pago') === 'exitoso' ||
-        params.get('entrega') === 'pack' ||
-        params.get('download') === 'pack' ||
-        params.has('payment_id') ||
-        hash === 'descarga' ||
-        hash === 'pack' ||
-        hash === 'entrega';
+      const token = params.get('token');
+      const paymentId = params.get('payment_id');
+      const code = params.get('code');
 
-      if (isPostPaymentOrDelivery) {
-        try {
-          localStorage.setItem('vibe_kit_purchased', 'true');
-        } catch {
-          // ignore
+      const hadSensitiveParams =
+        params.has('token') ||
+        params.has('payment_id') ||
+        params.has('code') ||
+        params.has('pago') ||
+        params.has('status') ||
+        params.has('collection_status') ||
+        params.has('entrega') ||
+        params.has('download') ||
+        hash === 'descarga' ||
+        hash === 'pack';
+
+      // Only grant access if genuine server-side verification succeeds
+      if (token || paymentId || code) {
+        const res = await verifyPurchaseOnServer({
+          token: token || undefined,
+          paymentId: paymentId || undefined,
+          code: code || undefined,
+        });
+
+        if (res.success && res.sessionToken) {
+          setVerifiedPurchaseSession(res.sessionToken);
+          setIsVaultModalOpen(true);
+          setActiveTab('kit');
+          triggerConfetti({ particleCount: 90, spread: 85 });
         }
-        setIsVaultModalOpen(true);
-        setActiveTab('kit');
-        triggerConfetti({ particleCount: 100, spread: 90 });
       }
-    }
+
+      // MIDDLEWARE CLEANUP:
+      // Immediately sanitize the browser address bar so payment parameters
+      // cannot be bookmarked, refreshed repeatedly, or shared to bypass payment
+      if (hadSensitiveParams) {
+        const cleanPath = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanPath);
+      }
+    };
+
+    validateIncomingAccess();
 
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
@@ -273,24 +302,24 @@ export default function App() {
         onOpenVault={() => setIsVaultModalOpen(true)}
       />
 
-      {/* Mobile-Friendly Quick Download Bar for Buyers */}
-      <div className="bg-gradient-to-r from-emerald-950 via-[#0F261E] to-emerald-950 border-b border-emerald-500/40 px-3 py-2 text-center text-xs text-white sticky top-16 z-30 shadow-md">
+      {/* Protected Access Bar with Verification Gate */}
+      <div className="bg-[#120E2C] border-b border-[#2C1F5C] px-3 py-2 text-center text-xs text-white sticky top-16 z-30 shadow-md">
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-          <span className="flex items-center gap-1.5 font-bold text-emerald-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>¿Ya pagaste tu Audio-Kit ($9.990)?</span>
+          <span className="flex items-center gap-1.5 font-bold text-amber-300">
+            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <span>¿Ya pagaste en Mercado Pago ($9.990)?</span>
           </span>
           <span className="hidden sm:inline text-slate-300 text-[11px]">
-            Descargá el ZIP con los 120 audios MP3 y la Guía Maestra PDF a tu celular:
+            Usá el <strong className="text-white">N° de Operación</strong> que te dio MP para desbloquear la descarga:
           </span>
           <button
             onClick={() => {
               setIsVaultModalOpen(true);
-              triggerConfetti({ particleCount: 50, spread: 60 });
             }}
-            className="px-3 py-1 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs cursor-pointer shadow-sm transition-all flex items-center gap-1 active:scale-95"
+            className="px-3.5 py-1.5 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs cursor-pointer shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
           >
-            <span>📥 Descargar mis Archivos</span>
+            <KeyRound className="w-3.5 h-3.5 text-slate-950" />
+            <span>Desbloquear con N° de Operación</span>
           </button>
         </div>
       </div>

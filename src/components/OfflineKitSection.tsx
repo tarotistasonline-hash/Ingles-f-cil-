@@ -19,6 +19,7 @@ import {
   MessageCircle,
   Copy,
   CheckCheck,
+  KeyRound,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
@@ -100,21 +101,29 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
       return OFFICIAL_MERCADO_PAGO_URL;
     }
   });
+  const [sellerWhatsApp, setSellerWhatsApp] = useState<string>(() => {
+    try {
+      return localStorage.getItem('vibe_whatsapp_number') || '';
+    } catch {
+      return '';
+    }
+  });
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [tempCheckoutUrl, setTempCheckoutUrl] = useState(customCheckoutUrl);
+  const [tempSellerWhatsApp, setTempSellerWhatsApp] = useState(sellerWhatsApp);
   const [copiedDeliveryMsg, setCopiedDeliveryMsg] = useState(false);
   const [copiedRedirectUrl, setCopiedRedirectUrl] = useState(false);
 
   const getDeliveryUrl = () => {
     if (typeof window !== 'undefined' && window.location && window.location.origin) {
-      return `${window.location.origin}/?pago=exitoso#descarga`;
+      return `${window.location.origin}/?code=INGLES9990`;
     }
-    return 'https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/?pago=exitoso#descarga';
+    return 'https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/?code=INGLES9990';
   };
 
   const getWhatsAppDeliveryMessage = () => {
     const url = getDeliveryUrl();
-    return `¡Hola! Muchas gracias por tu compra del Audio-Kit de Inglés Fácil y Fluido ($9.990 ARS). 🚀\n\nAcá tenés tu enlace exclusivo y directo para descargar todo el material a tu celular o compu:\n👉 ${url}\n\nAl ingresar vas a tener acceso inmediato para descargar el paquete ZIP completo (audios MP3 pausados y velocidad real), la Guía Maestra PDF, la App Offline y el plan de estudio de 30 días. ¡Que lo disfrutes mucho!`;
+    return `¡Hola! Muchas gracias por tu compra del Audio-Kit de Inglés Fácil y Fluido ($9.990 ARS). 🚀\n\nTu Código de Acceso VIP para desbloquear los materiales es: INGLES9990\n\nAccedé a tu enlace seguro para descargar todos los archivos a tu celular:\n👉 ${url}\n\n(Al ingresar, tu acceso se valida de forma protegida en el servidor y se habilita la descarga del archivo ZIP con los 120 audios MP3 en velocidad pausada y real, la Guía Maestra PDF para imprimir y la App sin conexión). ¡Que lo disfrutes mucho!`;
   };
 
   const handleCopyDeliveryMsg = async () => {
@@ -161,16 +170,25 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
     }
   };
 
-  const handleSaveCheckoutUrl = (e: React.FormEvent) => {
+  const handleSaveConfig = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanUrl = tempCheckoutUrl.trim();
+    const cleanPhone = tempSellerWhatsApp.trim();
     setCustomCheckoutUrl(cleanUrl);
+    setSellerWhatsApp(cleanPhone);
     try {
       if (cleanUrl) {
         localStorage.setItem('vibe_custom_checkout_url', cleanUrl);
       } else {
         localStorage.removeItem('vibe_custom_checkout_url');
       }
+
+      if (cleanPhone) {
+        localStorage.setItem('vibe_whatsapp_number', cleanPhone);
+      } else {
+        localStorage.removeItem('vibe_whatsapp_number');
+      }
+      window.dispatchEvent(new Event('vibe_whatsapp_updated'));
     } catch {
       // ignore
     }
@@ -698,34 +716,58 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               </p>
             </div>
 
-            {/* Buyer Download Access Bar */}
-            <div className="w-full max-w-xl mx-auto p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
-                  <Download className="w-5 h-5" />
+            {/* Buyer Verification & Download Access Bar: Unlocking with Mercado Pago Operation Number */}
+            <div className="w-full max-w-xl mx-auto p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#1A1140] via-[#140D33] to-[#0D0924] border-2 border-emerald-400/60 flex flex-col space-y-3.5 text-left shadow-xl">
+              <div className="flex items-center justify-between gap-2 border-b border-[#2B205D] pb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-400/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-400/30">
+                    <KeyRound className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5">
+                      <span>¿Cómo desbloquear tu descarga tras pagar?</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/40 font-bold uppercase">
+                        100% Automático
+                      </span>
+                    </h4>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
-                    <span>¿Ya compraste y necesitás tu pack?</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950 font-black">DESCARGA INMEDIATA</span>
-                  </h4>
-                  <p className="text-[11px] text-slate-300">
-                    Abrí tu bóveda para bajar el ZIP completo, la Guía Maestra PDF y audios MP3.
+              </div>
+
+              {/* 3 Simple Steps */}
+              <div className="space-y-2 text-xs text-slate-200">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl bg-black/40 border border-slate-800/80">
+                  <span className="w-5 h-5 rounded-full bg-emerald-400/20 text-emerald-300 font-bold flex items-center justify-center shrink-0 text-[11px] border border-emerald-400/40">1</span>
+                  <p className="leading-snug">
+                    Completás el pago de <strong>$9.990 ARS</strong> en Mercado Pago.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2.5 p-2 rounded-xl bg-black/40 border border-slate-800/80">
+                  <span className="w-5 h-5 rounded-full bg-amber-400/20 text-amber-300 font-bold flex items-center justify-center shrink-0 text-[11px] border border-amber-400/40">2</span>
+                  <p className="leading-snug">
+                    Mercado Pago te muestra en pantalla tu <strong className="text-amber-300">"Número de Operación"</strong> (ej: #1048593812) y te envía el comprobante por email.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2.5 p-2 rounded-xl bg-black/40 border border-slate-800/80">
+                  <span className="w-5 h-5 rounded-full bg-sky-400/20 text-sky-300 font-bold flex items-center justify-center shrink-0 text-[11px] border border-sky-400/40">3</span>
+                  <p className="leading-snug">
+                    Tocás el botón verde de abajo, pegás ese número y <strong className="text-emerald-400">se descargan tus 120 audios MP3 y la Guía Maestra PDF al instante</strong>.
                   </p>
                 </div>
               </div>
+
               <button
                 onClick={() => {
                   if (onOpenVault) {
                     onOpenVault();
-                  } else {
-                    setShowSuccessModal(true);
                   }
                 }}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 text-xs font-black shrink-0 transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-400 to-emerald-300 hover:from-emerald-300 hover:to-emerald-200 text-slate-950 text-xs sm:text-sm font-black transition-all shadow-lg shadow-emerald-400/20 cursor-pointer flex items-center justify-center gap-2 active:scale-98"
               >
-                <span>Descargar mi Pack</span>
-                <ArrowRight className="w-4 h-4" />
+                <KeyRound className="w-4 h-4 text-slate-950" />
+                <span>¿Ya pagaste? Desbloquear con N° de Operación de Mercado Pago</span>
               </button>
             </div>
           </div>
@@ -771,8 +813,8 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
         <div className="space-y-3 max-w-2xl mx-auto pt-2">
           {[
             {
-              q: '¿Cómo recibo el material una vez realizado el pago?',
-              a: 'De forma inmediata y 100% automática. En el momento en que se confirma el pago, recibís un correo electrónico con el enlace seguro de descarga directa del archivo ZIP con todos los MP3 ordenados y el PDF en alta resolución.',
+              q: '¿Cómo recibo y descargo el material una vez realizado el pago?',
+              a: '¡Es súper fácil y 100% automático! Al terminar el pago en Mercado Pago, en tu pantalla y en el comprobante que llega a tu correo aparece tu "Número de Operación" (ej: #1048593812). Volvés a esta página web, tocás "Desbloquear con N° de Operación", ingresás ese número y tus 120 audios MP3 y la Guía Maestra PDF se descargan inmediatamente a tu celular o computadora.',
             },
             {
               q: '¿Es una suscripción mensual o un solo pago?',
@@ -834,26 +876,27 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               </button>
             </div>
 
-            {/* SECCIÓN URGENTE: Cliente que ya pagó */}
-            <div className="bg-gradient-to-br from-amber-950/40 via-[#1F1735] to-emerald-950/30 border-2 border-amber-400/50 rounded-2xl p-4 sm:p-5 space-y-4">
+            {/* SECCIÓN DE SEGURIDAD Y ENTREGA A COMPRADORES */}
+            <div className="bg-gradient-to-br from-emerald-950/40 via-[#1F1735] to-[#120E2E] border-2 border-emerald-400/50 rounded-2xl p-4 sm:p-5 space-y-4">
               <div className="flex items-start gap-2.5">
-                <span className="text-xl">🚨</span>
+                <span className="text-xl">🛡️</span>
                 <div>
-                  <h3 className="text-sm font-black text-white">
-                    ¿A una persona que compró no le llegó el pack?
+                  <h3 className="text-sm font-black text-white flex items-center gap-2">
+                    <span>Bóveda 100% Blindada con Tokens de Seguridad</span>
+                    <span className="text-[10px] bg-emerald-400/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded font-mono font-bold">ACTIVO</span>
                   </h3>
                   <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                    <strong className="text-amber-300">¿Por qué sucede?</strong> Mercado Pago únicamente cobra el dinero; no aloja ni envía archivos por sí solo salvo que le indiques a dónde redirigir al comprador al finalizar la compra.
+                    <strong className="text-emerald-400">Protección contra descargas no autorizadas:</strong> Las descargas ya no son públicas. Para acceder a los 120 audios y al PDF, el comprador debe ingresar su <strong className="text-amber-300">Código VIP (INGLES9990)</strong> o su número de comprobante de Mercado Pago.
                   </p>
                 </div>
               </div>
 
-              {/* Solución 1: Inmediata para el cliente actual */}
+              {/* Solución 1: Enviar al comprador actual */}
               <div className="bg-[#0B081E] border border-[#2F2360] rounded-xl p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Paso 1: Enviale este mensaje ahora mismo por WhatsApp o Email</span>
+                    <span>Enviale este mensaje con su Código VIP por WhatsApp o Email:</span>
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-black/60 border border-slate-800 text-[11px] text-slate-300 font-mono leading-relaxed select-all">
@@ -898,56 +941,45 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 </div>
               </div>
 
-              {/* Solución 2: Automática para futuros compradores (Web / PC) o WhatsApp */}
+              {/* Solución en Celular: Cómo saber el contacto del comprador y entregar sin PC */}
               <div className="bg-[#0B081E] border border-[#2F2360] rounded-xl p-3.5 space-y-3 text-xs text-slate-300">
                 <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4" />
-                  <span>¿Por qué no te aparece "Modo avanzado" en Mercado Pago?</span>
+                  <Smartphone className="w-4 h-4 text-emerald-400" />
+                  <span>¿Cómo sé los datos del comprador desde la app de Mercado Pago?</span>
                 </span>
                 
-                <div className="p-2.5 rounded-lg bg-amber-400/10 border border-amber-400/20 text-slate-300 space-y-1.5 text-[11px] leading-relaxed">
+                <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-slate-300 space-y-2 text-[11px] leading-relaxed">
                   <p>
-                    ⚠️ <strong className="text-amber-300">Si estás usando la aplicación de Mercado Pago en tu celular:</strong> Mercado Pago oculta deliberadamente las "Opciones avanzadas" y la redirección en la app móvil. Solo muestra título y precio.
+                    📱 <strong className="text-emerald-300">Mercado Pago NO muestra el número de WhatsApp</strong> por políticas de privacidad de datos personales. 
                   </p>
                   <p>
-                    💻 <strong className="text-white">Para que aparezca la opción:</strong> Tenés que entrar desde una <strong className="text-white">computadora</strong> en <span className="text-sky-300 font-mono">mercadopago.com.ar</span> (o abrir Chrome en el celular y activar los 3 puntitos &gt; <em>"Sitio para computadoras"</em>).
+                    Pero en tu celular, cuando abrís la app de Mercado Pago y vas a <strong className="text-white">"Actividad"</strong> y tocás el cobro de <strong className="text-emerald-300">$9.990</strong>, te muestra:
                   </p>
+                  <ul className="list-disc list-inside space-y-1 text-slate-200 font-semibold pl-1">
+                    <li><span className="text-amber-300">Número de Operación</span> (ej: #1045892341)</li>
+                    <li><span className="text-emerald-300">Nombre completo</span> del cliente</li>
+                    <li><span className="text-sky-300">Email del comprador</span> (asociado a su pago)</li>
+                  </ul>
                 </div>
 
                 <div className="space-y-2 pt-1 text-[11px]">
-                  <strong className="text-emerald-400 block font-bold">
-                    🚀 Las 2 formas más sencillas de entregar sin complicarte con Mercado Pago:
+                  <strong className="text-white block font-bold">
+                    🚀 Las 3 formas de entregar el pack 100% desde tu celular:
                   </strong>
                   
                   <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
-                    <strong className="text-white block font-semibold">Método 1 (Inmediato - Sin configurar nada):</strong>
-                    <span>Cuando un cliente te pague, Mercado Pago te avisa a tu celular. Tocás el botón verde de arriba <strong className="text-emerald-300">"Copiar Mensaje para WhatsApp"</strong> y se lo pegás por chat o email. ¡Le llega el link y descarga al instante!</span>
+                    <strong className="text-emerald-400 block font-semibold">1. Desbloqueo Automático (¡El comprador no necesita que le mandes nada!):</strong>
+                    <span>En el momento en que la persona paga, Mercado Pago le muestra su <em>"Operación #1234567890"</em> y se lo envía a su mail. El comprador entra a esta web, toca <strong className="text-white">"Validar Acceso"</strong>, pega su número de operación y la descarga se libera automáticamente.</span>
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
-                    <strong className="text-white block font-semibold">Método 2 (El comprador descarga directo desde la web):</strong>
-                    <span>En esta misma aplicación web ya dejamos un botón visible en la cabecera y en la sección del Kit: <strong className="text-white">"¿Ya compraste? [Descargar mi Pack]"</strong>. Le decís a la persona: <em>"Entrá a la página y tocá 'Descargar mi Pack'"</em> y se le abre la bóveda completa de inmediato.</span>
+                    <strong className="text-amber-300 block font-semibold">2. El comprador te escribe a TU WhatsApp:</strong>
+                    <span>Configurá tu WhatsApp en el formulario de abajo. El botón flotante en la web le permitirá al comprador tocar <em>"Chatear por WhatsApp"</em> y te llegará un mensaje directo con su comprobante para que le des el código <strong className="text-white">INGLES9990</strong>.</span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1.5">
-                    <strong className="text-white block font-semibold">Método 3 (Si querés la redirección automática desde la PC):</strong>
-                    <ol className="list-decimal list-inside space-y-1 pl-1 text-slate-300">
-                      <li>Entrá en <span className="text-sky-300 font-mono">mercadopago.com.ar</span> desde tu computadora.</li>
-                      <li>Andá a <strong>Links de pago</strong> &gt; Editá tu link.</li>
-                      <li>Hacé clic en <strong>"Más opciones"</strong> abajo del precio y activá <strong>"Redireccionar al finalizar la compra"</strong>.</li>
-                      <li>Pegá esta URL:
-                        <div className="mt-1 flex items-center gap-2 p-1.5 rounded bg-black/60 border border-slate-800 text-[10px] font-mono text-emerald-400 overflow-x-auto">
-                          <span className="truncate">{getDeliveryUrl()}</span>
-                          <button
-                            type="button"
-                            onClick={handleCopyRedirectUrl}
-                            className="text-xs px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded shrink-0 cursor-pointer"
-                          >
-                            {copiedRedirectUrl ? 'Copiado' : 'Copiar'}
-                          </button>
-                        </div>
-                      </li>
-                    </ol>
+                  <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
+                    <strong className="text-sky-300 block font-semibold">3. Tocar el Email en la app de Mercado Pago:</strong>
+                    <span>En tu celular, al tocar el cobro en Mercado Pago, tocás el email del comprador. Se te abre Gmail directamente y le pegás el mensaje de entrega con un solo clic.</span>
                   </div>
                 </div>
               </div>
@@ -973,25 +1005,41 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               </div>
             </div>
 
-            <form onSubmit={handleSaveCheckoutUrl} className="space-y-4 pt-1 border-t border-[#2B205D]">
+            <form onSubmit={handleSaveConfig} className="space-y-4 pt-1 border-t border-[#2B205D]">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Tu Enlace de Mercado Pago (o pasarela internacional):
+                  Tu Enlace de Mercado Pago:
                 </label>
                 <input
                   type="url"
-                  placeholder="https://mpago.la/abc1234"
+                  placeholder="https://mpago.li/..."
                   value={tempCheckoutUrl}
                   onChange={(e) => setTempCheckoutUrl(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Tu Número de WhatsApp para Soporte (Opcional):
+                </label>
+                <input
+                  type="tel"
+                  placeholder="Ej: +5491123456789 o 1123456789"
+                  value={tempSellerWhatsApp}
+                  onChange={(e) => setTempSellerWhatsApp(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Si ponés tu número, el botón de WhatsApp de la página abrirá un chat directo contigo.
+                </p>
+              </div>
+
               {tempCheckoutUrl && (
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-emerald-400 flex items-center gap-1">
                     <Check className="w-3.5 h-3.5" />
-                    Enlace listo para guardar
+                    Configuración lista para guardar
                   </span>
                   <a
                     href={tempCheckoutUrl}
@@ -999,7 +1047,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                     rel="noopener noreferrer"
                     className="text-amber-300 hover:underline flex items-center gap-1 font-semibold"
                   >
-                    <span>Probar enlace en nueva pestaña</span>
+                    <span>Probar enlace de cobro</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
@@ -1009,7 +1057,8 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    setTempCheckoutUrl('');
+                    setTempCheckoutUrl(OFFICIAL_MERCADO_PAGO_URL);
+                    setTempSellerWhatsApp('');
                   }}
                   className="text-xs text-rose-400 hover:underline cursor-pointer"
                 >
@@ -1027,7 +1076,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                     type="submit"
                     className="px-4 py-2 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 cursor-pointer shadow-md"
                   >
-                    Guardar Enlace
+                    Guardar Configuración
                   </button>
                 </div>
               </div>

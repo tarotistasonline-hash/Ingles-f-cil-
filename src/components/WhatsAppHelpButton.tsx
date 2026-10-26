@@ -19,9 +19,27 @@ export const WhatsAppHelpButton: React.FC<WhatsAppHelpButtonProps> = ({
     }
   });
 
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      try {
+        const updated = localStorage.getItem('vibe_whatsapp_number') || '';
+        setPhoneNumber(updated);
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('vibe_whatsapp_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('vibe_whatsapp_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
   const encodedMsg = encodeURIComponent(defaultMessage);
-  const waUrl = phoneNumber
-    ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodedMsg}`
+  const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+  const waUrl = cleanPhone
+    ? `https://wa.me/${cleanPhone}?text=${encodedMsg}`
     : `https://wa.me/?text=${encodedMsg}`;
 
   return (

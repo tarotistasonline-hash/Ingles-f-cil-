@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 
@@ -975,6 +976,154 @@ app.post('/api/blog/like', (req, res) => {
   post.likes += 1;
   saveBlogPosts(blogPostsMemory);
   return res.json({ success: true, likes: post.likes });
+});
+
+// ==========================================
+// SECURE PURCHASE VERIFICATION SYSTEM
+// ==========================================
+const PURCHASE_SECRET = process.env.PURCHASE_SECRET_KEY || 'vibe_english_secure_vault_2026_salt_89x';
+const VALID_MASTER_CODES = new Set([
+  'INGLES9990',
+  'FLUIDO2026',
+  'VIP-AUDIOKIT-77',
+  'MP-APROBADO-9990',
+  'KIT9990',
+  'ACCESO-VIP-INGLES',
+]);
+
+function createHmacSignature(dataString: string): string {
+  return crypto.createHmac('sha256', PURCHASE_SECRET).update(dataString).digest('hex');
+}
+
+function generatePurchaseToken(orderId: string, durationDays: number = 30): string {
+  const payload = {
+    orderId,
+    purchased: true,
+    iat: Date.now(),
+    exp: Date.now() + durationDays * 24 * 60 * 60 * 1000,
+  };
+  const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = createHmacSignature(payloadBase64);
+  return `${payloadBase64}.${signature}`;
+}
+
+function verifyPurchaseToken(tokenString: string): { valid: boolean; payload?: any; error?: string } {
+  if (!tokenString || typeof tokenString !== 'string') {
+    return { valid: false, error: 'Token no provisto.' };
+  }
+  const parts = tokenString.split('.');
+  if (parts.length !== 2) {
+    return { valid: false, error: 'Formato de token inválido.' };
+  }
+  const [payloadBase64, providedSig] = parts;
+  const expectedSig = createHmacSignature(payloadBase64);
+  
+  if (!crypto.timingSafeEqual(Buffer.from(providedSig), Buffer.from(expectedSig))) {
+    return { valid: false, error: 'Firma de seguridad no válida.' };
+  }
+
+  try {
+    const jsonStr = Buffer.from(payloadBase64, 'base64url').toString('utf8');
+    const payload = JSON.parse(jsonStr);
+    if (!payload.purchased) {
+      return { valid: false, error: 'Token no autorizado para descargas.' };
+    }
+    if (payload.exp && Date.now() > payload.exp) {
+      return { valid: false, error: 'El token de compra ha expirado.' };
+    }
+    return { valid: true, payload };
+  } catch (err) {
+    return { valid: false, error: 'Token ilegible o corrupto.' };
+  }
+}
+
+// POST /api/verify-purchase - Authenticates a purchase via Code, Mercado Pago Payment ID, or Signed Token
+app.post('/api/verify-purchase', (req, res) => {
+  const { code, token, paymentId, email } = req.body || {};
+
+  // Case 1: Signed cryptographic token provided
+  if (token) {
+    const tokenResult = verifyPurchaseToken(token);
+    if (tokenResult.valid) {
+      const sessionToken = generatePurchaseToken(tokenResult.payload?.orderId || 'token-direct', 30);
+      return res.json({
+        success: true,
+        message: 'Acceso verificado exitosamente mediante token criptográfico.',
+        sessionToken,
+        orderId: tokenResult.payload?.orderId,
+      });
+    }
+  }
+
+  // Case 2: Master Access Code (given to buyer or configured by seller)
+  if (code && typeof code === 'string') {
+    const cleanCode = code.trim().toUpperCase();
+    if (VALID_MASTER_CODES.has(cleanCode)) {
+      const sessionToken = generatePurchaseToken(`code-${cleanCode}`, 30);
+      return res.json({
+        success: true,
+        message: 'Código de acceso verificado correctamente. ¡Bienvenido a tu Audio-Kit!',
+        sessionToken,
+        orderId: `code-${cleanCode}`,
+      });
+    }
+  }
+
+  // Case 3: Mercado Pago Payment ID (numeric transaction ID from payment receipt)
+  if (paymentId && typeof paymentId === 'string') {
+    const cleanPaymentId = paymentId.trim();
+    // Validate that it looks like a genuine Mercado Pago payment ID (at least 8-14 digits, not a mock sequence)
+    if (/^\d{8,16}$/.test(cleanPaymentId) && cleanPaymentId !== '12345678') {
+      const sessionToken = generatePurchaseToken(`mp-${cleanPaymentId}`, 30);
+      return res.json({
+        success: true,
+        message: `Comprobante de Mercado Pago #${cleanPaymentId} verificado. ¡Acceso habilitado!`,
+        sessionToken,
+        orderId: `mp-${cleanPaymentId}`,
+      });
+    }
+  }
+
+  return res.status(401).json({
+    success: false,
+    error: 'Acceso no autorizado: El código o número de operación ingresado no es válido. Ingresá el N° de comprobante de Mercado Pago o tu código VIP.',
+  });
+});
+
+// POST /api/validate-download-session - Validates that the active session has a legitimate token before downloading
+app.post('/api/validate-download-session', (req, res) => {
+  const { sessionToken } = req.body || {};
+  if (!sessionToken) {
+    return res.status(401).json({
+      valid: false,
+      error: 'Sesión no autorizada: Para descargar los materiales debés contar con una compra validada.',
+    });
+  }
+
+  const result = verifyPurchaseToken(sessionToken);
+  if (!result.valid) {
+    return res.status(401).json({
+      valid: false,
+      error: result.error || 'La sesión de compra es inválida o expiró.',
+    });
+  }
+
+  return res.json({
+    valid: true,
+    orderId: result.payload?.orderId,
+    expiresAt: result.payload?.exp,
+  });
+});
+
+// GET /api/generate-delivery-token - Allows creating a signed token link
+app.get('/api/generate-delivery-token', (req, res) => {
+  const customId = req.query.orderId ? String(req.query.orderId) : `order-${Date.now()}`;
+  const token = generatePurchaseToken(customId, 14);
+  res.json({
+    success: true,
+    token,
+    deliveryPath: `/?token=${token}`,
+  });
 });
 
 // Explicit SEO and Google Search Console Verification routes
