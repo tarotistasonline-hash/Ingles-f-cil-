@@ -272,45 +272,6 @@ function saveAudioToDiskCache(cacheKey: string, buffer: Buffer) {
   }
 }
 
-/**
- * Generates a valid standard 16-bit Mono PCM WAV buffer.
- * Ensures browsers and phones never experience broken/unplayable audio streams.
- */
-function createBasicWavBuffer(sampleRate = 22050, durationSec = 1.2, baseFreq = 523.25): Buffer {
-  const numSamples = Math.floor(sampleRate * durationSec);
-  const dataSize = numSamples * 2;
-  const buffer = Buffer.alloc(44 + dataSize);
-
-  // RIFF header
-  buffer.write('RIFF', 0);
-  buffer.writeUInt32LE(36 + dataSize, 4);
-  buffer.write('WAVE', 8);
-  buffer.write('fmt ', 12);
-  buffer.writeUInt32LE(16, 16);
-  buffer.writeUInt16LE(1, 20); // PCM
-  buffer.writeUInt16LE(1, 22); // Mono
-  buffer.writeUInt32LE(sampleRate, 24);
-  buffer.writeUInt32LE(sampleRate * 2, 28);
-  buffer.writeUInt16LE(2, 32);
-  buffer.writeUInt16LE(16, 34);
-  buffer.write('data', 36);
-  buffer.writeUInt32LE(dataSize, 40);
-
-  for (let i = 0; i < numSamples; i++) {
-    const t = i / sampleRate;
-    const attack = Math.min(1, t / 0.05);
-    const release = Math.min(1, (durationSec - t) / 0.1);
-    const env = Math.max(0, attack * release);
-    const sample =
-      Math.sin(2 * Math.PI * baseFreq * t) * 0.4 +
-      Math.sin(2 * Math.PI * (baseFreq * 1.5) * t) * 0.2;
-    const intSample = Math.floor(sample * env * 32767);
-    buffer.writeInt16LE(Math.max(-32768, Math.min(32767, intSample)), 44 + i * 2);
-  }
-
-  return buffer;
-}
-
 // 1. Voice TTS Endpoint
 app.post('/api/generate-tts', async (req, res) => {
   const { text, voice = 'Kore', speed = 0.8 } = req.body;
@@ -457,8 +418,7 @@ app.get('/api/audio-stream', async (req, res) => {
   }
 
   if (!ai || Date.now() < ttsCooldownUntil) {
-    const fallbackBuffer = createBasicWavBuffer(22050, 1.2, 523.25);
-    return sendAudioBuffer(fallbackBuffer);
+    return res.status(503).send('Audio service temporarily unavailable, use client speech');
   }
 
   try {
@@ -506,15 +466,13 @@ app.get('/api/audio-stream', async (req, res) => {
       return sendAudioBuffer(buffer);
     }
 
-    const fallbackBuffer = createBasicWavBuffer(22050, 1.2, 523.25);
-    return sendAudioBuffer(fallbackBuffer);
+    return res.status(500).send('No audio generated');
   } catch (err: any) {
     const errMsg = err?.message || '';
     if (err?.status === 429 || errMsg.includes('429') || errMsg.includes('quota')) {
       ttsCooldownUntil = Date.now() + 45000;
     }
-    const fallbackBuffer = createBasicWavBuffer(22050, 1.2, 523.25);
-    return sendAudioBuffer(fallbackBuffer);
+    return res.status(500).send('Error generating audio stream');
   }
 });
 
@@ -555,8 +513,7 @@ app.get('/api/audio-download', async (req, res) => {
   }
 
   if (!ai || Date.now() < ttsCooldownUntil) {
-    const fallbackBuffer = createBasicWavBuffer(22050, 1.5, 440);
-    return sendDownload(fallbackBuffer);
+    return res.status(503).send('Audio temporarily unavailable');
   }
 
   try {
@@ -592,11 +549,9 @@ app.get('/api/audio-download', async (req, res) => {
       saveAudioToDiskCache(cacheKey, buffer);
       return sendDownload(buffer);
     }
-    const fallbackBuffer = createBasicWavBuffer(22050, 1.5, 440);
-    return sendDownload(fallbackBuffer);
+    return res.status(500).send('No audio data');
   } catch {
-    const fallbackBuffer = createBasicWavBuffer(22050, 1.5, 440);
-    return sendDownload(fallbackBuffer);
+    return res.status(500).send('Error generating audio file');
   }
 });
 
@@ -876,10 +831,10 @@ interface StoredVisits {
   lastVisitTimestamp: string;
 }
 
-// Session debounce: 10 seconds cooldown per visitor ID to prevent accidental double-clicks,
+// Session debounce: 25 seconds cooldown per visitor ID to prevent accidental double-clicks,
 // while guaranteeing that all real visits, testers, and student sessions are accurately counted!
 const activeVisitorSessions = new Map<string, number>();
-const SESSION_COOLDOWN_MS = 10 * 1000;
+const SESSION_COOLDOWN_MS = 25 * 1000;
 
 function loadKnownVisitors(): Set<string> {
   try {
@@ -1018,24 +973,6 @@ app.post('/api/visits/record', (req, res) => {
 
   saveVisitsData(visitsData);
 
-  return res.json({
-    totalVisits: visitsData.totalVisits,
-    uniqueVisitors: visitsData.uniqueVisitors,
-    todayVisits: visitsData.todayVisits,
-    creatorSessionsExcluded: visitsData.creatorSessionsExcluded,
-    lastVisitTimestamp: visitsData.lastVisitTimestamp,
-    wasCounted: true,
-  });
-});
-
-// Explicit test increment endpoint for testing visits
-app.post('/api/visits/test-increment', (_req, res) => {
-  checkDailyReset();
-  visitsData.totalVisits += 1;
-  visitsData.todayVisits += 1;
-  visitsData.uniqueVisitors += 1;
-  visitsData.lastVisitTimestamp = new Date().toISOString();
-  saveVisitsData(visitsData);
   return res.json({
     totalVisits: visitsData.totalVisits,
     uniqueVisitors: visitsData.uniqueVisitors,

@@ -57,49 +57,18 @@ export function setGlobalAudioSpeed(speed: number) {
 // Global audio tracking and mobile audio unlock pipeline
 let currentAudio: HTMLAudioElement | null = null;
 let sharedAudioContext: AudioContext | null = null;
-let sharedAudioElement: HTMLAudioElement | null = null;
 let isMobileAudioUnlocked = false;
 const clientAudioCache = new Map<string, string>();
 
 /**
- * Singleton persistent DOM-bound HTMLAudioElement for mobile stability.
- * Mobile Safari / Chrome grant uninterrupted media playback to DOM-connected elements.
- */
-export function getSharedAudio(): HTMLAudioElement {
-  if (typeof window === 'undefined') {
-    return {} as HTMLAudioElement;
-  }
-  if (!sharedAudioElement) {
-    const existing = document.getElementById('vibe-shared-audio-player') as HTMLAudioElement;
-    if (existing) {
-      sharedAudioElement = existing;
-    } else {
-      sharedAudioElement = document.createElement('audio');
-      sharedAudioElement.id = 'vibe-shared-audio-player';
-      sharedAudioElement.setAttribute('playsinline', 'true');
-      sharedAudioElement.setAttribute('webkit-playsinline', 'true');
-      sharedAudioElement.setAttribute('x-webkit-airplay', 'allow');
-      sharedAudioElement.preload = 'auto';
-      sharedAudioElement.style.position = 'fixed';
-      sharedAudioElement.style.bottom = '-9999px';
-      sharedAudioElement.style.left = '-9999px';
-      sharedAudioElement.style.opacity = '0';
-      sharedAudioElement.style.pointerEvents = 'none';
-      document.body.appendChild(sharedAudioElement);
-    }
-  }
-  return sharedAudioElement;
-}
-
-/**
- * Mobile Audio Unlocker: Pre-warms the browser's audio subsystem on user touch/click.
+ * Mobile Audio Unlocker: Pre-warms the browser's audio subsystem on first user touch/click.
  * Crucial for mobile Safari & Android Chrome so subsequent audio plays instantly without gesture blockage.
  */
 export function unlockMobileAudio(): void {
-  if (typeof window === 'undefined') return;
+  if (isMobileAudioUnlocked || typeof window === 'undefined') return;
 
   try {
-    // 1. Web Audio Context Unlock
+    // 1. Unlock Web Audio Context
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (AudioCtx) {
       if (!sharedAudioContext) {
@@ -108,7 +77,7 @@ export function unlockMobileAudio(): void {
       if (sharedAudioContext.state === 'suspended') {
         sharedAudioContext.resume().catch(() => {});
       }
-      // Play a short micro-buffer (1 sample) to satisfy iOS WebKit
+      // Play a short silent buffer to satisfy iOS WebKit
       const buffer = sharedAudioContext.createBuffer(1, 1, 22050);
       const source = sharedAudioContext.createBufferSource();
       source.buffer = buffer;
@@ -116,16 +85,10 @@ export function unlockMobileAudio(): void {
       source.start(0);
     }
 
-    // 2. Pre-warm and resume SpeechSynthesis voices
+    // 2. Pre-warm SpeechSynthesis voices
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
-      if (window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
-      }
     }
-
-    // 3. Ensure shared DOM audio element is initialized
-    getSharedAudio();
 
     isMobileAudioUnlocked = true;
   } catch {
@@ -255,7 +218,6 @@ export function speakWithWebSpeech(
   }
   try {
     window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
     const clean = cleanSpeechText(text);
     const utterance = new SpeechSynthesisUtterance(clean);
     utterance.lang = 'en-US';
@@ -287,6 +249,7 @@ export function speakWithWebSpeech(
     }
 
     // Workaround for mobile Chromium/iOS speech freeze
+    window.speechSynthesis.resume();
     window.speechSynthesis.speak(utterance);
   } catch (err) {
     console.warn('Speech synthesis failed', err);
@@ -305,7 +268,7 @@ export interface PlayVoiceOptions {
 
 /**
  * Master speech player: Plays native audio stream or falls back to Web Speech instantly.
- * Resilient for iOS Safari, Android Chrome, and in-app webviews (WhatsApp/Instagram).
+ * Resilient for iOS Safari and Android Chrome mobile browsers.
  */
 export async function playEnglishVoice(
   text: string,
@@ -327,7 +290,7 @@ export async function playEnglishVoice(
   const onStart = options?.onStart;
   const onEnd = options?.onEnd;
 
-  // 1. If explicit device speech is selected, play immediately with zero network latency
+  // 1. If explicit device speech is selected, play immediately
   if (options?.useDeviceSpeech) {
     speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
     return;
@@ -337,8 +300,9 @@ export async function playEnglishVoice(
   const cachedAudioSrc = clientAudioCache.get(cacheKey);
   if (cachedAudioSrc) {
     try {
-      const audio = getSharedAudio();
-      audio.src = cachedAudioSrc;
+      const audio = new Audio(cachedAudioSrc);
+      (audio as any).playsInline = true;
+      (audio as any).preservesPitch = true;
       audio.playbackRate = effectiveSpeed;
       currentAudio = audio;
       if (onStart) audio.onplay = () => onStart();
@@ -349,15 +313,19 @@ export async function playEnglishVoice(
       await audio.play();
       return;
     } catch {
-      // Continue to streaming pipeline
+      // Audio playback failed, continue to stream
     }
   }
 
-  // 3. Direct Audio Stream via singleton DOM-attached element
+  // 3. Direct Audio Stream with generous timeout (6.5s) and automatic fallback
   try {
     const streamUrl = getAudioStreamUrl(clean, effectiveSpeed, voiceName);
-    const audio = getSharedAudio();
-    audio.playbackRate = effectiveSpeed;
+    const audio = new Audio();
+    (audio as any).playsInline = true;
+    (audio as any).setAttribute('playsinline', 'true');
+    (audio as any).setAttribute('webkit-playsinline', 'true');
+    audio.preload = 'auto';
+    audio.src = streamUrl;
     currentAudio = audio;
 
     let hasStarted = false;
@@ -378,12 +346,11 @@ export async function playEnglishVoice(
       }
     };
 
-    audio.src = streamUrl;
     const playPromise = audio.play();
 
-    // Fast 2.5-second buffer for mobile networks before seamless fallback to device speech
+    // 6.5-second buffer for slow mobile networks before graceful fallback
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Audio stream buffering exceeded 2.5s')), 2500)
+      setTimeout(() => reject(new Error('Audio stream buffering exceeded 6.5s')), 6500)
     );
 
     if (playPromise !== undefined) {
@@ -404,14 +371,6 @@ export function stopAllAudio() {
       currentAudio.pause();
       currentAudio.currentTime = 0;
       currentAudio = null;
-    } catch {
-      // ignore
-    }
-  }
-  if (sharedAudioElement) {
-    try {
-      sharedAudioElement.pause();
-      sharedAudioElement.currentTime = 0;
     } catch {
       // ignore
     }

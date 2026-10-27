@@ -14,7 +14,6 @@ import {
 import {
   getVisitStats,
   recordVisit,
-  testIncrementVisit,
   setCreatorMode,
   isCreatorMode,
   subscribeToVisitorUpdates,
@@ -299,15 +298,14 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
               <button
                 onClick={async () => {
                   setIsRefreshing(true);
-                  const updated = await testIncrementVisit();
-                  setStats(updated);
+                  await recordVisit(true);
                   setIsRefreshing(false);
                 }}
-                className="inline-flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 transition-colors cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 transition-colors cursor-pointer"
                 title="Probar que el contador registra y suma visitas"
               >
-                <Check className="w-3.5 h-3.5" />
-                <span>Sumar Visita de Prueba (+1)</span>
+                <Check className="w-3 h-3" />
+                <span>Probar (+1)</span>
               </button>
             </div>
 

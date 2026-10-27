@@ -178,49 +178,6 @@ export async function recordVisit(forceRefresh = false): Promise<VisitStats> {
 }
 
 /**
- * Force +1 immediate test visit (bypasses all debounce/creator filters)
- */
-export async function testIncrementVisit(): Promise<VisitStats> {
-  const isCreator = isCreatorMode();
-  try {
-    const res = await fetch('/api/visits/test-increment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      currentStats = {
-        totalVisits: typeof data.totalVisits === 'number' ? data.totalVisits : currentStats.totalVisits + 1,
-        uniqueVisitors: typeof data.uniqueVisitors === 'number' ? data.uniqueVisitors : currentStats.uniqueVisitors + 1,
-        todayVisits: typeof data.todayVisits === 'number' ? data.todayVisits : currentStats.todayVisits + 1,
-        creatorSessionsExcluded: typeof data.creatorSessionsExcluded === 'number' ? data.creatorSessionsExcluded : currentStats.creatorSessionsExcluded,
-        lastVisitTimestamp: data.lastVisitTimestamp || new Date().toISOString(),
-        isCreator,
-        wasCounted: true,
-      };
-      persistCache(currentStats);
-      notifyListeners();
-      return currentStats;
-    }
-  } catch (_e) {
-    // Offline fallback
-  }
-
-  currentStats = {
-    ...currentStats,
-    totalVisits: currentStats.totalVisits + 1,
-    todayVisits: currentStats.todayVisits + 1,
-    uniqueVisitors: currentStats.uniqueVisitors + 1,
-    lastVisitTimestamp: new Date().toISOString(),
-    isCreator,
-    wasCounted: true,
-  };
-  persistCache(currentStats);
-  notifyListeners();
-  return currentStats;
-}
-
-/**
  * Fetch current visit stats without registering a new visit
  */
 export async function getVisitStats(): Promise<VisitStats> {
