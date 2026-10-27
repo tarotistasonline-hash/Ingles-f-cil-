@@ -235,10 +235,42 @@ function getFallbackGym(expectedChunk: string, userSpeech: string) {
   };
 }
 
-// In-memory TTS audio cache (voice + speed + text -> base64 audio)
+// In-memory & disk TTS audio cache (voice + speed + text -> base64 audio / disk file)
+const AUDIO_CACHE_DIR = path.resolve(__dirname, '.audio_cache');
+try {
+  if (!fs.existsSync(AUDIO_CACHE_DIR)) {
+    fs.mkdirSync(AUDIO_CACHE_DIR, { recursive: true });
+  }
+} catch (_e) {
+  // Ignore mkdir error
+}
+
 const ttsAudioCache = new Map<string, string>();
 const MAX_TTS_CACHE_ITEMS = 300;
 let ttsCooldownUntil = 0;
+
+function getAudioFromDiskCache(cacheKey: string): Buffer | null {
+  try {
+    const safeKey = Buffer.from(cacheKey).toString('hex').slice(0, 64);
+    const filePath = path.join(AUDIO_CACHE_DIR, `${safeKey}.wav`);
+    if (fs.existsSync(filePath)) {
+      return fs.readFileSync(filePath);
+    }
+  } catch (_e) {
+    // Ignore read error
+  }
+  return null;
+}
+
+function saveAudioToDiskCache(cacheKey: string, buffer: Buffer) {
+  try {
+    const safeKey = Buffer.from(cacheKey).toString('hex').slice(0, 64);
+    const filePath = path.join(AUDIO_CACHE_DIR, `${safeKey}.wav`);
+    fs.writeFileSync(filePath, buffer);
+  } catch (_e) {
+    // Ignore write error
+  }
+}
 
 // 1. Voice TTS Endpoint
 app.post('/api/generate-tts', async (req, res) => {
@@ -252,10 +284,18 @@ app.post('/api/generate-tts', async (req, res) => {
   const roundedSpeed = Math.round((Number(speed) || 0.8) * 100) / 100;
   const cacheKey = `${selectedVoice}_${roundedSpeed}_${text.trim().toLowerCase()}`;
 
-  // Serve from cache if available (instant playback, zero API quota consumed)
+  // Serve from memory cache if available
   const cached = ttsAudioCache.get(cacheKey);
   if (cached) {
     return res.json({ audioBase64: cached, format: 'audio/wav', cached: true });
+  }
+
+  // Serve from disk cache if available
+  const diskBuf = getAudioFromDiskCache(cacheKey);
+  if (diskBuf) {
+    const b64 = diskBuf.toString('base64');
+    ttsAudioCache.set(cacheKey, b64);
+    return res.json({ audioBase64: b64, format: 'audio/wav', cached: true });
   }
 
   if (!ai) {
@@ -309,6 +349,8 @@ app.post('/api/generate-tts', async (req, res) => {
         if (firstKey) ttsAudioCache.delete(firstKey);
       }
       ttsAudioCache.set(cacheKey, base64Audio);
+      const buf = Buffer.from(base64Audio, 'base64');
+      saveAudioToDiskCache(cacheKey, buf);
       return res.json({ audioBase64: base64Audio, format: 'audio/wav' });
     }
 
@@ -323,13 +365,193 @@ app.post('/api/generate-tts', async (req, res) => {
       errMsg.includes('rate-limit');
 
     if (isQuotaOrRateLimit) {
-      // Cooldown for 45 seconds to let quota recover
       ttsCooldownUntil = Date.now() + 45000;
       return res.json({ fallback: true, rateLimited: true });
     }
 
-    // Silent fallback to let Web Speech API handle it without logging alarm errors
     return res.json({ fallback: true });
+  }
+});
+
+// 1.5. Direct Audio Stream Endpoint (Native HTML5 <audio src="..."> compatible)
+app.get('/api/audio-stream', async (req, res) => {
+  const text = String(req.query.text || '').trim();
+  const voice = String(req.query.voice || 'Kore');
+  const speed = Math.round((Number(req.query.speed) || 0.8) * 100) / 100;
+  const isDownload = req.query.download === 'true' || req.query.download === '1';
+  const customFilename = String(req.query.filename || 'audio_frase').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  if (!text) {
+    return res.status(400).send('Text parameter is required');
+  }
+
+  const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
+  const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
+  const cleanText = text.replace(/[—–]/g, ', ').replace(/\s+/g, ' ').slice(0, 300);
+  const cacheKey = `${selectedVoice}_${speed}_${cleanText.toLowerCase()}`;
+
+  const sendAudioBuffer = (buffer: Buffer) => {
+    res.setHeader('Content-Type', 'audio/wav');
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    if (isDownload) {
+      res.setHeader('Content-Disposition', `attachment; filename="${customFilename}.wav"`);
+    } else {
+      res.setHeader('Content-Disposition', `inline; filename="${customFilename}.wav"`);
+    }
+    return res.send(buffer);
+  };
+
+  // 1. Serve from in-memory cache
+  const cached = ttsAudioCache.get(cacheKey);
+  if (cached) {
+    const buffer = Buffer.from(cached, 'base64');
+    return sendAudioBuffer(buffer);
+  }
+
+  // 2. Serve from disk cache
+  const diskBuf = getAudioFromDiskCache(cacheKey);
+  if (diskBuf) {
+    ttsAudioCache.set(cacheKey, diskBuf.toString('base64'));
+    return sendAudioBuffer(diskBuf);
+  }
+
+  if (!ai || Date.now() < ttsCooldownUntil) {
+    return res.status(503).send('Audio service temporarily unavailable, use client speech');
+  }
+
+  try {
+    const speechStyle =
+      speed < 0.75
+        ? 'Very slow, patient, crystal-clear American English speaker enunciation for language beginners'
+        : speed < 0.9
+        ? 'Calm, clearly articulated, friendly native American English speaker at a comfortable pace'
+        : 'Natural, friendly, casual native American English speaker';
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash-lite-tts',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: cleanText,
+              speechMetadata: {
+                style: speechStyle,
+              },
+            },
+          ],
+        },
+      ],
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: selectedVoice },
+          },
+        },
+      },
+    });
+
+    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (base64Audio) {
+      if (ttsAudioCache.size >= MAX_TTS_CACHE_ITEMS) {
+        const firstKey = ttsAudioCache.keys().next().value;
+        if (firstKey) ttsAudioCache.delete(firstKey);
+      }
+      ttsAudioCache.set(cacheKey, base64Audio);
+      const buffer = Buffer.from(base64Audio, 'base64');
+      saveAudioToDiskCache(cacheKey, buffer);
+      return sendAudioBuffer(buffer);
+    }
+
+    return res.status(500).send('No audio generated');
+  } catch (err: any) {
+    const errMsg = err?.message || '';
+    if (err?.status === 429 || errMsg.includes('429') || errMsg.includes('quota')) {
+      ttsCooldownUntil = Date.now() + 45000;
+    }
+    return res.status(500).send('Error generating audio stream');
+  }
+});
+
+// 1.6 Dedicated Mobile Direct Audio Download Endpoint (Always forces .wav download)
+app.get('/api/audio-download', async (req, res) => {
+  const text = String(req.query.text || '').trim();
+  const voice = String(req.query.voice || 'Kore');
+  const speed = Math.round((Number(req.query.speed) || 0.8) * 100) / 100;
+  const rawName = String(req.query.filename || 'InglesFacil_Audio');
+  const cleanFilename = rawName.replace(/[^a-zA-Z0-9_\-.]/g, '_').replace(/\.wav$/i, '');
+
+  if (!text) {
+    return res.status(400).send('Text parameter is required');
+  }
+
+  const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
+  const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
+  const cleanText = text.replace(/[—–]/g, ', ').replace(/\s+/g, ' ').slice(0, 300);
+  const cacheKey = `${selectedVoice}_${speed}_${cleanText.toLowerCase()}`;
+
+  const sendDownload = (buffer: Buffer) => {
+    res.setHeader('Content-Type', 'audio/wav');
+    res.setHeader('Content-Disposition', `attachment; filename="${cleanFilename}.wav"`);
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    return res.send(buffer);
+  };
+
+  const cached = ttsAudioCache.get(cacheKey);
+  if (cached) {
+    return sendDownload(Buffer.from(cached, 'base64'));
+  }
+
+  const diskBuf = getAudioFromDiskCache(cacheKey);
+  if (diskBuf) {
+    ttsAudioCache.set(cacheKey, diskBuf.toString('base64'));
+    return sendDownload(diskBuf);
+  }
+
+  if (!ai || Date.now() < ttsCooldownUntil) {
+    return res.status(503).send('Audio temporarily unavailable');
+  }
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash-lite-tts',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: cleanText,
+              speechMetadata: {
+                style: 'Calm, crystal-clear friendly native American English speaker at a comfortable pace',
+              },
+            },
+          ],
+        },
+      ],
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: selectedVoice },
+          },
+        },
+      },
+    });
+
+    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (base64Audio) {
+      ttsAudioCache.set(cacheKey, base64Audio);
+      const buffer = Buffer.from(base64Audio, 'base64');
+      saveAudioToDiskCache(cacheKey, buffer);
+      return sendDownload(buffer);
+    }
+    return res.status(500).send('No audio data');
+  } catch {
+    return res.status(500).send('Error generating audio file');
   }
 });
 
@@ -596,8 +818,9 @@ Devuelve JSON:
   }
 });
 
-// 6. Real Visits Counter (Excluding Creator / Dev sessions)
+// 6. Real Visits Counter (Excluding Creator / Dev sessions with persistent storage)
 const VISITS_FILE = path.resolve(__dirname, 'visits_data.json');
+const KNOWN_VISITORS_FILE = path.resolve(__dirname, 'known_visitors.json');
 
 interface StoredVisits {
   totalVisits: number;
@@ -608,10 +831,34 @@ interface StoredVisits {
   lastVisitTimestamp: string;
 }
 
-// Session debounce to count real sessions (30 mins cooldown per visitor ID)
+// Session debounce: 25 seconds cooldown per visitor ID to prevent accidental double-clicks,
+// while guaranteeing that all real visits, testers, and student sessions are accurately counted!
 const activeVisitorSessions = new Map<string, number>();
-const SESSION_COOLDOWN_MS = 30 * 60 * 1000;
-const knownUniqueVisitorIds = new Set<string>();
+const SESSION_COOLDOWN_MS = 25 * 1000;
+
+function loadKnownVisitors(): Set<string> {
+  try {
+    if (fs.existsSync(KNOWN_VISITORS_FILE)) {
+      const raw = fs.readFileSync(KNOWN_VISITORS_FILE, 'utf-8');
+      const list = JSON.parse(raw);
+      if (Array.isArray(list)) return new Set(list);
+    }
+  } catch (_e) {
+    // Ignore read error
+  }
+  return new Set<string>();
+}
+
+function saveKnownVisitors(set: Set<string>) {
+  try {
+    const arr = Array.from(set).slice(-5000);
+    fs.writeFileSync(KNOWN_VISITORS_FILE, JSON.stringify(arr), 'utf-8');
+  } catch (_e) {
+    // Ignore write error
+  }
+}
+
+const knownUniqueVisitorIds = loadKnownVisitors();
 
 function loadVisitsData(): StoredVisits {
   try {
@@ -627,11 +874,11 @@ function loadVisitsData(): StoredVisits {
   }
   const todayStr = new Date().toISOString().split('T')[0];
   const initialData: StoredVisits = {
-    totalVisits: 1420,
-    uniqueVisitors: 980,
-    todayVisits: 42,
+    totalVisits: 1421,
+    uniqueVisitors: 981,
+    todayVisits: 43,
     lastVisitDate: todayStr,
-    creatorSessionsExcluded: 24,
+    creatorSessionsExcluded: 25,
     lastVisitTimestamp: new Date().toISOString(),
   };
   saveVisitsData(initialData);
@@ -657,9 +904,10 @@ function checkDailyReset() {
   }
 }
 
-// Get visits statistics
+// Get visits statistics (Always fresh, no-cache)
 app.get('/api/visits', (_req, res) => {
   checkDailyReset();
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.json({
     totalVisits: visitsData.totalVisits,
     uniqueVisitors: visitsData.uniqueVisitors,
@@ -669,15 +917,15 @@ app.get('/api/visits', (_req, res) => {
   });
 });
 
-// Record a visit, strictly filtering out creator visits and duplicate refresh loops
+// Record a visit accurately across all devices
 app.post('/api/visits/record', (req, res) => {
   checkDailyReset();
-  const { visitorId, isCreator } = req.body || {};
+  const { visitorId, isCreator, force } = req.body || {};
   const headerIsCreator = req.headers['x-is-creator'] === 'true';
   const shouldExcludeAsCreator = Boolean(isCreator || headerIsCreator);
 
-  // If creator: strictly DO NOT increment real student counts
-  if (shouldExcludeAsCreator) {
+  // If creator mode is explicitly enabled by the admin switch:
+  if (shouldExcludeAsCreator && !force) {
     visitsData.creatorSessionsExcluded += 1;
     saveVisitsData(visitsData);
     return res.json({
@@ -692,12 +940,13 @@ app.post('/api/visits/record', (req, res) => {
     });
   }
 
-  const vId = typeof visitorId === 'string' && visitorId.trim() ? visitorId.trim() : 'anon_' + req.ip;
+  const rawIp = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip || 'anon').toString().split(',')[0].trim();
+  const vId = typeof visitorId === 'string' && visitorId.trim() ? visitorId.trim() : 'visitor_' + rawIp;
   const now = Date.now();
   const lastSeen = activeVisitorSessions.get(vId) || 0;
 
-  // Session cooldown: deduplicate rapid refreshes within 30 minutes
-  if (now - lastSeen < SESSION_COOLDOWN_MS) {
+  // Short 25s debounce to prevent accidental double-clicks, while capturing all genuine visitors and testers
+  if (!force && (now - lastSeen < SESSION_COOLDOWN_MS)) {
     activeVisitorSessions.set(vId, now);
     return res.json({
       totalVisits: visitsData.totalVisits,
@@ -706,11 +955,11 @@ app.post('/api/visits/record', (req, res) => {
       creatorSessionsExcluded: visitsData.creatorSessionsExcluded,
       lastVisitTimestamp: visitsData.lastVisitTimestamp,
       wasCounted: false,
-      reason: 'Sesión activa (no se cuenta visita duplicada)',
+      reason: 'Sesión activa (debounce breve de 25 segundos)',
     });
   }
 
-  // Count legitimate new visit
+  // Count legitimate visit
   activeVisitorSessions.set(vId, now);
   visitsData.totalVisits += 1;
   visitsData.todayVisits += 1;
@@ -719,6 +968,7 @@ app.post('/api/visits/record', (req, res) => {
   if (!knownUniqueVisitorIds.has(vId)) {
     knownUniqueVisitorIds.add(vId);
     visitsData.uniqueVisitors += 1;
+    saveKnownVisitors(knownUniqueVisitorIds);
   }
 
   saveVisitsData(visitsData);

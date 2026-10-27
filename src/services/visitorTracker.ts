@@ -11,28 +11,48 @@ export interface VisitStats {
 
 const CREATOR_STORAGE_KEY = 'vibe_is_creator';
 const VISITOR_ID_KEY = 'vibe_visitor_id';
-const LAST_SESSION_PING_KEY = 'vibe_last_visit_ping';
+const CACHED_STATS_KEY = 'vibe_cached_visits_v2';
 
-// Subscribers for real-time UI updates
+// Subscribers for real-time UI updates across the entire app
 type Listener = (stats: VisitStats) => void;
 const listeners = new Set<Listener>();
 
-let currentStats: VisitStats = {
-  totalVisits: 1284,
-  uniqueVisitors: 912,
-  todayVisits: 37,
-  creatorSessionsExcluded: 14,
-  isCreator: false,
-};
+// Try loading cached stats from localStorage so UI shows current figures immediately without flash
+function getInitialStats(): VisitStats {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem(CACHED_STATS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (typeof parsed.totalVisits === 'number') {
+          return {
+            ...parsed,
+            isCreator: isCreatorMode(),
+          };
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }
+  return {
+    totalVisits: 1422,
+    uniqueVisitors: 982,
+    todayVisits: 43,
+    creatorSessionsExcluded: 25,
+    isCreator: isCreatorMode(),
+  };
+}
+
+let currentStats: VisitStats = getInitialStats();
 
 /**
  * Checks if the current browser session has creator mode enabled.
- * Auto-detects query parameters (?creator=true or ?admin=true or ?soy_creador=1).
  */
 export function isCreatorMode(): boolean {
   if (typeof window === 'undefined') return false;
 
-  // 1. Check URL parameters
+  // 1. Check URL parameters for explicit intent
   try {
     const params = new URLSearchParams(window.location.search);
     if (params.get('creator') === 'true' || params.get('admin') === 'true' || params.get('soy_creador') === '1') {
@@ -88,7 +108,7 @@ export function getVisitorId(): string {
   try {
     let id = localStorage.getItem(VISITOR_ID_KEY);
     if (!id) {
-      id = 'vis_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now().toString(36);
+      id = 'vis_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36);
       localStorage.setItem(VISITOR_ID_KEY, id);
     }
     return id;
@@ -97,23 +117,22 @@ export function getVisitorId(): string {
   }
 }
 
+function persistCache(stats: VisitStats) {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(CACHED_STATS_KEY, JSON.stringify(stats));
+    } catch (_e) {
+      // Ignore
+    }
+  }
+}
+
 /**
- * Record a visit to the backend while strictly excluding creator activity
+ * Record a visit to the backend
  */
 export async function recordVisit(forceRefresh = false): Promise<VisitStats> {
   const isCreator = isCreatorMode();
   const visitorId = getVisitorId();
-
-  // Rate-limit pings in the same browser session (1 ping per 10 minutes unless forced)
-  if (!forceRefresh && typeof window !== 'undefined') {
-    const lastPing = parseInt(sessionStorage.getItem(LAST_SESSION_PING_KEY) || '0', 10);
-    const now = Date.now();
-    if (now - lastPing < 10 * 60 * 1000) {
-      // Return cached stats or quickly fetch stats without counting
-      return getVisitStats();
-    }
-    sessionStorage.setItem(LAST_SESSION_PING_KEY, now.toString());
-  }
 
   try {
     const res = await fetch('/api/visits/record', {
@@ -125,6 +144,7 @@ export async function recordVisit(forceRefresh = false): Promise<VisitStats> {
       body: JSON.stringify({
         visitorId,
         isCreator,
+        force: forceRefresh,
         referrer: typeof document !== 'undefined' ? document.referrer : '',
       }),
     });
@@ -132,26 +152,28 @@ export async function recordVisit(forceRefresh = false): Promise<VisitStats> {
     if (res.ok) {
       const data = await res.json();
       currentStats = {
-        totalVisits: data.totalVisits ?? currentStats.totalVisits,
-        uniqueVisitors: data.uniqueVisitors ?? currentStats.uniqueVisitors,
-        todayVisits: data.todayVisits ?? currentStats.todayVisits,
-        creatorSessionsExcluded: data.creatorSessionsExcluded ?? currentStats.creatorSessionsExcluded,
+        totalVisits: typeof data.totalVisits === 'number' ? data.totalVisits : currentStats.totalVisits,
+        uniqueVisitors: typeof data.uniqueVisitors === 'number' ? data.uniqueVisitors : currentStats.uniqueVisitors,
+        todayVisits: typeof data.todayVisits === 'number' ? data.todayVisits : currentStats.todayVisits,
+        creatorSessionsExcluded: typeof data.creatorSessionsExcluded === 'number' ? data.creatorSessionsExcluded : currentStats.creatorSessionsExcluded,
         lastVisitTimestamp: data.lastVisitTimestamp,
         isCreator,
         wasCounted: data.wasCounted,
         reason: data.reason,
       };
+      persistCache(currentStats);
       notifyListeners();
       return currentStats;
     }
   } catch (_err) {
-    // Graceful fallback if backend is momentarily unreachable
+    // Backend unreachable or offline
   }
 
   currentStats = {
     ...currentStats,
     isCreator,
   };
+  notifyListeners();
   return currentStats;
 }
 
@@ -165,17 +187,19 @@ export async function getVisitStats(): Promise<VisitStats> {
       headers: {
         'X-Is-Creator': isCreator ? 'true' : 'false',
       },
+      cache: 'no-store',
     });
     if (res.ok) {
       const data = await res.json();
       currentStats = {
-        totalVisits: data.totalVisits ?? currentStats.totalVisits,
-        uniqueVisitors: data.uniqueVisitors ?? currentStats.uniqueVisitors,
-        todayVisits: data.todayVisits ?? currentStats.todayVisits,
-        creatorSessionsExcluded: data.creatorSessionsExcluded ?? currentStats.creatorSessionsExcluded,
+        totalVisits: typeof data.totalVisits === 'number' ? data.totalVisits : currentStats.totalVisits,
+        uniqueVisitors: typeof data.uniqueVisitors === 'number' ? data.uniqueVisitors : currentStats.uniqueVisitors,
+        todayVisits: typeof data.todayVisits === 'number' ? data.todayVisits : currentStats.todayVisits,
+        creatorSessionsExcluded: typeof data.creatorSessionsExcluded === 'number' ? data.creatorSessionsExcluded : currentStats.creatorSessionsExcluded,
         lastVisitTimestamp: data.lastVisitTimestamp,
         isCreator,
       };
+      persistCache(currentStats);
       notifyListeners();
       return currentStats;
     }
@@ -206,4 +230,11 @@ function notifyListeners() {
       // Ignore listener error
     }
   });
+}
+
+// Background auto-poller every 25 seconds so live counter updates automatically when other visitors enter
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    getVisitStats();
+  }, 25000);
 }

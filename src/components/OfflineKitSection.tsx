@@ -20,6 +20,10 @@ import {
   Copy,
   CheckCheck,
   KeyRound,
+  Mail,
+  FolderArchive,
+  Laptop,
+  Tablet,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
@@ -486,7 +490,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
             </div>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Archivos en alta fidelidad organizados por carpetas para pasar a tu
-              WhatsApp, Spotify local o reproductor del celu. Diseñado para entrenar el oído
+              reproductor del celu, tablet o Spotify local. Diseñado para entrenar el oído
               mientras hacés otras cosas, sin tener la pantalla prendida.
             </p>
             <ul className="space-y-2 pt-2 text-xs text-slate-300 border-t border-[#231A4D]">
@@ -695,17 +699,15 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               <ArrowRight className="w-5 h-5" />
             </a>
 
-            {/* WhatsApp direct help & reassurance */}
+            {/* Support Email Reassurance */}
             <div className="space-y-2 text-center pt-1">
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <a
-                  href="https://wa.me/?text=%C2%A1Hola!%20Tengo%20una%20consulta%20sobre%20el%20Audio-Kit%20de%20Ingl%C3%A9s%20F%C3%A1cil%20y%20Fluido%20($9.990)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-xs font-semibold transition-colors no-underline cursor-pointer"
+                  href="mailto:inglesfacilyfluido@gmail.com?subject=Ayuda%20Descarga%20Audio-Kit%20Ingl%C3%A9s&body=%C2%A1Hola!%20Abon%C3%A9%20el%20Audio-Kit%20y%20necesito%20asistencia%20para%20descargar%20los%20archivos.%20Mi%20n%C3%BAmero%20de%20operaci%C3%B3n%20es%3A%20"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/50 text-emerald-300 text-xs sm:text-sm font-bold transition-all no-underline cursor-pointer shadow-lg shadow-emerald-500/10"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>¿Dudas antes de pagar? Consultanos por WhatsApp</span>
+                  <Mail className="w-4 h-4 text-emerald-400" />
+                  <span>Solo en caso de no poder descargar el pack: <strong className="text-white underline">inglesfacilyfluido@gmail.com</strong></span>
                 </a>
               </div>
 
@@ -715,29 +717,120 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               </div>
               <div className="text-[11px] text-emerald-400 font-mono flex items-center justify-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Link oficial conectado: mpago.li/1PhcDv4</span>
+                <span>Link oficial verificado: mpago.li/1PhcDv4</span>
               </div>
             </div>
 
-            {/* Mini-guía visual: Cómo abrir el pack en tu celular */}
-            <div className="mt-4 p-4 rounded-2xl bg-[#0E0A22] border border-[#2B205D] text-left space-y-2.5 max-w-xl mx-auto w-full">
-              <div className="flex items-center gap-2 text-xs font-bold text-white">
-                <Smartphone className="w-4 h-4 text-amber-400" />
-                <span>📱 ¿Cómo se abre el pack en tu celular? (En 2 toques simples)</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-300">
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
-                  <strong className="text-white block font-semibold">🍏 En iPhone / iPad:</strong>
-                  <span>Tocás el archivo descargado y Safari lo abre directo en tu app <em>Archivos</em> listo para reproducir.</span>
+            {/* Guía Visual Paso a Paso: Cómo descomprimir archivos .ZIP en Celulares y Tablets */}
+            <div className="mt-5 p-5 rounded-3xl bg-gradient-to-b from-[#151036] via-[#100B2B] to-[#0A071E] border-2 border-emerald-400/40 text-left space-y-4 max-w-2xl mx-auto w-full shadow-2xl">
+              <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-amber-400/20 text-amber-300 shrink-0">
+                    <FolderArchive className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm sm:text-base font-black text-white">
+                      ¿Cómo descomprimir el archivo .ZIP en Celulares y Tablets?
+                    </h4>
+                    <p className="text-xs text-slate-300">
+                      Paso a paso fácil para abrir todos tus audios y PDFs según tu dispositivo:
+                    </p>
+                  </div>
                 </div>
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
-                  <strong className="text-white block font-semibold">🤖 En Android:</strong>
-                  <span>Se guarda en tu carpeta <em>Descargas</em> y se abre con la app <em>Files de Google</em> o tu reproductor habitual.</span>
+                <span className="text-[10px] bg-emerald-400/20 text-emerald-300 px-2 py-0.5 rounded font-black tracking-wider uppercase border border-emerald-400/30">
+                  Sin Apps Raras
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Dispositivo 1: Android (Celulares y Tablets Samsung, Motorola, Xiaomi, etc.) */}
+                <div className="p-3.5 rounded-2xl bg-black/50 border border-slate-700/80 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-white flex items-center gap-1.5">
+                        <Smartphone className="w-4 h-4 text-emerald-400" />
+                        <span>Android (Celular o Tablet)</span>
+                      </span>
+                      <span className="text-[10px] text-emerald-400 font-mono bg-emerald-400/10 px-1.5 py-0.5 rounded">
+                        Samsung, Moto, etc.
+                      </span>
+                    </div>
+
+                    <ol className="space-y-1.5 text-[11px] text-slate-300 leading-relaxed list-decimal list-inside pl-0.5">
+                      <li>
+                        Abrí la app <strong className="text-white">"Files de Google"</strong> o <strong className="text-white">"Mis Archivos"</strong> que ya viene en tu teléfono.
+                      </li>
+                      <li>
+                        Entrá a la carpeta <strong className="text-amber-300">Descargas</strong> y tocá el archivo <code className="text-slate-200 bg-white/10 px-1 py-0.2 rounded font-mono text-[10px]">.zip</code>.
+                      </li>
+                      <li>
+                        Tocá el botón azul <strong className="text-emerald-400">"Extraer"</strong> o <strong>"Descomprimir"</strong>.
+                      </li>
+                    </ol>
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 bg-white/5 p-2 rounded-lg border border-white/5">
+                    💡 ¡Listo! Se creará una carpeta normal con los 120 audios MP3 y la guía para escuchar sin internet.
+                  </p>
+                </div>
+
+                {/* Dispositivo 2: iPhone y iPad */}
+                <div className="p-3.5 rounded-2xl bg-black/50 border border-slate-700/80 space-y-2.5 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-white flex items-center gap-1.5">
+                        <Tablet className="w-4 h-4 text-sky-400" />
+                        <span>iPhone &amp; iPad (Apple)</span>
+                      </span>
+                      <span className="text-[10px] text-sky-400 font-mono bg-sky-400/10 px-1.5 py-0.5 rounded">
+                        iOS / iPadOS
+                      </span>
+                    </div>
+
+                    <ol className="space-y-1.5 text-[11px] text-slate-300 leading-relaxed list-decimal list-inside pl-0.5">
+                      <li>
+                        Abrí la app nativa <strong className="text-white">"Archivos"</strong> (ícono de carpeta azul sobre fondo blanco).
+                      </li>
+                      <li>
+                        Tocá en <strong className="text-amber-300">"Descargas"</strong> o <strong className="text-amber-300">"En mi iPhone"</strong>.
+                      </li>
+                      <li>
+                        Dale <strong className="text-sky-300">un solo toque suave al archivo .zip</strong>.
+                      </li>
+                    </ol>
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 bg-white/5 p-2 rounded-lg border border-white/5">
+                    💡 Apple lo descomprime al instante en 1 segundo y te crea la carpeta con los audios sin instalar ninguna app adicional.
+                  </p>
                 </div>
               </div>
-              <p className="text-[10px] text-emerald-400/90 font-medium text-center pt-1 border-t border-[#231A4D]">
-                ✓ Además podés usar directamente la Mini-App Offline en tu navegador sin descomprimir nada.
-              </p>
+
+              {/* Opción Alternativa: En Computadora o 100% Sin Descomprimir */}
+              <div className="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+                  <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>¿Preferís no descomprimir nada? ¡Podés usar la Bóveda Directa!</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  En nuestra <strong className="text-white">Bóveda de Descargas</strong> podés elegir la pestaña <strong className="text-amber-300">"Para Celular (Sin ZIP)"</strong> y tocar para abrir la Guía Maestra PDF y escuchar todos los audios directamente desde tu navegador en tu celular o tablet.
+                </p>
+                <div className="text-[10px] text-slate-400 flex items-center gap-1 pt-0.5">
+                  <Laptop className="w-3.5 h-3.5 text-slate-400" />
+                  <span>En Windows / Mac en computadora: Clic derecho sobre el ZIP ➔ <em>"Extraer todo..."</em></span>
+                </div>
+              </div>
+
+              {/* Nota para escuchar los audios en celular */}
+              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-400/40 space-y-1.5 text-left">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
+                  <Volume2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>¿Cómo escuchar los audios en tu celular?</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Podés escucharlos directamente en la web con nuestro reproductor interactivo o descargar cada audio en formato <strong className="text-white">.WAV estándar</strong> para el reproductor de música de tu teléfono. <em>(Recordá desactivar la palanquita de silencio si estás en iPhone y tener el volumen multimedia activo)</em>.
+                </p>
+              </div>
             </div>
 
             {/* Buyer Verification & Download Access Bar: Unlocking with Mercado Pago Operation Number */}
@@ -920,7 +1013,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Enviale este mensaje con su Código VIP por WhatsApp o Email:</span>
+                    <span>Enviale este mensaje con su Código VIP por Email:</span>
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-black/60 border border-slate-800 text-[11px] text-slate-300 font-mono leading-relaxed select-all">
@@ -940,7 +1033,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                     ) : (
                       <>
                         <Copy className="w-3.5 h-3.5" />
-                        <span>Copiar Mensaje para WhatsApp</span>
+                        <span>Copiar Mensaje de Entrega</span>
                       </>
                     )}
                   </button>
@@ -974,10 +1067,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 
                 <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-slate-300 space-y-2 text-[11px] leading-relaxed">
                   <p>
-                    📱 <strong className="text-emerald-300">Mercado Pago NO muestra el número de WhatsApp</strong> por políticas de privacidad de datos personales. 
-                  </p>
-                  <p>
-                    Pero en tu celular, cuando abrís la app de Mercado Pago y vas a <strong className="text-white">"Actividad"</strong> y tocás el cobro de <strong className="text-emerald-300">$9.990</strong>, te muestra:
+                    En tu celular, cuando abrís la app de Mercado Pago y vas a <strong className="text-white">"Actividad"</strong> y tocás el cobro de <strong className="text-emerald-300">$9.990</strong>, te muestra:
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-slate-200 font-semibold pl-1">
                     <li><span className="text-amber-300">Número de Operación</span> (ej: #1045892341)</li>
@@ -988,7 +1078,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
 
                 <div className="space-y-2 pt-1 text-[11px]">
                   <strong className="text-white block font-bold">
-                    🚀 Las 3 formas de entregar el pack 100% desde tu celular:
+                    🚀 Formas de entrega y asistencia desde tu celular:
                   </strong>
                   
                   <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
@@ -997,8 +1087,8 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
-                    <strong className="text-amber-300 block font-semibold">2. El comprador te escribe a TU WhatsApp:</strong>
-                    <span>Configurá tu WhatsApp en el formulario de abajo. El botón flotante en la web le permitirá al comprador tocar <em>"Chatear por WhatsApp"</em> y te llegará un mensaje directo con su comprobante para que le des el código <strong className="text-white">INGLES9990</strong>.</span>
+                    <strong className="text-amber-300 block font-semibold">2. Solo en caso de no poder descargar el pack:</strong>
+                    <span>El comprador puede escribir directamente a <strong className="text-white">inglesfacilyfluido@gmail.com</strong> indicando su número de comprobante para recibir los archivos.</span>
                   </div>
 
                   <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1">
@@ -1043,19 +1133,15 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Tu Número de WhatsApp para Soporte (Opcional):
+              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 space-y-1">
+                <label className="block text-xs font-semibold text-emerald-400">
+                  Canal Oficial de Soporte para Descargas:
                 </label>
-                <input
-                  type="tel"
-                  placeholder="Ej: +5491123456789 o 1123456789"
-                  value={tempSellerWhatsApp}
-                  onChange={(e) => setTempSellerWhatsApp(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                />
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Si ponés tu número, el botón de WhatsApp de la página abrirá un chat directo contigo.
+                <p className="font-mono text-white bg-black/60 p-2 rounded-lg border border-slate-700">
+                  inglesfacilyfluido@gmail.com
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Solo en caso de no poder descargar el pack, los compradores tienen este correo indicado para recibir asistencia.
                 </p>
               </div>
 

@@ -834,18 +834,50 @@ export function generateOfflinePocketPlayerHtml(): string {
       document.getElementById('btn-normal').className = speed === 1.0 ? 'speed-btn active' : 'speed-btn';
     }
 
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
     function playAudio(text) {
+      try {
+        const ctx = getAudioContext();
+        if (ctx) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(520, ctx.currentTime);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.12);
+        }
+      } catch(e) {}
+
       if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'en-US';
-        utter.rate = currentSpeed;
-        const voices = window.speechSynthesis.getVoices();
-        const usVoice = voices.find(v => v.lang === 'en-US' || v.lang.startsWith('en'));
-        if (usVoice) utter.voice = usVoice;
-        window.speechSynthesis.speak(utter);
+        try {
+          window.speechSynthesis.resume();
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'en-US';
+          utter.rate = currentSpeed;
+          const voices = window.speechSynthesis.getVoices();
+          const usVoice = voices.find(v => v.lang === 'en-US' || v.lang.startsWith('en'));
+          if (usVoice) utter.voice = usVoice;
+          window.speechSynthesis.speak(utter);
+        } catch(e) {
+          console.warn('Speech error', e);
+        }
       } else {
-        alert('Tu navegador no soporta síntesis de voz offline.');
+        alert('Para escuchar en celular, abrí este archivo con Google Chrome o Safari.');
       }
     }
 
@@ -925,6 +957,53 @@ export async function generateAndDownloadZipPackage(onProgress?: (percent: numbe
   onProgress?.(85, 'Construyendo Reproductor de Audio Offline de Bolsillo...');
   const offlinePlayerHtml = generateOfflinePocketPlayerHtml();
   zip.file('06_Reproductor_Audio_Offline_De_Bolsillo.html', offlinePlayerHtml);
+
+  // Dedicated guide for playing audio on phones
+  const audioMobileGuide = `========================================================================
+ GUÍA OFICIAL: CÓMO ESCUCHAR LOS AUDIOS EN TU CELULAR (ANDROID O IPHONE)
+========================================================================
+
+¡Hola! Esta guía rápida te resuelve cualquier duda para escuchar las frases
+claramente en tu celular o computadora.
+
+¿CÓMO ESCUCHAR LAS FRASES?
+------------------------------------------------------------------------
+Tenés dos formas súper sencillas:
+
+OPCIÓN 1 (RECOMENDADA): EL REPRODUCTOR DE BOLSILLO
+Abrí el archivo "06_Reproductor_Audio_Offline_De_Bolsillo.html" en tu celular.
+- Funciona 100% SIN INTERNET.
+- Te permite tocar cualquier frase y escucharla en 2 velocidades (0.8x y 1.0x).
+- Tiene buscador instantáneo en español e inglés.
+
+OPCIÓN 2: LA BÓVEDA WEB EN VIVO (ONLINE)
+Si querés voces nativas ultra-realistas generadas con audio de estudio,
+podés abrir el enlace web de la bóveda que recibiste tras tu compra.
+Ahí tenés el reproductor web directo y podés descargar frases sueltas en WAV.
+
+¿TOCÁS Y NO ESCUCHÁS NADA EN TU CELULAR?
+------------------------------------------------------------------------
+Si tocás "Escuchar" y no sale sonido, es por una de estas 3 razones comunes:
+
+1. ¿Tenés un iPhone?
+   Revisá la palanquita lateral de tu iPhone (el interruptor físico de silencio).
+   Si muestra una franja naranja, el celular está en "Mute" y silencia los reproductores.
+   Movelo hacia adelante para desactivar el silencio.
+
+2. ¿Volumen multimedia bajo?
+   Apretá los botones de volumen del celular. Asegurate de que el "Volumen multimedia"
+   (el de música y videos) esté alto, no solo el volumen de llamadas.
+
+3. ¿Lo abriste desde la carpeta de descargas o WhatsApp?
+   En algunos celulares Android (Samsung, Xiaomi, Motorola), abrir un archivo HTML
+   directamente desde el visor de archivos puede bloquear el audio por seguridad.
+   SOLUCIÓN: Tocá el archivo, elegí "Compartir" o los 3 puntos (⋮) y seleccioná
+   "Abrir con Google Chrome" o "Abrir con Safari".
+
+¿PREGUNTAS O NECESITÁS AYUDA CON TU PACK?
+Escribinos directamente a: inglesfacilyfluido@gmail.com
+========================================================================`;
+  zip.file('00_LEEME_COMO_ESCUCHAR_AUDIOS_EN_CELULAR.txt', audioMobileGuide);
 
   // Readme instructions
   const readme = `========================================================================

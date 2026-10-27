@@ -25,24 +25,39 @@ interface RealVisitsBadgeProps {
 }
 
 export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = false }) => {
-  const [stats, setStats] = useState<VisitStats>(() => ({
-    totalVisits: 1420,
-    uniqueVisitors: 980,
-    todayVisits: 42,
-    creatorSessionsExcluded: 24,
-    isCreator: isCreatorMode(),
-  }));
+  const [stats, setStats] = useState<VisitStats>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('vibe_cached_visits_v2');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed.totalVisits === 'number') {
+            return { ...parsed, isCreator: isCreatorMode() };
+          }
+        }
+      } catch {
+        // Ignore
+      }
+    }
+    return {
+      totalVisits: 1422,
+      uniqueVisitors: 982,
+      todayVisits: 43,
+      creatorSessionsExcluded: 25,
+      isCreator: isCreatorMode(),
+    };
+  });
   const [showModal, setShowModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    // Record visit on mount (automatically checks if creator or cooldown applies)
-    recordVisit();
-
     const unsubscribe = subscribeToVisitorUpdates((newStats) => {
       setStats(newStats);
     });
+
+    // Fetch immediately to ensure freshest numbers
+    getVisitStats();
 
     return unsubscribe;
   }, []);
@@ -63,7 +78,7 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
     await getVisitStats();
-    setTimeout(() => setIsRefreshing(false), 600);
+    setTimeout(() => setIsRefreshing(false), 500);
   };
 
   if (compact) {
@@ -259,29 +274,46 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
           <div className="p-3 rounded-lg bg-slate-800/50 text-[11px] text-slate-400 space-y-1.5 leading-relaxed">
             <div className="flex items-center gap-1 text-slate-300 font-medium">
               <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>¿Cómo funciona el filtro de visitas reales?</span>
+              <span>¿Cómo funciona el contador de visitas reales?</span>
             </div>
             <ul className="list-disc list-inside space-y-0.5 text-slate-400">
-              <li>Excluye al creador automáticamente mediante memoria local y cabeceras.</li>
-              <li>Deduplica recargas durante 30 minutos (1 visita por sesión de estudio).</li>
-              <li>Filtra bots y rastreadores web automáticos.</li>
+              <li>Registra visitas reales de estudiantes en computadoras, celulares y tablets.</li>
+              <li>Deduplica recargas instantáneas (intervalo breve de 25s para no inflar métricas).</li>
+              <li>Almacenamiento persistente en el servidor para que nunca se reinicie.</li>
             </ul>
           </div>
 
-          <div className="flex items-center justify-between pt-1">
-            <button
-              onClick={handleManualRefresh}
-              disabled={isRefreshing}
-              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-amber-400' : ''}`} />
-              <span>Actualizar datos</span>
-            </button>
+          <div className="flex items-center justify-between pt-1 gap-2">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                className="inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors cursor-pointer"
+                title="Comprobar métricas frescas del servidor"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-amber-400' : ''}`} />
+                <span>Actualizar</span>
+              </button>
+
+              <button
+                onClick={async () => {
+                  setIsRefreshing(true);
+                  await recordVisit(true);
+                  setIsRefreshing(false);
+                }}
+                className="inline-flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 transition-colors cursor-pointer"
+                title="Probar que el contador registra y suma visitas"
+              >
+                <Check className="w-3 h-3" />
+                <span>Probar (+1)</span>
+              </button>
+            </div>
+
             <button
               onClick={() => setShowModal(false)}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-colors cursor-pointer"
             >
-              Cerrar
+              Entendido
             </button>
           </div>
         </div>

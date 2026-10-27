@@ -29,6 +29,7 @@ import {
   setVerifiedPurchaseSession,
   getStoredSessionToken,
 } from './services/purchaseVerification';
+import { recordVisit } from './services/visitorTracker';
 
 export default function App() {
   const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
@@ -61,6 +62,11 @@ export default function App() {
   const [currentSpeed, setCurrentSpeed] = useState<number>(() => getGlobalAudioSpeed());
   const [activeLevel, setActiveLevel] = useState<SkillLevel | 'all'>('all');
   const [isKitModalOpen, setIsKitModalOpen] = useState(false);
+
+  React.useEffect(() => {
+    // Record visit globally on root mount across all devices, routes and tabs
+    recordVisit();
+  }, []);
 
   React.useEffect(() => {
     // SECURE MIDDLEWARE & PURCHASE TOKEN VALIDATION

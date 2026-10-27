@@ -151,8 +151,8 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* Real visits counter on desktop */}
-          <div className="hidden xl:block">
+          {/* Real visits counter on desktop and tablet */}
+          <div className="hidden lg:block">
             <RealVisitsBadge compact={true} />
           </div>
 
