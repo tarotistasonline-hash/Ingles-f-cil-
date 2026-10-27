@@ -112,13 +112,16 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
     }
   };
 
-  const handlePlayVoice = async (item: {
-    id: string;
-    entrecasaNative: string;
-    spanishSituation: string;
-    categoryLabel: string;
-    phoneticEasy?: string;
-  }) => {
+  const handlePlayVoice = async (
+    item: {
+      id: string;
+      entrecasaNative: string;
+      spanishSituation: string;
+      categoryLabel: string;
+      phoneticEasy?: string;
+    },
+    forceSpeech = false
+  ) => {
     unlockMobileAudio();
     setActiveAudioPhrase({
       id: item.id,
@@ -132,7 +135,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
 
     try {
       await playEnglishVoice(item.entrecasaNative, 'Kore', selectedSpeed, {
-        useDeviceSpeech,
+        useDeviceSpeech: forceSpeech || useDeviceSpeech,
         onStart: () => {
           setAudioLoadingId(null);
           setPlayingPhraseId(item.id);
@@ -947,7 +950,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
 
                   {/* ACTIVE PLAYER BAR (STICKY / PROMINENT) */}
                   {activeAudioPhrase && (
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-[#18233C] to-teal-950 border-2 border-emerald-400 shadow-xl space-y-3 animate-fade-in">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950 via-[#18233C] to-teal-950 border-2 border-emerald-400 shadow-2xl space-y-3.5 animate-fade-in">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div className="space-y-1 min-w-0">
                           <div className="flex items-center gap-2">
@@ -968,7 +971,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                           )}
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+                        <div className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto">
                           <button
                             type="button"
                             onClick={() =>
@@ -978,12 +981,30 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                                 spanishSituation: activeAudioPhrase.situation,
                                 categoryLabel: activeAudioPhrase.category,
                                 phoneticEasy: activeAudioPhrase.phonetic,
-                              })
+                              }, false)
                             }
-                            className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-400/20 cursor-pointer"
+                            className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-400/20 cursor-pointer active:scale-95"
                           >
                             <Play className="w-3.5 h-3.5 fill-current" />
-                            <span>Repetir</span>
+                            <span>🎧 Repetir HD</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handlePlayVoice({
+                                id: activeAudioPhrase.id,
+                                entrecasaNative: activeAudioPhrase.text,
+                                spanishSituation: activeAudioPhrase.situation,
+                                categoryLabel: activeAudioPhrase.category,
+                                phoneticEasy: activeAudioPhrase.phonetic,
+                              }, true)
+                            }
+                            className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-md shadow-amber-400/20 cursor-pointer active:scale-95"
+                            title="Reproducir al instante usando la voz directa de tu teléfono"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                            <span>🗣️ Voz Celular</span>
                           </button>
 
                           <a
@@ -993,37 +1014,63 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                               selectedSpeed
                             )}
                             download={`InglesFacil_${activeAudioPhrase.id}.wav`}
-                            className="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all border border-white/15 no-underline cursor-pointer"
+                            className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all border border-white/15 no-underline cursor-pointer"
                             title="Descargar archivo .WAV listo para reproducir en cualquier celular"
                           >
                             <Download className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>Bajar .WAV</span>
+                            <span className="hidden sm:inline">Bajar .WAV</span>
                           </a>
                         </div>
                       </div>
 
-                      {/* Native HTML5 Audio Controls Element (Scrubber without conflicting autoPlay) */}
-                      <div className="bg-black/60 p-2.5 rounded-xl border border-emerald-400/40 space-y-1.5">
-                        <div className="flex items-center justify-between text-[11px] text-slate-300">
-                          <span className="font-bold text-emerald-300 flex items-center gap-1">
-                            <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                            Barra de Control de Audio:
-                          </span>
-                          <span className="text-slate-400 font-mono">Velocidad: {selectedSpeed}x</span>
+                      {/* Visual Sound Status & Live Notice */}
+                      <div className="bg-black/70 p-3 rounded-xl border border-emerald-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2 text-slate-200">
+                          {playingPhraseId === activeAudioPhrase.id ? (
+                            <span className="flex items-center gap-1.5 text-emerald-400 font-bold animate-pulse">
+                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                              🔊 Sonando en el altavoz...
+                            </span>
+                          ) : audioLoadingId === activeAudioPhrase.id ? (
+                            <span className="flex items-center gap-1.5 text-amber-300 font-bold animate-pulse">
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              Conectando parlante...
+                            </span>
+                          ) : (
+                            <span className="text-slate-300">
+                              Listo para reproducir. Tocá <strong>🎧 Repetir HD</strong> o <strong>🗣️ Voz Celular</strong>.
+                            </span>
+                          )}
                         </div>
-                        <audio
-                          key={`${activeAudioPhrase.id}-${selectedSpeed}`}
-                          controls
-                          playsInline
-                          preload="metadata"
-                          className="w-full h-10 rounded-lg accent-emerald-400"
-                          src={getAudioStreamUrl(activeAudioPhrase.text, selectedSpeed)}
-                        >
-                          Tu celular no soporta audio HTML5 nativo.
-                        </audio>
+
+                        <span className="text-[11px] text-slate-400 bg-white/5 px-2 py-1 rounded">
+                          Velocidad: <strong className="text-white">{selectedSpeed}x</strong>
+                        </span>
                       </div>
                     </div>
                   )}
+
+                  {/* UNMISSABLE MOBILE SOUND BANNER */}
+                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-[#21163F] to-emerald-500/15 border border-amber-400/40 space-y-1.5 text-xs">
+                    <div className="flex items-center gap-2 font-bold text-amber-300">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>¿Hacés clic y no escuchás nada en tu celular? Mirá esto:</span>
+                    </div>
+                    <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-300 pt-1">
+                      <li className="bg-black/40 p-2 rounded-lg border border-white/5 list-none">
+                        <strong className="text-amber-300 block">1. iPhone en silencio:</strong>
+                        Fijate el botón lateral. Si tiene franja naranja, el celular silencia las páginas web.
+                      </li>
+                      <li className="bg-black/40 p-2 rounded-lg border border-white/5 list-none">
+                        <strong className="text-amber-300 block">2. Volumen Multimedia:</strong>
+                        Subí el volumen con las teclas laterales de tu teléfono (volumen de música/videos).
+                      </li>
+                      <li className="bg-black/40 p-2 rounded-lg border border-white/5 list-none">
+                        <strong className="text-emerald-300 block">3. Botón 🗣️ Voz Celular:</strong>
+                        Tocá el botón <em>"Voz Celular"</em> en cualquier frase para que hable tu teléfono al instante sin esperar descargas.
+                      </li>
+                    </ul>
+                  </div>
 
                   {/* PLAYER CONTROLS (SPEED & SEARCH) */}
                   <div className="p-4 rounded-2xl bg-[#140E35] border border-emerald-400/40 space-y-3">
@@ -1034,7 +1081,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                           <span>Lista de Frases con Pronunciación</span>
                         </h3>
                         <p className="text-xs text-slate-300">
-                          Tocá el botón verde para escuchar o la flecha para descargar el archivo .WAV a tu celular.
+                          Tocá <strong className="text-emerald-300">Audio HD</strong> o <strong className="text-amber-300">Voz Celular</strong> para escuchar con tu velocidad preferida:
                         </p>
                       </div>
 
@@ -1075,7 +1122,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                   </div>
 
                   {/* List of Playable Phrases */}
-                  <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+                  <div className="space-y-2.5 max-h-[55vh] overflow-y-auto pr-1">
                     {(() => {
                       const query = audioSearch.toLowerCase().trim();
                       const filtered = ENTRECASA_PHRASES.filter((p) => {
@@ -1102,8 +1149,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                         return (
                           <div
                             key={item.id}
-                            onClick={() => handlePlayVoice(item)}
-                            className={`p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
+                            className={`p-3.5 sm:p-4 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                               isCurrentActive
                                 ? 'bg-[#1C1642] border-emerald-400 shadow-md shadow-emerald-400/10 ring-1 ring-emerald-400/30'
                                 : 'bg-[#140E34] border-[#2B1F5E] hover:border-emerald-400/40 hover:bg-[#18113E]'
@@ -1118,7 +1164,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                                   {item.spanishSituation}
                                 </span>
                               </div>
-                              <p className="text-sm font-bold text-white tracking-wide">
+                              <p className="text-sm sm:text-base font-bold text-white tracking-wide">
                                 {item.entrecasaNative}
                               </p>
                               {item.phoneticEasy && (
@@ -1140,7 +1186,43 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                               )}
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                              {/* Option A: HD Studio Audio */}
+                              <button
+                                type="button"
+                                onClick={() => handlePlayVoice(item, false)}
+                                disabled={isLoading}
+                                className={`px-3 py-2.5 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                                  isPlaying
+                                    ? 'bg-amber-400 text-slate-950 ring-2 ring-amber-300 shadow-lg animate-pulse'
+                                    : isLoading
+                                    ? 'bg-amber-500/80 text-slate-950 animate-pulse'
+                                    : 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 shadow-md shadow-emerald-400/20 active:scale-95'
+                                }`}
+                                title="Escuchar audio HD con pronunciación de estudio"
+                              >
+                                {isLoading ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : isPlaying ? (
+                                  <Volume2 className="w-4 h-4 animate-bounce" />
+                                ) : (
+                                  <Play className="w-4 h-4 fill-current ml-0.5" />
+                                )}
+                                <span>{isPlaying ? 'Sonando' : 'Audio HD'}</span>
+                              </button>
+
+                              {/* Option B: Direct Device Speech (100% reliable without network) */}
+                              <button
+                                type="button"
+                                onClick={() => handlePlayVoice(item, true)}
+                                className="px-3 py-2.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/30 text-amber-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer active:scale-95"
+                                title="Reproducir inmediatamente con el sintetizador de tu propio celular (100% sin conexión ni demoras)"
+                              >
+                                <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                                <span>Voz Celular</span>
+                              </button>
+
+                              {/* Option C: Download .WAV for offline playback */}
                               <a
                                 href={getAudioDownloadUrl(
                                   item.entrecasaNative,
@@ -1148,38 +1230,11 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                                   selectedSpeed
                                 )}
                                 download={`InglesFacil_${item.id}.wav`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors flex items-center gap-1 text-[11px]"
+                                className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors flex items-center justify-center text-xs border border-white/10"
                                 title="Descargar archivo WAV listo para escuchar en tu celular"
                               >
-                                <Download className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="hidden sm:inline">Bajar .WAV</span>
+                                <Download className="w-4 h-4 text-emerald-400" />
                               </a>
-
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePlayVoice(item);
-                                }}
-                                disabled={isLoading}
-                                className={`p-3 rounded-xl flex items-center justify-center shrink-0 transition-all cursor-pointer ${
-                                  isPlaying
-                                    ? 'bg-amber-400 text-slate-950 ring-2 ring-amber-300 shadow-lg animate-pulse'
-                                    : isLoading
-                                    ? 'bg-amber-500/80 text-slate-950 animate-pulse'
-                                    : 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 shadow-md shadow-emerald-400/20 active:scale-95'
-                                }`}
-                                title="Reproducir frase en el altavoz"
-                              >
-                                {isLoading ? (
-                                  <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : isPlaying ? (
-                                  <Volume2 className="w-5 h-5 animate-bounce" />
-                                ) : (
-                                  <Play className="w-5 h-5 fill-current ml-0.5" />
-                                )}
-                              </button>
                             </div>
                           </div>
                         );
