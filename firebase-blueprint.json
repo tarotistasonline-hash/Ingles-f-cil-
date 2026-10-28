@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "SiteMetrics": {
+      "title": "SiteMetrics",
+      "description": "Global persistent counter and analytics tracking student visits",
+      "type": "object",
+      "properties": {
+        "totalVisits": {
+          "type": "number",
+          "description": "Cumulative total number of legitimate visits recorded across all sessions"
+        },
+        "uniqueVisitors": {
+          "type": "number",
+          "description": "Total count of unique individual learners/devices"
+        },
+        "todayVisits": {
+          "type": "number",
+          "description": "Count of visits recorded on the current calendar day"
+        },
+        "lastVisitDate": {
+          "type": "string",
+          "description": "Current date in YYYY-MM-DD format for daily resets"
+        },
+        "lastVisitTimestamp": {
+          "type": "string",
+          "description": "ISO timestamp of the most recent visit event"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp when the metric document was last synchronized"
+        }
+      },
+      "required": ["totalVisits", "uniqueVisitors", "todayVisits", "lastVisitDate"]
+    },
+    "VisitorLog": {
+      "title": "VisitorLog",
+      "description": "Record of an individual student or tester session",
+      "type": "object",
+      "properties": {
+        "visitorId": {
+          "type": "string",
+          "description": "Persistent unique browser identifier"
+        },
+        "firstSeenAt": {
+          "type": "string",
+          "description": "ISO timestamp when the visitor first entered"
+        },
+        "lastSeenAt": {
+          "type": "string",
+          "description": "ISO timestamp of the latest interaction"
+        },
+        "visitCount": {
+          "type": "number",
+          "description": "Number of recorded visits by this visitor"
+        },
+        "isCreator": {
+          "type": "boolean",
+          "description": "Flag indicating if the session belongs to creator mode"
+        }
+      },
+      "required": ["visitorId", "firstSeenAt", "lastSeenAt", "visitCount"]
+    }
+  },
+  "firestore": {
+    "/site_metrics/{metricId}": {
+      "schema": "SiteMetrics",
+      "description": "Global visitor metrics documents readable by all visitors and updatable on legitimate visits"
+    },
+    "/visitors/{visitorId}": {
+      "schema": "VisitorLog",
+      "description": "Individual visitor session records tracking unique student devices"
+    }
+  }
+}

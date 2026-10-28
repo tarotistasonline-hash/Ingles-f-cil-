@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidSiteMetrics(data) {
+      return data.keys().hasAll(['totalVisits', 'uniqueVisitors', 'todayVisits', 'lastVisitDate'])
+        && data.keys().hasOnly(['totalVisits', 'uniqueVisitors', 'todayVisits', 'lastVisitDate', 'lastVisitTimestamp', 'updatedAt', 'creatorSessionsExcluded'])
+        && data.totalVisits is number
+        && data.totalVisits >= 0
+        && data.uniqueVisitors is number
+        && data.uniqueVisitors >= 0
+        && data.todayVisits is number
+        && data.todayVisits >= 0
+        && data.lastVisitDate is string
+        && data.lastVisitDate.size() <= 25;
+    }
+
+    function isValidVisitorLog(data) {
+      return data.keys().hasAll(['visitorId', 'firstSeenAt', 'lastSeenAt', 'visitCount'])
+        && data.keys().hasOnly(['visitorId', 'firstSeenAt', 'lastSeenAt', 'visitCount', 'isCreator', 'referrer'])
+        && data.visitorId is string
+        && data.visitorId.size() > 0
+        && data.visitorId.size() <= 80
+        && data.visitCount is number
+        && data.visitCount >= 1;
+    }
+
+    // Site metrics: publicly readable so live visitor badge shows current count
+    match /site_metrics/{metricId} {
+      allow get: if isValidId(metricId);
+      allow list: if true;
+      allow create, update: if isValidId(metricId) && isValidSiteMetrics(request.resource.data);
+      allow delete: if false;
+    }
+
+    // Individual visitor session logs
+    match /visitors/{visitorId} {
+      allow get: if isValidId(visitorId);
+      allow list: if false;
+      allow create, update: if isValidId(visitorId) && isValidVisitorLog(request.resource.data);
+      allow delete: if false;
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

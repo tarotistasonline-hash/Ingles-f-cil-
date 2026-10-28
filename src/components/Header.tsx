@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, LayoutGrid, ScrollText, Headphones, HelpCircle, X, Check, Info } from 'lucide-react';
+import { Volume2, LayoutGrid, ScrollText, Headphones, HelpCircle, X, Check, Info, Sun, Moon } from 'lucide-react';
 import { SPEED_LEVELS } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
+import { AppTheme } from '../types';
 
 interface HeaderProps {
   activeTab: string;
@@ -13,6 +14,8 @@ interface HeaderProps {
   onToggleViewMode?: () => void;
   onOpenKitModal?: () => void;
   onOpenVault?: () => void;
+  currentTheme?: AppTheme;
+  onToggleTheme?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -24,6 +27,8 @@ export const Header: React.FC<HeaderProps> = ({
   viewMode = 'modular',
   onToggleViewMode,
   onOpenKitModal,
+  currentTheme = 'vibrant-dark',
+  onToggleTheme,
 }) => {
   const [showSpeedHelp, setShowSpeedHelp] = useState(false);
   const speedHelpRef = useRef<HTMLDivElement>(null);
@@ -146,6 +151,37 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <ScrollText className="w-3.5 h-3.5 text-emerald-400" />
                   <span className="text-[11px] font-medium">Ver Todo</span>
+                </>
+              )}
+            </button>
+          )}
+
+          {/* Theme Toggle: Vibrant Dark vs Clean Light */}
+          {onToggleTheme && (
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer shadow-xs active:scale-95 ${
+                currentTheme === 'clean-light'
+                  ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 hover:border-amber-400'
+                  : 'bg-slate-900 border-slate-700/80 text-slate-300 hover:text-white hover:border-amber-400/50'
+              }`}
+              title={
+                currentTheme === 'clean-light'
+                  ? 'Modo Claro activo (alto contraste). Clic para volver a modo Oscuro.'
+                  : 'Modo Oscuro activo. Clic para cambiar a modo Claro (ideal para leer en exteriores o luz brillante).'
+              }
+              aria-label="Alternar tema claro y oscuro"
+            >
+              {currentTheme === 'clean-light' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-600 fill-amber-400" />
+                  <span className="text-[11px] font-bold text-amber-900 hidden sm:inline">Claro</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-indigo-300 fill-indigo-400/30" />
+                  <span className="text-[11px] font-bold text-slate-300 hidden sm:inline">Oscuro</span>
                 </>
               )}
             </button>

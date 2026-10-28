@@ -271,16 +271,25 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
             </div>
           </div>
 
-          {/* Explanation notes */}
-          <div className="p-3 rounded-lg bg-slate-800/50 text-[11px] text-slate-400 space-y-1.5 leading-relaxed">
-            <div className="flex items-center gap-1 text-slate-300 font-medium">
-              <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>¿Cómo funciona el contador de visitas reales?</span>
+          {/* Explanation notes - Simple and direct */}
+          <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300 space-y-2 leading-relaxed">
+            <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>100% Automático y Directo en tu Web</span>
             </div>
-            <ul className="list-disc list-inside space-y-0.5 text-slate-400">
-              <li>Registra visitas reales de estudiantes en computadoras, celulares y tablets.</li>
-              <li>Deduplica recargas instantáneas (intervalo breve de 25s para no inflar métricas).</li>
-              <li>Almacenamiento persistente en el servidor para que nunca se reinicie.</li>
+            <ul className="space-y-1 text-slate-300 text-[11px]">
+              <li className="flex items-start gap-1.5">
+                <span className="text-emerald-400 font-bold">✓</span>
+                <span><strong>No tienes que hacer nada:</strong> Cada vez que alguien entra a la página desde cualquier celular o computadora, el contador suma la visita en automático.</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <span className="text-emerald-400 font-bold">✓</span>
+                <span><strong>A la vista siempre:</strong> Ves los números directamente aquí en tu pantalla, sin entrar a paneles raros ni configuraciones externas.</span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <span className="text-emerald-400 font-bold">✓</span>
+                <span><strong>Guardado permanente:</strong> Tus visitas quedan almacenadas de forma segura para que nunca se reinicien a cero.</span>
+              </li>
             </ul>
           </div>
 

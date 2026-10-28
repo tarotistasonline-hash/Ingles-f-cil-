@@ -1,4 +1,5 @@
 export type SkillLevel = 'cero' | 'principiante' | 'avanzado';
+export type AppTheme = 'vibrant-dark' | 'clean-light';
 
 export interface PowerChunk {
   id: string;

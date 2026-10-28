@@ -1,9 +1,14 @@
 import { PowerChunk, Scenario, ConnectedSpeechLesson, ReflexChallenge, EntrecasaPhrase } from '../types';
 
-export const HERO_IMAGE = '/src/assets/images/hero_natural_flow_1791483871015.jpg';
-export const CAFE_IMAGE = '/src/assets/images/scene_cafe_order_1791483883249.jpg';
-export const TRAVEL_IMAGE = '/src/assets/images/scene_travel_chat_1791483893789.jpg';
-export const ENTRECASA_IMAGE = '/src/assets/images/scene_entrecasa_cozy_1791492514223.jpg';
+import heroImg from '../assets/images/hero_natural_flow_1791483871015.jpg';
+import cafeImg from '../assets/images/scene_cafe_order_1791483883249.jpg';
+import travelImg from '../assets/images/scene_travel_chat_1791483893789.jpg';
+import entrecasaImg from '../assets/images/scene_entrecasa_cozy_1791492514223.jpg';
+
+export const HERO_IMAGE = heroImg || '/images/hero_natural_flow_1791483871015.jpg';
+export const CAFE_IMAGE = cafeImg || '/images/scene_cafe_order_1791483883249.jpg';
+export const TRAVEL_IMAGE = travelImg || '/images/scene_travel_chat_1791483893789.jpg';
+export const ENTRECASA_IMAGE = entrecasaImg || '/images/scene_entrecasa_cozy_1791492514223.jpg';
 
 export const SCENARIOS: Scenario[] = [
   {

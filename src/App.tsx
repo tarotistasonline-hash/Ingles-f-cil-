@@ -23,7 +23,8 @@ import { WhatsAppHelpButton } from './components/WhatsAppHelpButton';
 import { Footer } from './components/Footer';
 import { triggerConfetti } from './utils/confetti';
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
-import { SkillLevel } from './types';
+import { SkillLevel, AppTheme } from './types';
+import { getInitialTheme, applyThemeToDocument } from './services/theme';
 import {
   verifyPurchaseOnServer,
   setVerifiedPurchaseSession,
@@ -32,6 +33,7 @@ import {
 import { recordVisit } from './services/visitorTracker';
 
 export default function App() {
+  const [theme, setTheme] = useState<AppTheme>(getInitialTheme);
   const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>(() => {
     if (typeof window !== 'undefined') {
@@ -62,6 +64,14 @@ export default function App() {
   const [currentSpeed, setCurrentSpeed] = useState<number>(() => getGlobalAudioSpeed());
   const [activeLevel, setActiveLevel] = useState<SkillLevel | 'all'>('all');
   const [isKitModalOpen, setIsKitModalOpen] = useState(false);
+
+  React.useEffect(() => {
+    applyThemeToDocument(theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'vibrant-dark' ? 'clean-light' : 'vibrant-dark'));
+  };
 
   React.useEffect(() => {
     // Record visit globally on root mount across all devices, routes and tabs
@@ -293,8 +303,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-vibrant-dark text-slate-100 flex flex-col font-sans-clean selection:bg-amber-400 selection:text-slate-950">
-      {/* Top Bar Navigation with Audio Speed Selector and View Switcher */}
+    <div
+      className={`min-h-screen flex flex-col font-sans-clean transition-colors duration-200 ${
+        theme === 'clean-light'
+          ? 'bg-clean-light text-slate-900 selection:bg-amber-300 selection:text-slate-900'
+          : 'bg-vibrant-dark text-slate-100 selection:bg-amber-400 selection:text-slate-950'
+      }`}
+    >
+      {/* Top Bar Navigation with Audio Speed Selector, Theme Toggle and View Switcher */}
       <Header
         activeTab={activeTab}
         setActiveTab={navigateTo}
@@ -304,6 +320,8 @@ export default function App() {
         viewMode={viewMode}
         onToggleViewMode={toggleViewMode}
         onOpenKitModal={() => setIsKitModalOpen(true)}
+        currentTheme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       <main className="flex-1">
@@ -319,6 +337,7 @@ export default function App() {
                   onTryTweak={() => navigateTo('tweak')}
                   onExploreEntrecasa={() => navigateTo('entrecasa')}
                   onStartDesdeCero={() => navigateTo('desde-cero')}
+                  onStartGym={() => navigateTo('gym')}
                   onOpenKit={() => setIsKitModalOpen(true)}
                   currentSpeed={currentSpeed}
                 />
@@ -468,7 +487,11 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer onNavigate={navigateTo} />
+      <Footer
+        onNavigate={navigateTo}
+        currentTheme={theme}
+        onToggleTheme={toggleTheme}
+      />
 
       {/* Floating Audio-Kit Trigger (Visible Everywhere across the app) */}
       <AudioKitFloatingTrigger onOpenModal={() => setIsKitModalOpen(true)} />

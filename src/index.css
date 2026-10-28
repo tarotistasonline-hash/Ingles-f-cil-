@@ -137,3 +137,174 @@
   }
 }
 
+/* =========================================================================
+   CLEAN-LIGHT THEME SYSTEM OVERRIDES
+   Engineered for maximum accessibility & readability in bright daylight
+   ========================================================================= */
+
+.bg-clean-light {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
+    radial-gradient(at 90% 15%, rgba(16, 185, 129, 0.07) 0px, transparent 50%),
+    radial-gradient(at 50% 60%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
+    radial-gradient(at 80% 85%, rgba(236, 72, 153, 0.05) 0px, transparent 50%);
+  color: #0f172a;
+}
+
+.clean-light {
+  color-scheme: light;
+}
+
+.clean-light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Header & Navigation Bar in Clean-Light */
+.clean-light header.sticky {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-bottom-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.clean-light header.sticky button span.font-heading {
+  color: #0f172a !important;
+}
+
+.clean-light header.sticky nav {
+  color: #334155 !important;
+}
+
+/* Transform Dark Panels to Crisp High-Contrast Light Cards */
+.clean-light [class*="bg-[#0c0a1d]"],
+.clean-light [class*="bg-[#14102e]"],
+.clean-light [class*="bg-[#120d2c]"],
+.clean-light [class*="bg-[#1a123e]"],
+.clean-light [class*="bg-[#100c2a]"],
+.clean-light [class*="bg-[#16113a]"],
+.clean-light [class*="bg-[#1f1745]"],
+.clean-light [class*="bg-[#18113e]"],
+.clean-light [class*="bg-[#0d0924]"],
+.clean-light [class*="bg-[#140e34]"],
+.clean-light [class*="bg-[#1c1642]"],
+.clean-light [class*="bg-[#0d0922]"],
+.clean-light [class*="bg-[#140e35]"],
+.clean-light [class*="bg-[#18233c]"],
+.clean-light [class*="bg-[#110d29]"],
+.clean-light [class*="bg-[#1a1440]"],
+.clean-light [class*="bg-[#0f0b24]"] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.clean-light [class*="bg-slate-900"],
+.clean-light [class*="bg-slate-950"],
+.clean-light [class*="bg-black/"] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Typography Overrides in Clean-Light for Crystal-Clear Contrast */
+.clean-light p.text-slate-300,
+.clean-light span.text-slate-300,
+.clean-light div.text-slate-300,
+.clean-light li.text-slate-300 {
+  color: #334155 !important;
+}
+
+.clean-light p.text-slate-400,
+.clean-light span.text-slate-400,
+.clean-light div.text-slate-400,
+.clean-light li.text-slate-400 {
+  color: #475569 !important;
+}
+
+.clean-light p.text-slate-500,
+.clean-light span.text-slate-500,
+.clean-light div.text-slate-500 {
+  color: #64748b !important;
+}
+
+.clean-light h1 .from-white,
+.clean-light h2 .from-white,
+.clean-light h3 .from-white {
+  --tw-gradient-from: #0f172a var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #334155 var(--tw-gradient-to-position) !important;
+}
+
+.clean-light .text-white:not(button *):not([class*="bg-emerald-"]):not([class*="bg-amber-"]):not([class*="bg-rose-"]):not([class*="bg-sky-"]):not([class*="bg-violet-"]) {
+  color: #0f172a !important;
+}
+
+/* Form Inputs, Search Bars & Textareas in Clean-Light */
+.clean-light input,
+.clean-light textarea,
+.clean-light select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.clean-light input::placeholder,
+.clean-light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Borders in Clean-Light */
+.clean-light [class*="border-[#2"],
+.clean-light [class*="border-[#3"],
+.clean-light [class*="border-white/"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* Modal Dialogs in Clean-Light */
+.clean-light .fixed .bg-\[\#0c0a1d\],
+.clean-light .fixed .bg-\[\#0d0924\],
+.clean-light .fixed [class*="bg-[#1"] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Accessible High-Contrast Accents */
+.clean-light .text-amber-400,
+.clean-light .text-amber-300 {
+  color: #b45309 !important;
+}
+
+.clean-light .text-emerald-400,
+.clean-light .text-emerald-300 {
+  color: #047857 !important;
+}
+
+.clean-light .bg-amber-400\/10,
+.clean-light .bg-amber-500\/10,
+.clean-light .bg-amber-500\/15,
+.clean-light .bg-amber-400\/20 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+}
+
+.clean-light .bg-emerald-400\/10,
+.clean-light .bg-emerald-500\/10,
+.clean-light .bg-emerald-500\/15,
+.clean-light .bg-emerald-400\/20 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+}
+
+.clean-light .bg-rose-950\/20,
+.clean-light .bg-rose-950\/40,
+.clean-light .bg-rose-950\/60 {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+}
+
+/* Subtle Ambient Lighting in Clean-Light (No harsh glare) */
+.clean-light .animate-pulse-ambient,
+.clean-light .animate-float-slow,
+.clean-light .animate-float-reverse {
+  opacity: 0.15 !important;
+}
+
+

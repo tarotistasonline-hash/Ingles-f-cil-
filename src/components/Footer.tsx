@@ -1,7 +1,19 @@
 import React from 'react';
+import { Sun, Moon } from 'lucide-react';
 import { RealVisitsBadge } from './RealVisitsBadge';
+import { AppTheme } from '../types';
 
-export const Footer: React.FC<{ onNavigate: (tab: string) => void }> = ({ onNavigate }) => {
+interface FooterProps {
+  onNavigate: (tab: string) => void;
+  currentTheme?: AppTheme;
+  onToggleTheme?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({
+  onNavigate,
+  currentTheme = 'vibrant-dark',
+  onToggleTheme,
+}) => {
   return (
     <footer className="bg-[#070D18] text-slate-400 py-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,8 +86,28 @@ export const Footer: React.FC<{ onNavigate: (tab: string) => void }> = ({ onNavi
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} VibeEnglish. Aprende a hablar con libertad.</p>
-          <div className="flex items-center gap-3">
-            <span>Enfoque comunicativo directo</span>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {onToggleTheme && (
+              <button
+                type="button"
+                onClick={onToggleTheme}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 hover:border-amber-400/40 text-slate-300 hover:text-white transition-colors cursor-pointer text-xs"
+                title="Cambiar entre modo Oscuro (Vibrant Dark) y modo Claro (Clean Light)"
+              >
+                {currentTheme === 'clean-light' ? (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Cambiar a Modo Oscuro</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                    <span>Cambiar a Modo Claro (Alto Contraste)</span>
+                  </>
+                )}
+              </button>
+            )}
             <span aria-hidden="true">·</span>
             <span>Audio adaptable para principiantes</span>
           </div>

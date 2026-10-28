@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { HERO_IMAGE } from '../data/defaultData';
+import {
+  HERO_IMAGE,
+  CAFE_IMAGE,
+  TRAVEL_IMAGE,
+  ENTRECASA_IMAGE,
+} from '../data/defaultData';
 import {
   Volume2,
   ArrowRight,
@@ -14,6 +19,7 @@ import {
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
+import { DailyChallengeWidget } from './DailyChallengeWidget';
 
 interface HeroSectionProps {
   onStartSimulator: () => void;
@@ -21,6 +27,7 @@ interface HeroSectionProps {
   onTryTweak: () => void;
   onExploreEntrecasa?: () => void;
   onStartDesdeCero?: () => void;
+  onStartGym?: () => void;
   onOpenKit?: () => void;
   currentSpeed: number;
 }
@@ -31,6 +38,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onTryTweak,
   onExploreEntrecasa,
   onStartDesdeCero,
+  onStartGym,
   onOpenKit,
   currentSpeed,
 }) => {
@@ -43,6 +51,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       context: 'En un café o restaurante',
       tag: 'Cafetería & Pedidos',
       icon: '☕',
+      image: CAFE_IMAGE,
       literalSpanish: '¿Puedo tener un café para llevar por favor?',
       literalEnglishFailed: 'Can I have please a coffee for take away?',
       nativeSaying: 'Can I grab an Americano to go?',
@@ -56,6 +65,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       context: 'Pidiendo un favor o ayuda rápida',
       tag: 'Trabajo & Favores',
       icon: '💼',
+      image: HERO_IMAGE,
       literalSpanish: '¿Puedes tú mirar esto muy rápido?',
       literalEnglishFailed: 'Can you look this very quickly please?',
       nativeSaying: 'Any chance you could look over this real quick?',
@@ -69,6 +79,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       context: 'Despidiéndote o yéndote a casa',
       tag: 'Salidas & Despedidas',
       icon: '👋',
+      image: ENTRECASA_IMAGE,
       literalSpanish: 'Yo voy a ir a mi casa ahora, te veo luego',
       literalEnglishFailed: 'I will go to my home now, see you later',
       nativeSaying: "I'm about to head out, catch you later!",
@@ -82,6 +93,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       context: 'Al llegar a un aeropuerto o terminal',
       tag: 'Viajes & Direcciones',
       icon: '✈️',
+      image: TRAVEL_IMAGE,
       literalSpanish: '¿Dónde está la puerta para mi vuelo?',
       literalEnglishFailed: 'Where is the gate of my airplane fly?',
       nativeSaying: 'Which gate is flight 402 boarding at?',
@@ -222,7 +234,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         {/* Dynamic Interactive Scenario Bar with Gentle Live Ticker */}
-        <div className="mt-10 max-w-5xl mx-auto">
+        <div className="mt-8 sm:mt-10 max-w-5xl mx-auto">
           <div className="bg-[#120D2C]/90 border border-[#2B215E] rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 px-2">
               <span className="flex h-2.5 w-2.5 relative">
@@ -260,13 +272,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Symmetrical 2-Column Showcase Centered under Hero with Movement */}
         <div className="mt-6 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          {/* Left Column: Hero Visual Asset with Floating Motion Badges */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-[#2E2463] bg-[#14102E] group h-full flex flex-col justify-end min-h-[350px]">
+          {/* Left Column: Hero Visual Asset with Floating Motion Badges & Dynamic Scenes */}
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-[#2E2463] bg-[#14102E] group h-full flex flex-col justify-end min-h-[360px]">
             <img
-              src={HERO_IMAGE}
-              alt="Dos personas conversando en inglés de forma natural y espontánea en una cafetería"
-              className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.04] transition-transform duration-700 opacity-85"
-              referrerPolicy="no-referrer"
+              key={currentDemo.tag}
+              src={currentDemo.image || HERO_IMAGE}
+              alt={currentDemo.context}
+              className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.04] transition-all duration-700 opacity-90"
+              fetchPriority="high"
+              loading="eager"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/images/hero_natural_flow_1791483871015.jpg';
+              }}
             />
 
             {/* Floating Top Badge with Animated Soundwave (Movement) */}
@@ -486,6 +503,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Daily Challenge Widget: 5-Minute Micro-Activity for Daily Fluency */}
+        <div className="mt-10 sm:mt-12 max-w-5xl mx-auto">
+          <DailyChallengeWidget
+            onStartGym={onStartGym}
+            onExploreChunks={onExploreChunks}
+            onStartSimulator={onStartSimulator}
+            currentSpeed={currentSpeed}
+          />
         </div>
       </div>
     </section>
