@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Eye,
   RefreshCw,
+  Download,
 } from 'lucide-react';
 import {
   getVisitStats,
@@ -269,6 +270,34 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
                 )}
               </button>
             </div>
+
+            {/* Private Creator Backup Downloads (Only visible when Modo Creador is ON) */}
+            {stats.isCreator && (
+              <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                <span className="text-[11px] font-bold text-amber-300 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Archivos de Respaldo y Netlify (Privado para el Creador):</span>
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href="/codigo_fuente_completo.zip"
+                    download="codigo_fuente_completo.zip"
+                    className="p-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 text-emerald-300 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-3 h-3" />
+                    <span>Código Fuente (.ZIP)</span>
+                  </a>
+                  <a
+                    href="/sitio_listo_netlify_dist.zip"
+                    download="sitio_listo_netlify_dist.zip"
+                    className="p-2 rounded-lg bg-amber-500/15 border border-amber-500/30 hover:bg-amber-500/25 text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-3 h-3" />
+                    <span>Para Netlify (.ZIP)</span>
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Explanation notes - Simple and direct */}
