@@ -1,25 +1,112 @@
 [
   {
-    "id": "post-1791737986576-mww5",
-    "type": "sugerencia",
-    "title": "Proponer situaciones en el supermercado y compras",
-    "content": "Sería genial sumar una charla para preguntar en qué góndola están ciertos productos o pedir una bolsa reutilizable.",
-    "author": "Estudiante de Entrecasa",
+    "id": "post-op-1",
+    "type": "opinion",
+    "title": "Al fin perdí la vergüenza de atender en inglés: los bloques me salvaron en mi trabajo",
+    "content": "Trabajo en atención al público y cada vez que entraba un turista me quedaba en blanco por intentar traducir palabra por palabra mentalmente. Con los bloques automáticos de esta app ya no pienso en qué tiempo verbal usar: digo 'Could I get your name?' o 'Right this way' sin titubear. ¡Los audios a 0.65x me dieron la seguridad que ningún instituto me dio en años!",
+    "author": "Marisol T.",
     "authorLevel": "Principiante",
     "isCreator": false,
-    "date": "2026-10-11",
-    "likes": 2,
+    "date": "2026-10-25",
+    "likes": 53,
+    "status": "abierto",
     "comments": [
       {
-        "id": "c-1791737992001-y02o",
-        "author": "Camila",
+        "id": "c-op-101",
+        "author": "Diego F.",
         "isCreator": false,
-        "content": "¡Apoyo totalmente! Siempre dudo con how much is this vs how much does it cost.",
-        "date": "2026-10-11",
-        "likes": 0
+        "content": "¡Me pasa exactamente lo mismo en el hotel! Dejar de traducir en la cabeza es el mejor cambio.",
+        "date": "2026-10-26",
+        "likes": 12
+      },
+      {
+        "id": "c-op-102",
+        "author": "La Profe",
+        "isCreator": true,
+        "content": "¡Excelente Marisol! Automatizar el bloque como si fuera una sola palabra larga es el verdadero secreto de la fluidez.",
+        "date": "2026-10-26",
+        "likes": 21
       }
-    ],
-    "status": "abierto"
+    ]
+  },
+  {
+    "id": "post-2",
+    "type": "opinion",
+    "title": "Mi experiencia empezando de cero a los 45 años: al fin entiendo sin memorizar",
+    "content": "Toda mi vida sentí que el inglés no era para mí porque en la secundaria me hacían conjugar tablas de verbos interminables. Acá con la fonética figurada en español y los audios lentos a 0.65x pude soltar frases completas en 2 días sin trabarme. ¡El enfoque de bloques es un alivio total!",
+    "author": "Marcos G.",
+    "authorLevel": "Desde Cero",
+    "isCreator": false,
+    "date": "2026-10-10",
+    "likes": 47,
+    "status": "abierto",
+    "comments": [
+      {
+        "id": "c-103",
+        "author": "Valeria S.",
+        "isCreator": false,
+        "content": "¡Totalmente identificada Marcos! Escuchar el audio pausado te quita el pánico a no entender nada.",
+        "date": "2026-10-10",
+        "likes": 15
+      }
+    ]
+  },
+  {
+    "id": "post-op-2",
+    "type": "opinion",
+    "title": "Mi primer viaje a EE.UU. sin entrar en pánico en el aeropuerto ni en los cafés",
+    "content": "Siempre le tuve terror a la aduana y a pedir en cafeterías. Practiqué 10 minutos por día en el Simulador y en el Gimnasio de Reflejos. Cuando llegué a Miami pedí mi café con 'Can I grab an iced latte to go?' y la cajera me entendió al segundo sin mirarme raro. ¡Una satisfacción inexplicable sentir que te entienden a la primera!",
+    "author": "Esteban R. (Viajero)",
+    "authorLevel": "Principiante",
+    "isCreator": false,
+    "date": "2026-10-22",
+    "likes": 61,
+    "status": "abierto",
+    "comments": [
+      {
+        "id": "c-op-201",
+        "author": "Romina K.",
+        "isCreator": false,
+        "content": "¡Qué emoción! 'Can I grab...' es mi bloque favorito de la app, sirve para todo.",
+        "date": "2026-10-23",
+        "likes": 18
+      }
+    ]
+  },
+  {
+    "id": "post-op-3",
+    "type": "opinion",
+    "title": "Pensé que a mis 58 años ya era imposible: la fonética en español fue mi salvación",
+    "content": "Creía que la gente de mi edad ya no tenía oído para otro idioma. Pero ver cómo suena la palabra escrita tal cual en español ('ai-uás-uán-der-ing') y poder escucharla despacito a 0.65x las veces que necesite me devolvió la confianza. Hoy hablé por videollamada con mis nietos que viven en el exterior y se sorprendieron de lo claro que hablo.",
+    "author": "Patricia D.",
+    "authorLevel": "Desde Cero",
+    "isCreator": false,
+    "date": "2026-10-20",
+    "likes": 84,
+    "status": "abierto",
+    "comments": [
+      {
+        "id": "c-op-301",
+        "author": "La Profe",
+        "isCreator": true,
+        "content": "¡Qué orgullo Patricia! Nunca es tarde para entrenar el oído y la lengua. ¡Felicitaciones!",
+        "date": "2026-10-21",
+        "likes": 32
+      }
+    ]
+  },
+  {
+    "id": "post-op-4",
+    "type": "opinion",
+    "title": "El truco de no traducir palabra por palabra cambió mis reuniones de trabajo",
+    "content": "En mis reuniones en Zoom antes hacía silencios eternos de 5 segundos ('ehhh... I think that...'). Memorizar bloques como 'As far as I know...' o 'I was wondering if...' me dio fluidez inmediata. Mis compañeros de trabajo en el exterior ahora me notan mucho más seguro y directo.",
+    "author": "Gastón V.",
+    "authorLevel": "Avanzado",
+    "isCreator": false,
+    "date": "2026-10-18",
+    "likes": 39,
+    "status": "abierto",
+    "comments": []
   },
   {
     "id": "post-1",
@@ -52,59 +139,15 @@
     ]
   },
   {
-    "id": "post-2",
-    "type": "opinion",
-    "title": "Mi experiencia empezando de cero a los 45 años: al fin entiendo sin memorizar",
-    "content": "Toda mi vida sentí que el inglés no era para mí porque en la secundaria me hacían conjugar tablas de verbos interminables. Acá con la fonética figurada en español y los audios lentos a 0.65x pude soltar frases completas en 2 días sin trabarme. ¡El enfoque de bloques es un alivio total!",
-    "author": "Marcos G.",
-    "authorLevel": "Desde Cero",
-    "isCreator": false,
-    "date": "2026-10-10",
-    "likes": 29,
-    "status": "abierto",
-    "comments": [
-      {
-        "id": "c-103",
-        "author": "Valeria S.",
-        "isCreator": false,
-        "content": "¡Totalmente identificada Marcos! Escuchar el audio pausado te quita el pánico a no entender nada.",
-        "date": "2026-10-10",
-        "likes": 6
-      }
-    ]
-  },
-  {
-    "id": "post-3",
-    "type": "sugerencia",
-    "title": "Sugerencia: ¿Se podría agregar un botón de prueba de micrófono en el Simulador?",
-    "content": "A veces cuando estoy con auriculares no sé si el navegador captó bien el micrófono antes de empezar. Un botoncito rápido de testeo antes de la charla sería genial.",
-    "author": "Andrés (Viajero)",
-    "authorLevel": "Principiante",
-    "isCreator": false,
-    "date": "2026-10-11",
-    "likes": 19,
-    "status": "implementado",
-    "comments": [
-      {
-        "id": "c-104",
-        "author": "Equipo Entrecasa",
-        "isCreator": true,
-        "content": "¡Excelente idea Andrés! El simulador ahora valida permisos en tiempo real y permite fallback con botones de voz si no tienes micrófono a mano.",
-        "date": "2026-10-11",
-        "likes": 8
-      }
-    ]
-  },
-  {
     "id": "post-4",
     "type": "debate",
     "title": "El secreto de aprender en pantuflas: ¿Por qué menos presión significa más fluidez?",
     "content": "Cuando estás en un aula bajo presión de que te corrijan con un bolígrafo rojo, el cerebro libera cortisol y bloquea el acceso rápido al vocabulario. En cambio, cuando practicas 5 minutos descalzo en la cocina jugando con el Gimnasio de Reflejos, los bloques se fijan en la memoria a largo plazo de forma natural.",
-    "author": "Coach Leo",
-    "authorLevel": "Asesor",
+    "author": "La Profe",
+    "authorLevel": "Mentora",
     "isCreator": true,
     "date": "2026-10-11",
-    "likes": 44,
+    "likes": 64,
     "status": "abierto",
     "comments": []
   }

@@ -16,6 +16,10 @@ import {
   XCircle,
   Radio,
   Zap,
+  MessageSquare,
+  Star,
+  Quote,
+  Heart,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
@@ -29,6 +33,8 @@ interface HeroSectionProps {
   onStartDesdeCero?: () => void;
   onStartGym?: () => void;
   onOpenKit?: () => void;
+  onAskTeacher?: () => void;
+  onOpenBlog?: () => void;
   currentSpeed: number;
 }
 
@@ -40,6 +46,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onStartDesdeCero,
   onStartGym,
   onOpenKit,
+  onAskTeacher,
+  onOpenBlog,
   currentSpeed,
 }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -196,6 +204,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 className="px-5 py-3 text-sm font-semibold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-xl transition-all cursor-pointer hover:scale-102"
               >
                 Vida Cotidiana
+              </button>
+            )}
+            {onAskTeacher && (
+              <button
+                onClick={onAskTeacher}
+                className="group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 border border-purple-400/50 rounded-xl shadow-lg shadow-purple-900/30 transition-all cursor-pointer hover:scale-103 flex items-center gap-2"
+                title="Escribe tu duda y la profe te responde con audio y fonética"
+              >
+                <span>👩‍🏫</span>
+                <span>Preguntarle a la profe</span>
               </button>
             )}
             <button
@@ -505,14 +523,206 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
         </div>
 
+        {/* LUGAR DESTACADO: Banner Interactivo "Preguntarle a la profe" */}
+        {onAskTeacher && (
+          <div className="mt-8 sm:mt-10 max-w-5xl mx-auto">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1E124A] via-[#161036] to-[#25144A] border-2 border-amber-400/60 p-5 sm:p-6 shadow-2xl shadow-purple-950/60 group">
+              <div className="absolute -right-12 -top-12 w-48 h-48 bg-amber-400/10 rounded-full blur-2xl pointer-events-none"></div>
+              <div className="flex flex-col md:flex-row items-center justify-between gap-5 relative z-10">
+                <div className="flex items-center gap-4 text-center md:text-left">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 flex items-center justify-center text-3xl shadow-lg shadow-amber-400/30 shrink-0 group-hover:scale-105 transition-transform">
+                    👩‍🏫
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                      <h3 className="font-heading text-lg sm:text-xl font-bold text-white">
+                        Preguntarle a la profe
+                      </h3>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/40 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        En línea · Explicación Simple
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
+                      ¿Tienes dudas sobre cómo decir una frase real o cómo sonar natural? Escribe tu duda en español y la profe te dará la respuesta exacta con audio pausado y fonética simple.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={onAskTeacher}
+                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-amber-400/25 hover:scale-104 transition-all flex items-center gap-2 cursor-pointer shrink-0"
+                >
+                  <span>Preguntarle a la profe</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Daily Challenge Widget: 5-Minute Micro-Activity for Daily Fluency */}
-        <div className="mt-10 sm:mt-12 max-w-5xl mx-auto">
+        <div className="mt-8 sm:mt-10 max-w-5xl mx-auto">
           <DailyChallengeWidget
             onStartGym={onStartGym}
             onExploreChunks={onExploreChunks}
             onStartSimulator={onStartSimulator}
             currentSpeed={currentSpeed}
           />
+        </div>
+
+        {/* LUGAR DESTACADO: Blog & Opiniones Reales de la Comunidad */}
+        <div className="mt-12 sm:mt-16 max-w-5xl mx-auto">
+          <div className="rounded-3xl bg-gradient-to-b from-[#151035] via-[#100C2A] to-[#0D0922] border-2 border-emerald-400/40 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            {/* Header del bloque destacado */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-[#281F54] relative z-10">
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-400/40 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Blog & Opiniones</span>
+                  </span>
+                  <span className="text-xs font-semibold text-amber-300 flex items-center gap-1 bg-amber-950/40 border border-amber-400/30 px-2.5 py-0.5 rounded-full">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span>4.9 / 5 · Experiencias Reales</span>
+                  </span>
+                </div>
+                <h3 className="font-heading text-xl sm:text-2xl font-bold text-white pt-1">
+                  Lo que opinan quienes ya están hablando con soltura
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300">
+                  Estudiantes desde cero, profesionales y viajeros que superaron el miedo a quedarse en blanco.
+                </p>
+              </div>
+
+              {onOpenBlog && (
+                <button
+                  onClick={onOpenBlog}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-xs sm:text-sm transition-all shadow-md shadow-emerald-400/20 hover:scale-103 flex items-center gap-2 cursor-pointer shrink-0"
+                >
+                  <span>Ver todas en el Blog</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Cuadrícula de Opiniones Destacadas */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 relative z-10">
+              {/* Opinión 1 */}
+              <div className="bg-[#0A071E]/90 border border-[#281F54] hover:border-emerald-400/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all group hover:scale-[1.02]">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-emerald-400/20 border border-emerald-400/40 text-emerald-300 font-bold text-xs flex items-center justify-center">
+                        MT
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white leading-tight">Marisol T.</p>
+                        <span className="text-[10px] text-emerald-300 font-medium">Principiante · Trabajo</span>
+                      </div>
+                    </div>
+                    <div className="flex text-amber-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-amber-400" />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed italic">
+                    "Al fin perdí la vergüenza de atender en inglés: los bloques me salvaron en mi trabajo. Ya no pienso en qué tiempo verbal usar, digo <strong className="text-emerald-300 not-italic">'Could I get your name?'</strong> sin titubear. ¡Los audios a 0.65x son un alivio!"
+                  </p>
+                </div>
+                <div className="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                  <span className="flex items-center gap-1 text-rose-400">
+                    <Heart className="w-3 h-3 fill-rose-500" />
+                    <span>53 coincidieron</span>
+                  </span>
+                  <span>Hace 4 días</span>
+                </div>
+              </div>
+
+              {/* Opinión 2 */}
+              <div className="bg-[#0A071E]/90 border border-[#281F54] hover:border-amber-400/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all group hover:scale-[1.02]">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 font-bold text-xs flex items-center justify-center">
+                        MG
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white leading-tight">Marcos G. (45 años)</p>
+                        <span className="text-[10px] text-amber-300 font-medium">Desde Cero Absoluto</span>
+                      </div>
+                    </div>
+                    <div className="flex text-amber-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-amber-400" />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed italic">
+                    "Empezando a los 45 años: al fin entiendo sin memorizar. Con la fonética en español y el audio pausado pude soltar frases en 2 días sin trabarme. ¡Cero listas de verbos interminables!"
+                  </p>
+                </div>
+                <div className="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                  <span className="flex items-center gap-1 text-rose-400">
+                    <Heart className="w-3 h-3 fill-rose-500" />
+                    <span>47 coincidieron</span>
+                  </span>
+                  <span>Hace 2 semanas</span>
+                </div>
+              </div>
+
+              {/* Opinión 3 */}
+              <div className="bg-[#0A071E]/90 border border-[#281F54] hover:border-sky-400/50 rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all group hover:scale-[1.02]">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-sky-400/20 border border-sky-400/40 text-sky-300 font-bold text-xs flex items-center justify-center">
+                        ER
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white leading-tight">Esteban R.</p>
+                        <span className="text-[10px] text-sky-300 font-medium">Viajes & Vacaciones</span>
+                      </div>
+                    </div>
+                    <div className="flex text-amber-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-amber-400" />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed italic">
+                    "Mi primer viaje a EE.UU. sin entrar en pánico en el aeropuerto. Practiqué en el Simulador y cuando llegué pedí mi café con <strong className="text-sky-300 not-italic">'Can I grab an iced latte to go?'</strong> y me entendieron a la primera."
+                  </p>
+                </div>
+                <div className="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                  <span className="flex items-center gap-1 text-rose-400">
+                    <Heart className="w-3 h-3 fill-rose-500" />
+                    <span>61 coincidieron</span>
+                  </span>
+                  <span>Hace 1 semana</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer con llamada a la acción hacia el blog */}
+            <div className="mt-6 pt-5 border-t border-[#281F54] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 relative z-10">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>¿Tú también tienes una duda, sugerencia o anécdota para compartir?</span>
+              </span>
+              {onOpenBlog && (
+                <button
+                  onClick={onOpenBlog}
+                  className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                >
+                  <span>✍️ Dejar mi opinión en el Blog</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -151,7 +151,7 @@ export async function evaluateRoleplaySession(payload: {
   };
 }
 
-export async function askCoachLeo(query: string) {
+export async function askTeacher(query: string) {
   try {
     const res = await fetch('/api/coach-ask', {
       method: 'POST',
@@ -180,6 +180,8 @@ export async function askCoachLeo(query: string) {
     soundTip: "Une 'about to' como 'ə-baʊ-tə' sin hacer pausa entre las dos palabras.",
   };
 }
+
+export const askCoachLeo = askTeacher;
 
 export async function evaluateGymReflex(payload: {
   challengePrompt: string;

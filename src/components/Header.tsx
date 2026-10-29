@@ -102,6 +102,18 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Reflejos 5s</span>
           </button>
           <button
+            onClick={() => setActiveTab('coach')}
+            className={`transition-all flex items-center gap-1.5 px-3 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+              activeTab === 'coach'
+                ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
+                : 'bg-purple-950/40 hover:bg-purple-900/60 border-purple-400/40 hover:border-amber-400 text-purple-200 hover:text-white'
+            }`}
+            title="Pregúntale cualquier duda de inglés a la profe"
+          >
+            <span>👩‍🏫</span>
+            <span>Preguntarle a la profe</span>
+          </button>
+          <button
             onClick={() => setActiveTab('dashboard')}
             className={`transition-colors hover:text-white flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400/10 border border-amber-400/25 ${
               activeTab === 'dashboard'
@@ -110,6 +122,18 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <span>📊 Progreso</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('blog')}
+            className={`transition-all flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold shadow-xs ${
+              activeTab === 'blog'
+                ? 'bg-amber-400 text-slate-950 font-bold border-amber-400'
+                : 'bg-slate-900 border-slate-700/80 text-slate-300 hover:text-white hover:border-amber-400/50'
+            }`}
+            title="Opiniones reales de estudiantes y buzón de la comunidad"
+          >
+            <span>💬</span>
+            <span>Blog & Opiniones</span>
           </button>
           <button
             onClick={onOpenKitModal || (() => setActiveTab('kit'))}

@@ -321,6 +321,8 @@ export default function App() {
                   onStartDesdeCero={() => navigateTo('desde-cero')}
                   onStartGym={() => navigateTo('gym')}
                   onOpenKit={() => setIsKitModalOpen(true)}
+                  onAskTeacher={() => navigateTo('coach')}
+                  onOpenBlog={() => navigateTo('blog')}
                   currentSpeed={currentSpeed}
                 />
               </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { askCoachLeo } from '../services/api';
+import { askTeacher } from '../services/api';
 import { playEnglishVoice } from '../services/audio';
 import { Sparkles, Volume2, MessageSquare, Send, Zap } from 'lucide-react';
 
@@ -26,7 +26,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
 
     setIsLoading(true);
     try {
-      const data = await askCoachLeo(q);
+      const data = await askTeacher(q);
       setResponse(data);
     } catch (err) {
       console.error('Coach ask error:', err);
@@ -50,16 +50,16 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
         {/* Header */}
         <div className="max-w-3xl space-y-3">
           <div className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-400">
-            <span>Tu Mentor Bilingüe</span>
+            <span>👩‍🏫 Tu Mentora Bilingüe</span>
             <span aria-hidden="true">·</span>
-            <span>Cero Jerga Gramatical</span>
+            <span>Cero Vergüenza · Cero Jerga</span>
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Pregúntale a Leo: "¿Cómo se dice esto de verdad?"
+          <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+            <span>Pregúntale a la profe: "¿Cómo se dice esto de verdad?"</span>
           </h2>
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
             Pregúntale cualquier duda que siempre te dio pena hacer en clase o cualquier expresión que no sepas cómo decir naturalmente.
-            Leo te responderá con bloques de la vida real, ritmo pausado y ejemplos claros con audio.
+            La profe te responderá con bloques de la vida real, ritmo pausado y ejemplos claros con audio.
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
-                placeholder="Pregunta a Leo: ej. '¿Cómo cancelo una cita sin sonar grosero?'"
+                placeholder="Pregunta a la profe: ej. '¿Cómo cancelo una cita sin sonar grosero?'"
                 className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
               />
               <button
@@ -81,7 +81,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                 className="px-6 py-3 rounded-xl bg-amber-400 text-slate-950 font-bold text-sm hover:bg-amber-300 disabled:opacity-40 transition-colors flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap shadow-xs"
               >
                 <Sparkles className="w-4 h-4 text-slate-950" />
-                <span>{isLoading ? 'Consultando...' : 'Preguntar a Leo'}</span>
+                <span>{isLoading ? 'Consultando...' : 'Preguntar a la profe'}</span>
               </button>
             </div>
 
@@ -107,13 +107,13 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
           {response && (
             <div className="pt-6 border-t border-slate-800 space-y-5 animate-in fade-in">
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs">
-                  L
+                <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xl flex items-center justify-center shrink-0 shadow-md">
+                  👩‍🏫
                 </div>
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold text-white">
-                      Leo (Tu Coach Easy)
+                      La Profe (Tu Mentora Easy)
                     </span>
                     <span className="text-[11px] text-amber-300 bg-amber-950/60 px-2.5 py-0.5 rounded-full font-semibold border border-amber-900/60">
                       Explicación Simple (Easy)
@@ -176,19 +176,19 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                               </p>
                               <div className="flex items-center gap-1">
                                 <button
-                                  onClick={() => handlePlayVoice(ex.en, `ex-leo-${i}-slow`, 0.65)}
+                                  onClick={() => handlePlayVoice(ex.en, `ex-profe-${i}-slow`, 0.65)}
                                   className="text-[10px] text-slate-400 hover:text-amber-300 px-1 py-0.5 rounded bg-slate-900 border border-slate-800 cursor-pointer"
                                   title="Escuchar lento (0.65x)"
                                 >
                                   0.65x
                                 </button>
                                 <button
-                                  onClick={() => handlePlayVoice(ex.en, `ex-leo-${i}`)}
+                                  onClick={() => handlePlayVoice(ex.en, `ex-profe-${i}`)}
                                   className="text-slate-400 hover:text-amber-400 p-1 cursor-pointer"
                                 >
                                   <Volume2
                                     className={`w-3.5 h-3.5 ${
-                                      playingAudioKey?.startsWith(`ex-leo-${i}`)
+                                      playingAudioKey?.startsWith(`ex-profe-${i}`)
                                         ? 'text-amber-400 animate-pulse'
                                         : ''
                                     }`}

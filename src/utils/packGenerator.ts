@@ -622,7 +622,7 @@ SEMANA 4: AUTOMATIZACIÓN Y FLUIDEZ MUSCULAR (Días 22 al 30)
 ------------------------------------------------------------------------
 • Día 22: Desarmar la rigidez: Usar "You're good / Don't sweat it" en vez de disculpas.
 • Día 23: Bloques de rescate en restaurantes: cambiar un plato, pedir aderezos.
-• Día 24: Hablar con el Coach Leo en la app: tener 1 conversación completa.
+• Día 24: Hablar con la Profe en la app: tener 1 consulta o conversación completa.
 • Día 25: Repaso intensivo de las 10 contracciones clave del inglés hablado.
 • Día 26: Simular una conversación de viaje de principio a fin.
 • Día 27: Practicar frases a velocidad 1.0x (ritmo nativo de la calle).

@@ -767,7 +767,7 @@ Responde únicamente el JSON.`;
   }
 });
 
-// 4. Pregúntale al Coach Leo (Compañero Nativo)
+// 4. Pregúntale a la Profe (Mentora y Coach de Inglés Real)
 app.post('/api/coach-ask', async (req, res) => {
   const { query } = req.body;
   if (!query) {
@@ -779,13 +779,13 @@ app.post('/api/coach-ask', async (req, res) => {
   }
 
   try {
-    const prompt = `Eres Leo, un coach bilingüe nativo que ayuda a hispanohablantes a hablar inglés con fluidez y naturalidad REAL.
+    const prompt = `Eres "La Profe", una profesora y mentora bilingüe de inglés muy cercana, empática, paciente y motivadora. Ayudas a hispanohablantes a hablar inglés con fluidez y naturalidad REAL.
 REGLA DE ORO INQUEBRANTABLE:
 - TIENES PROHIBIDO usar terminología gramatical abstracta (nada de tiempos verbales formales, participios, complementos directos, modales auxiliares, etc.).
-- Explica usando BLOQUES DE LENGUAJE (chunks), cómo sienten los nativos la frase, ejemplos del día a día, y trucos de ritmo y contracción.
-- Sé cálido, conciso, motivador y directo al grano.
+- Explica usando BLOQUES DE LENGUAJE (chunks), cómo sienten los nativos la frase en la vida real, ejemplos cotidianos, y trucos de pronunciación y ritmo.
+- Sé ultra cálida, motivadora, pedagógica y directa al grano.
 
-Pregunta del usuario: "${query}"
+Pregunta del alumno: "${query}"
 
 Devuelve un JSON estrictamente estructurado así:
 {
@@ -1075,6 +1075,106 @@ interface BlogPost {
 function getInitialBlogPosts(): BlogPost[] {
   return [
     {
+      id: 'post-op-1',
+      type: 'opinion',
+      title: 'Al fin perdí la vergüenza de atender en inglés: los bloques me salvaron en mi trabajo',
+      content:
+        "Trabajo en atención al público y cada vez que entraba un turista me quedaba en blanco por intentar traducir palabra por palabra mentalmente. Con los bloques automáticos de esta app ya no pienso en qué tiempo verbal usar: digo 'Could I get your name?' o 'Right this way' sin titubear. ¡Los audios a 0.65x me dieron la seguridad que ningún instituto me dio en años!",
+      author: 'Marisol T.',
+      authorLevel: 'Principiante',
+      isCreator: false,
+      date: '2026-10-25',
+      likes: 53,
+      status: 'abierto',
+      comments: [
+        {
+          id: 'c-op-101',
+          author: 'Diego F.',
+          isCreator: false,
+          content: '¡Me pasa exactamente lo mismo en el hotel! Dejar de traducir en la cabeza es el mejor cambio.',
+          date: '2026-10-26',
+          likes: 12,
+        },
+        {
+          id: 'c-op-102',
+          author: 'La Profe',
+          isCreator: true,
+          content: '¡Excelente Marisol! Automatizar el bloque como si fuera una sola palabra larga es el verdadero secreto de la fluidez.',
+          date: '2026-10-26',
+          likes: 21,
+        },
+      ],
+    },
+    {
+      id: 'post-2',
+      type: 'opinion',
+      title: 'Mi experiencia empezando de cero a los 45 años: al fin entiendo sin memorizar',
+      content:
+        'Toda mi vida sentí que el inglés no era para mí porque en la secundaria me hacían conjugar tablas de verbos interminables. Acá con la fonética figurada en español y los audios lentos a 0.65x pude soltar frases completas en 2 días sin trabarme. ¡El enfoque de bloques es un alivio total!',
+      author: 'Marcos G.',
+      authorLevel: 'Desde Cero',
+      isCreator: false,
+      date: '2026-10-10',
+      likes: 47,
+      status: 'abierto',
+      comments: [
+        {
+          id: 'c-103',
+          author: 'Valeria S.',
+          isCreator: false,
+          content: '¡Totalmente identificada Marcos! Escuchar el audio pausado te quita el pánico a no entender nada.',
+          date: '2026-10-10',
+          likes: 15,
+        },
+      ],
+    },
+    {
+      id: 'post-op-2',
+      type: 'opinion',
+      title: 'Mi primer viaje a EE.UU. sin entrar en pánico en el aeropuerto ni en los cafés',
+      content:
+        "Siempre le tuve terror a la aduana y a pedir en cafeterías. Practiqué 10 minutos por día en el Simulador y en el Gimnasio de Reflejos. Cuando llegué a Miami pedí mi café con 'Can I grab an iced latte to go?' y la cajera me entendió al segundo sin mirarme raro. ¡Una satisfacción inexplicable sentir que te entienden a la primera!",
+      author: 'Esteban R. (Viajero)',
+      authorLevel: 'Principiante',
+      isCreator: false,
+      date: '2026-10-22',
+      likes: 61,
+      status: 'abierto',
+      comments: [
+        {
+          id: 'c-op-201',
+          author: 'Romina K.',
+          isCreator: false,
+          content: "¡Qué emoción! 'Can I grab...' es mi bloque favorito de la app, sirve para todo.",
+          date: '2026-10-23',
+          likes: 18,
+        },
+      ],
+    },
+    {
+      id: 'post-op-3',
+      type: 'opinion',
+      title: 'Pensé que a mis 58 años ya era imposible: la fonética en español fue mi salvación',
+      content:
+        "Creía que la gente de mi edad ya no tenía oído para otro idioma. Pero ver cómo suena la palabra escrita tal cual en español ('ai-uás-uán-der-ing') y poder escucharla despacito a 0.65x las veces que necesite me devolvió la confianza. Hoy hablé por videollamada con mis nietos que viven en el exterior y se sorprendieron de lo claro que hablo.",
+      author: 'Patricia D.',
+      authorLevel: 'Desde Cero',
+      isCreator: false,
+      date: '2026-10-20',
+      likes: 84,
+      status: 'abierto',
+      comments: [
+        {
+          id: 'c-op-301',
+          author: 'La Profe',
+          isCreator: true,
+          content: '¡Qué orgullo Patricia! Nunca es tarde para entrenar el oído y la lengua. ¡Felicitaciones!',
+          date: '2026-10-21',
+          likes: 32,
+        },
+      ],
+    },
+    {
       id: 'post-1',
       type: 'sugerencia',
       title: 'Buzón Abierto: ¿Qué situaciones te gustaría ver en el Simulador de Voz?',
@@ -1108,64 +1208,16 @@ function getInitialBlogPosts(): BlogPost[] {
       ],
     },
     {
-      id: 'post-2',
-      type: 'opinion',
-      title: 'Mi experiencia empezando de cero a los 45 años: al fin entiendo sin memorizar',
-      content:
-        'Toda mi vida sentí que el inglés no era para mí porque en la secundaria me hacían conjugar tablas de verbos interminables. Acá con la fonética figurada en español y los audios lentos a 0.65x pude soltar frases completas en 2 días sin trabarme. ¡El enfoque de bloques es un alivio total!',
-      author: 'Marcos G.',
-      authorLevel: 'Desde Cero',
-      isCreator: false,
-      date: '2026-10-10',
-      likes: 29,
-      status: 'abierto',
-      comments: [
-        {
-          id: 'c-103',
-          author: 'Valeria S.',
-          isCreator: false,
-          content:
-            '¡Totalmente identificada Marcos! Escuchar el audio pausado te quita el pánico a no entender nada.',
-          date: '2026-10-10',
-          likes: 6,
-        },
-      ],
-    },
-    {
-      id: 'post-3',
-      type: 'sugerencia',
-      title: 'Sugerencia: ¿Se podría agregar un botón de prueba de micrófono en el Simulador?',
-      content:
-        'A veces cuando estoy con auriculares no sé si el navegador captó bien el micrófono antes de empezar. Un botoncito rápido de testeo antes de la charla sería genial.',
-      author: 'Andrés (Viajero)',
-      authorLevel: 'Principiante',
-      isCreator: false,
-      date: '2026-10-11',
-      likes: 19,
-      status: 'implementado',
-      comments: [
-        {
-          id: 'c-104',
-          author: 'Equipo Entrecasa',
-          isCreator: true,
-          content:
-            '¡Excelente idea Andrés! El simulador ahora valida permisos en tiempo real y permite fallback con botones de voz si no tienes micrófono a mano.',
-          date: '2026-10-11',
-          likes: 8,
-        },
-      ],
-    },
-    {
       id: 'post-4',
       type: 'debate',
       title: 'El secreto de aprender en pantuflas: ¿Por qué menos presión significa más fluidez?',
       content:
         'Cuando estás en un aula bajo presión de que te corrijan con un bolígrafo rojo, el cerebro libera cortisol y bloquea el acceso rápido al vocabulario. En cambio, cuando practicas 5 minutos descalzo en la cocina jugando con el Gimnasio de Reflejos, los bloques se fijan en la memoria a largo plazo de forma natural.',
-      author: 'Coach Leo',
-      authorLevel: 'Asesor',
+      author: 'La Profe',
+      authorLevel: 'Mentora',
       isCreator: true,
       date: '2026-10-11',
-      likes: 44,
+      likes: 64,
       status: 'abierto',
       comments: [],
     },
@@ -1488,6 +1540,16 @@ app.get('/sitemap.xml', (_req, res) => {
 // Serve public directory explicitly
 app.use(express.static(path.resolve(__dirname, 'public')));
 
+// Prevent aggressive browser caching of HTML entrypoint
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path.endsWith('.html')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
+
 // Vite middleware in dev or static files in production
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
@@ -1500,6 +1562,9 @@ async function startServer() {
   } else {
     app.use(express.static(path.resolve(__dirname, 'dist')));
     app.get('*', (_req, res) => {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
     });
   }
