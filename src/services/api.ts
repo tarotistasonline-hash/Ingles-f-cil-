@@ -1,15 +1,28 @@
 import { SpeakTweakResult, SessionConfidenceFeedback } from '../types';
 
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 7000): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
 export async function fetchSpeakTweak(
   userPhrase: string,
   context?: string
 ): Promise<SpeakTweakResult> {
   try {
-    const res = await fetch('/api/speak-tweak', {
+    const res = await fetchWithTimeout('/api/speak-tweak', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userPhrase, context }),
-    });
+    }, 7000);
 
     if (res.ok) {
       const data = await res.json();
@@ -21,9 +34,46 @@ export async function fetchSpeakTweak(
     console.warn('Network issue fetching tweak, falling back to local transformer:', err);
   }
 
-  // Graceful client fallback
+  // Graceful client fallback to guarantee instant disassembly
   const lower = (userPhrase || '').toLowerCase();
-  if (lower.includes('coffee') || lower.includes('cafe')) {
+  
+  if (lower.includes('descuento') || lower.includes('rebaja') || lower.includes('discount') || lower.includes('tacaño')) {
+    return {
+      literalSchool: 'I want to ask for a reduction of money without appearing cheap.',
+      nativeReal: 'Is there any wiggle room on the price?',
+      casualSlang: 'Could you cut me a deal on this?',
+      connectedSpeech: 'ɪz ðɛr ˈɛni ˈwɪɡəl rʊm ɑn ðə praɪs',
+      whyItSoundsNatural:
+        "Preguntar 'Is there any wiggle room on the price?' es la forma más educada y natural de pedir rebaja sin sonar tacaño ni agresivo.",
+      powerChunk: 'Is there any wiggle room on...?',
+    };
+  }
+
+  if (lower.includes('dejalo') || lower.includes('déjalo') || lower.includes('encargo yo') || lower.includes('después me')) {
+    return {
+      literalSchool: 'Leave it in that position and I will make the responsibility later.',
+      nativeReal: 'Just leave it there, I got this!',
+      casualSlang: "Leave it be, I'll take care of it.",
+      connectedSpeech: 'dʒʌst liːv ɪt ðɛr, aɪ ɡɑt ðɪs',
+      whyItSoundsNatural:
+        "'I got this' es el bloque universal de resolución. No traduzcas 'I will take charge', simplemente di 'I got this'.",
+      powerChunk: 'Just leave it there, I got this...',
+    };
+  }
+
+  if (lower.includes('juntada') || lower.includes('fiesta') || lower.includes('party') || lower.includes('no puedo')) {
+    return {
+      literalSchool: 'I will not be able to attend the celebration due to reasons.',
+      nativeReal: "I'm so sorry, I won't be able to make it tonight!",
+      casualSlang: 'Gotta pass tonight, have fun though!',
+      connectedSpeech: "aɪ woʊnt bi ˈeɪbəl tə meɪk ɪt",
+      whyItSoundsNatural:
+        "'Make it' es el bloque universal de los nativos para asistir a un evento. 'I won't be able to make it' es educado, fluido y 100% natural.",
+      powerChunk: "I won't be able to make it...",
+    };
+  }
+
+  if (lower.includes('coffee') || lower.includes('cafe') || lower.includes('café')) {
     return {
       literalSchool: 'I desire to buy a coffee with milk, please.',
       nativeReal: 'Can I grab an iced latte to go?',
@@ -35,7 +85,7 @@ export async function fetchSpeakTweak(
     };
   }
 
-  if (lower.includes('hambre') || lower.includes('hunger') || lower.includes('eat')) {
+  if (lower.includes('hambre') || lower.includes('hunger') || lower.includes('eat') || lower.includes('comer')) {
     return {
       literalSchool: 'I have very much hunger and I need food immediately.',
       nativeReal: "I'm starving, let's grab a bite!",
@@ -61,7 +111,7 @@ export async function fetchSpeakTweak(
 
   return {
     literalSchool: `I think that ${userPhrase.trim()}.`,
-    nativeReal: `I was wondering if we could ${userPhrase.replace(/^(i|yo)\s+/i, '').trim() || 'look into this'}.`,
+    nativeReal: `I was wondering if we could ${userPhrase.replace(/^(i|yo|quiero)\s+/i, '').trim() || 'handle this'}.`,
     casualSlang: 'You might as well go for it!',
     connectedSpeech: 'aɪ wəz ˈwʌndərɪŋ ɪf wi kʊd...',
     whyItSoundsNatural:
@@ -153,11 +203,11 @@ export async function evaluateRoleplaySession(payload: {
 
 export async function askTeacher(query: string) {
   try {
-    const res = await fetch('/api/coach-ask', {
+    const res = await fetchWithTimeout('/api/coach-ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
-    });
+    }, 7000);
 
     if (res.ok) {
       const data = await res.json();
@@ -166,18 +216,60 @@ export async function askTeacher(query: string) {
       }
     }
   } catch (err) {
-    console.warn('Network issue asking coach:', err);
+    console.warn('Network issue asking teacher, falling back to local answer:', err);
   }
 
+  const lower = (query || '').toLowerCase();
+
+  if (lower.includes('descuento') || lower.includes('rebaja') || lower.includes('discount') || lower.includes('tacaño') || lower.includes('barato')) {
+    return {
+      answer:
+        "¡Excelente pregunta! Para pedir un descuento sin sonar tacaño, los nativos suavizan la pregunta con amabilidad usando el bloque **'Is there any wiggle room on the price?'** (¿Hay algún margen de descuento?) o simplemente **'Could you do [monto]?'**. Suena educado y muy natural.",
+      powerChunk: "Is there any wiggle room on...?",
+      naturalExamples: [
+        { en: "Is there any wiggle room on the price?", es: "¿Habría alguna posibilidad de rebaja en el precio?", chunkNote: "Educado y coloquial" },
+        { en: "Could you do $20 for both?", es: "¿Me lo podrías dejar en $20 los dos?", chunkNote: "En mercados o ferias" },
+      ],
+      soundTip: "Une 'wiggle room' /wɪɡəl rʊm/ con ritmo relajado y una sonrisa en la voz.",
+    };
+  }
+
+  if (lower.includes('cancelo') || lower.includes('cancelar') || lower.includes('cita') || lower.includes('grosero') || lower.includes('plata') || lower.includes('reunión')) {
+    return {
+      answer:
+        "Para cancelar un plan sin quedar mal, nunca digas 'I cancel the appointment'. En inglés se usa el bloque de oro: **'Something came up, can we take a rain check?'** (Surgió un imprevisto, ¿lo podemos dejar para después?). Es cálido, comprensivo y nadie se ofende.",
+      powerChunk: "Something came up, could we...?",
+      naturalExamples: [
+        { en: "Something came up, could we take a rain check?", es: "Me surgió un imprevisto, ¿podemos dejarlo para otro día?", chunkNote: "Súper educado" },
+        { en: "I'm so sorry, I won't be able to make it today.", es: "Mil disculpas, no voy a poder llegar hoy.", chunkNote: "Uso diario" },
+      ],
+      soundTip: "El bloque 'Something came up' se pronuncia de un solo tiro: /sʌmθɪŋ keɪm ʌp/.",
+    };
+  }
+
+  if (lower.includes('pereza') || lower.includes('lazy') || lower.includes('ganas')) {
+    return {
+      answer:
+        "¡Olvídate de decir 'I have laziness'! En inglés los nativos dicen **'I can't be bothered'** o **'I don't feel like it'**. Son bloques automáticos que expresan esa falta de ganas sin inventar traducciones raras.",
+      powerChunk: "I can't be bothered to...",
+      naturalExamples: [
+        { en: "I can't be bothered to cook tonight.", es: "Me da una pereza tremenda cocinar hoy.", chunkNote: "Uso diario" },
+        { en: "I really don't feel like going out.", es: "No tengo nada de ganas de salir.", chunkNote: "Muy natural" },
+      ],
+      soundTip: "Pronuncia 'can't be bothered' de corrido: /kænt bi ˈbɑðərd/",
+    };
+  }
+
+  const cleanQ = (query || '').replace(/[¿?]/g, '').trim();
   return {
     answer:
-      "En lugar de pensar en reglas o fórmulas gramaticales, concéntrate en aprender el bloque como una sola unidad de sonido. Los nativos no analizan verbos al hablar, disparan bloques de fluidez que ya tienen memorizados con ritmo.",
-    powerChunk: "I'm about to...",
+      `¡Hola! Me alegra que me preguntes sobre "${cleanQ || 'esta duda'}". En inglés real, la regla de oro de la profe es no traducir palabra por palabra. Los nativos usan bloques automáticos que se dicen con ritmo y confianza, como **'I was wondering if...'** o **'How does that sound?'**.`,
+    powerChunk: "I was wondering if...",
     naturalExamples: [
-      { en: "I'm about to head out, catch you later!", es: "Ya casi me voy, ¡te veo luego!", chunkNote: "Bloque de salida" },
-      { en: "I was about to ask you the same thing!", es: "¡Justo te iba a preguntar lo mismo!", chunkNote: "Empatía inmediata" },
+      { en: "I was wondering if that works for you.", es: "Me preguntaba si eso te queda bien / te sirve.", chunkNote: "Cálido y seguro" },
+      { en: "No worries at all, you're good!", es: "¡Cero problema, no te preocupes!", chunkNote: "Alivio instantáneo" },
     ],
-    soundTip: "Une 'about to' como 'ə-baʊ-tə' sin hacer pausa entre las dos palabras.",
+    soundTip: "Recuerda pronunciar las frases en bloques continuos sin frenar entre cada palabra.",
   };
 }
 

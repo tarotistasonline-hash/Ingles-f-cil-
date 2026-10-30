@@ -20,13 +20,27 @@ const apiKey = process.env.GEMINI_API_KEY;
 const ai = apiKey
   ? new GoogleGenAI({
       apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
     })
   : null;
+
+// Helper to run Gemini with guaranteed timeout to avoid hanging requests
+async function generateGeminiContentWithTimeout(prompt: string, timeoutMs = 6000) {
+  if (!ai) return null;
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Gemini API timeout')), timeoutMs)
+  );
+  return Promise.race([
+    ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        temperature: 0.7,
+      },
+    }),
+    timeoutPromise,
+  ]);
+}
 
 // Helper to sanitize and extract JSON safely from Gemini response text
 function safeParseJson(rawText: string): any {
@@ -118,9 +132,44 @@ function getFallbackTweak(userPhrase: string, context?: string) {
   }
 
   if (
+    lower.includes('descuento') ||
+    lower.includes('rebaja') ||
+    lower.includes('discount') ||
+    lower.includes('tacaño')
+  ) {
+    return {
+      literalSchool: 'I want to ask for a reduction of money without appearing cheap.',
+      nativeReal: 'Is there any wiggle room on the price?',
+      casualSlang: 'Could you cut me a deal on this?',
+      connectedSpeech: 'ɪz ðɛr ˈɛni ˈwɪɡəl rʊm ɑn ðə praɪs',
+      whyItSoundsNatural:
+        "Preguntar 'Is there any wiggle room on the price?' es la forma más educada y natural de pedir rebaja sin sonar tacaño ni agresivo.",
+      powerChunk: 'Is there any wiggle room on...?',
+    };
+  }
+
+  if (
+    lower.includes('dejalo') ||
+    lower.includes('déjalo') ||
+    lower.includes('encargo yo') ||
+    lower.includes('después me')
+  ) {
+    return {
+      literalSchool: 'Leave it in that position and I will make the responsibility later.',
+      nativeReal: 'Just leave it there, I got this!',
+      casualSlang: "Leave it be, I'll take care of it.",
+      connectedSpeech: 'dʒʌst liːv ɪt ðɛr, aɪ ɡɑt ðɪs',
+      whyItSoundsNatural:
+        "'I got this' es el bloque universal de resolución. No traduzcas 'I will take charge', simplemente di 'I got this'.",
+      powerChunk: 'Just leave it there, I got this...',
+    };
+  }
+
+  if (
     lower.includes('fiesta') ||
     lower.includes('party') ||
     lower.includes('no puedo') ||
+    lower.includes('juntada') ||
     lower.includes('cancel')
   ) {
     return {
@@ -198,7 +247,34 @@ function getFallbackSessionEvaluation(messages: any[], scenarioTitle: string) {
 
 function getFallbackCoach(query: string) {
   const lower = (query || '').toLowerCase();
-  if (lower.includes('pereza') || lower.includes('lazy')) {
+  
+  if (lower.includes('descuento') || lower.includes('rebaja') || lower.includes('discount') || lower.includes('barato')) {
+    return {
+      answer:
+        "¡Excelente pregunta! Para pedir un descuento sin sonar tacaño, los nativos suavizan la pregunta con amabilidad usando el bloque **'Is there any wiggle room on the price?'** (¿Hay algún margen de descuento?) o simplemente **'Could you do [monto]?'**. Suena educado y muy natural.",
+      powerChunk: "Is there any wiggle room on...?",
+      naturalExamples: [
+        { en: "Is there any wiggle room on the price?", es: "¿Habría alguna posibilidad de rebaja en el precio?", chunkNote: "Educado y coloquial" },
+        { en: "Could you do $20 for both?", es: "¿Me lo podrías dejar en $20 los dos?", chunkNote: "En mercados o ferias" },
+      ],
+      soundTip: "Une 'wiggle room' /wɪɡəl rʊm/ con ritmo relajado y una sonrisa en la voz.",
+    };
+  }
+
+  if (lower.includes('cancelo') || lower.includes('cancelar') || lower.includes('cita') || lower.includes('grosero') || lower.includes('plata') || lower.includes('reunión')) {
+    return {
+      answer:
+        "Para cancelar un plan sin quedar mal, nunca digas 'I cancel the appointment'. En inglés se usa el bloque de oro: **'Something came up, can we take a rain check?'** (Surgió un imprevisto, ¿lo podemos dejar para después?). Es cálido, comprensivo y nadie se ofende.",
+      powerChunk: "Something came up, could we...?",
+      naturalExamples: [
+        { en: "Something came up, could we take a rain check?", es: "Me surgió un imprevisto, ¿podemos dejarlo para otro día?", chunkNote: "Súper educado" },
+        { en: "I'm so sorry, I won't be able to make it today.", es: "Mil disculpas, no voy a poder llegar hoy.", chunkNote: "Uso diario" },
+      ],
+      soundTip: "El bloque 'Something came up' se pronuncia de un solo tiro: /sʌmθɪŋ keɪm ʌp/.",
+    };
+  }
+
+  if (lower.includes('pereza') || lower.includes('lazy') || lower.includes('ganas')) {
     return {
       answer:
         "¡Olvídate de decir 'I have laziness'! En inglés los nativos dicen **'I can't be bothered'** o **'I don't feel like it'**. Son bloques automáticos que expresan esa falta de ganas sin inventar traducciones raras.",
@@ -210,15 +286,44 @@ function getFallbackCoach(query: string) {
       soundTip: "Pronuncia 'can't be bothered' de corrido: /kænt bi ˈbɑðərd/",
     };
   }
+
+  if (lower.includes('comer') || lower.includes('hambre') || lower.includes('hunger')) {
+    return {
+      answer:
+        "En inglés nunca se dice 'I have hunger'. Los nativos usan adjetivos de sensación o bloques de acción rápida: **'I'm starving, let's grab a bite!'** o **'What's for dinner?'**.",
+      powerChunk: "Let's grab a bite...",
+      naturalExamples: [
+        { en: "I'm starving, let's grab a bite!", es: "¡Muero de hambre, comamos algo!", chunkNote: "Cotidianísimo" },
+        { en: "What are you in the mood for?", es: "¿De qué tienes ganas de comer?", chunkNote: "Para decidir restaurante" },
+      ],
+      soundTip: "'Grab a bite' suena 'græ-bə-baɪt' en un solo golpe de voz.",
+    };
+  }
+
+  if (lower.includes('hora') || lower.includes('tarde') || lower.includes('pasó')) {
+    return {
+      answer:
+        "Cuando se te pasa la hora sin darte cuenta, los nativos dicen **'I lost track of time'** (perdí la noción del tiempo). Suena sincero y natural.",
+      powerChunk: "I lost track of time...",
+      naturalExamples: [
+        { en: "Sorry, I completely lost track of time!", es: "Perdón, ¡se me pasó la hora por completo!", chunkNote: "Disculpa perfecta" },
+        { en: "Time flies when you're busy.", es: "El tiempo vuela cuando estás ocupado.", chunkNote: "Refrán cotidiano" },
+      ],
+      soundTip: "Une 'lost track of' casi como 'lostrá-kəv'.",
+    };
+  }
+
+  // Smart contextual default
+  const cleanQ = (query || '').replace(/[¿?]/g, '').trim();
   return {
     answer:
-      "En lugar de pensar en reglas o fórmulas gramaticales, concéntrate en aprender el bloque como una sola unidad de sonido. Los nativos no analizan verbos al hablar, disparan bloques de fluidez que ya tienen memorizados con ritmo.",
-    powerChunk: "I'm about to...",
+      `¡Hola! Me encanta esa consulta sobre "${cleanQ || 'esta expresión'}". En inglés cotidiano, la regla de oro es no traducir palabra por palabra. Los nativos usan bloques fijos que se dicen con ritmo y confianza, como **'I was wondering if...'** o **'How does that sound?'**.`,
+    powerChunk: "I was wondering if...",
     naturalExamples: [
-      { en: "I'm about to head out, catch you later!", es: "Ya casi me voy, ¡te veo luego!", chunkNote: "Bloque de salida" },
-      { en: "I was about to ask you the same thing!", es: "¡Justo te iba a preguntar lo mismo!", chunkNote: "Empatía inmediata" },
+      { en: "I was wondering if that works for you.", es: "Me preguntaba si eso te queda bien / te sirve.", chunkNote: "Cálido y seguro" },
+      { en: "No worries at all, you're good!", es: "¡Cero problema, no te preocupes!", chunkNote: "Alivio instantáneo" },
     ],
-    soundTip: "Une 'about to' como 'ə-baʊ-tə' sin hacer pausa entre las dos palabras.",
+    soundTip: "Recuerda pronunciar las frases en bloques sin frenar entre cada palabra.",
   };
 }
 
@@ -627,16 +732,8 @@ Proporciona una respuesta en formato JSON estrictamente válido con estas claves
 }
 Responde únicamente el JSON.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        temperature: 0.7,
-      },
-    });
-
-    const rawText = response.text || '';
+    const response = await generateGeminiContentWithTimeout(prompt, 6000);
+    const rawText = response?.text || '';
     const parsed = safeParseJson(rawText);
     if (parsed && parsed.nativeReal && parsed.literalSchool) {
       return res.json(parsed);
@@ -682,16 +779,8 @@ Instrucciones:
   }
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        temperature: 0.8,
-      },
-    });
-
-    const rawText = response.text || '';
+    const response = await generateGeminiContentWithTimeout(prompt, 6000);
+    const rawText = response?.text || '';
     const parsed = safeParseJson(rawText);
     if (parsed && parsed.characterReply) {
       return res.json(parsed);
@@ -746,16 +835,8 @@ Devuelve un JSON estrictamente válido con esta estructura:
 }
 Responde únicamente el JSON.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        temperature: 0.7,
-      },
-    });
-
-    const rawText = response.text || '';
+    const response = await generateGeminiContentWithTimeout(prompt, 6000);
+    const rawText = response?.text || '';
     const parsed = safeParseJson(rawText);
     if (parsed && typeof parsed.overallConfidenceScore === 'number') {
       return res.json(parsed);
@@ -798,16 +879,8 @@ Devuelve un JSON estrictamente estructurado así:
   "soundTip": "Consejo de pronunciación o cómo conectar las palabras"
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        temperature: 0.7,
-      },
-    });
-
-    const rawText = response.text || '';
+    const response = await generateGeminiContentWithTimeout(prompt, 6000);
+    const rawText = response?.text || '';
     const parsed = safeParseJson(rawText);
     if (parsed && parsed.answer) {
       return res.json(parsed);
@@ -842,16 +915,8 @@ Devuelve JSON:
   "rhythmHint": "Cómo acentuar la frase (ej: golpe en 'GOING', suave en 'to')"
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        temperature: 0.5,
-      },
-    });
-
-    const rawText = response.text || '';
+    const response = await generateGeminiContentWithTimeout(prompt, 6000);
+    const rawText = response?.text || '';
     const parsed = safeParseJson(rawText);
     if (parsed && typeof parsed.score === 'number') {
       return res.json(parsed);

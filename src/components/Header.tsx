@@ -150,30 +150,22 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Zone 3: Speed control & Primary action */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Mode toggle (Modular vs Full page) */}
-          {onToggleViewMode && (
-            <button
-              onClick={onToggleViewMode}
-              className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-700/80 text-xs text-slate-300 hover:text-amber-300 hover:border-amber-400/40 transition-colors cursor-pointer"
-              title={
-                viewMode === 'modular'
-                  ? 'Estás en modo módulos (ligero y sin scroll infinito). Clic para ver todo seguido.'
-                  : 'Estás en modo página completa. Clic para volver a módulos limpios.'
-              }
-            >
-              {viewMode === 'modular' ? (
-                <>
-                  <LayoutGrid className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-[11px] font-medium">Modo Módulos</span>
-                </>
-              ) : (
-                <>
-                  <ScrollText className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-[11px] font-medium">Ver Todo</span>
-                </>
-              )}
-            </button>
-          )}
+          {/* Shortcut to Thematic Panels */}
+          <button
+            onClick={() => {
+              setActiveTab('hero');
+              setTimeout(() => {
+                const el = document.getElementById('hub-panels');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                else window.scrollTo({ top: 0, behavior: 'smooth' });
+              }, 50);
+            }}
+            className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-700/80 text-xs text-slate-300 hover:text-amber-300 hover:border-amber-400/40 transition-colors cursor-pointer"
+            title="Ver los paneles de aprendizaje temáticos"
+          >
+            <LayoutGrid className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-[11px] font-medium">Paneles Temáticos</span>
+          </button>
 
           {/* Real visits counter on desktop and tablet */}
           <div className="hidden lg:block">
