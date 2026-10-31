@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Scissors,
   Award,
+  Film,
 } from 'lucide-react';
 import { SkillLevel } from '../types';
 
@@ -116,12 +117,26 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
       title: '🎙️ Práctica y Diálogo en Vivo',
       shortLabel: 'Práctica con Voz',
       icon: '🎙️',
-      tagline: 'Simulación interactiva y agilidad mental sin traducir',
-      badge: '2 Módulos',
+      tagline: 'Simulación interactiva, películas míticas y agilidad mental',
+      badge: '3 Módulos',
       themeColor: 'text-amber-400',
       activeBorder: 'border-amber-400/80 shadow-amber-950/40',
       activeBg: 'bg-amber-950/30 text-amber-300',
       items: [
+        {
+          id: 'cinema',
+          title: 'Cine & Películas en Inglés',
+          tagline: '🎬 Acostumbra tu oído con películas famosas',
+          description:
+            'Entrena tu comprensión auditiva con Forrest Gump, El Rey León, Friends, Titanic y más. Incluye subtítulos en español y fonética.',
+          levelBadge: '🎬 Subtítulos en Español',
+          levelColor: 'bg-red-500/20 text-amber-300 border-amber-400/50 font-bold',
+          icon: <Film className="w-5 h-5 text-amber-400" />,
+          accentColor: 'text-amber-400',
+          borderColor: 'border-amber-400/50 hover:border-amber-400 ring-1 ring-amber-400/30',
+          hoverBg: 'hover:bg-amber-950/20',
+          features: ['Escenas célebres del cine', 'Subtítulos en español ajustables', 'Audio a 0.65x y 1.0x'],
+        },
         {
           id: 'simulator',
           title: 'Simulador de Charlas Reales',

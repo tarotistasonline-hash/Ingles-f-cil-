@@ -91,6 +91,18 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Vida Real & Práctica</span>
           </button>
           <button
+            onClick={() => setActiveTab('cinema')}
+            className={`transition-all flex items-center gap-1.5 px-3 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+              activeTab === 'cinema'
+                ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
+                : 'bg-red-950/40 hover:bg-red-900/60 border-red-500/40 hover:border-amber-400 text-amber-200 hover:text-white'
+            }`}
+            title="Aprende inglés con películas famosas y subtítulos en español"
+          >
+            <span>🎬</span>
+            <span>Películas & Oído</span>
+          </button>
+          <button
             onClick={() => setActiveTab('gym')}
             className={`transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
               activeTab === 'gym'

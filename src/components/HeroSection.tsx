@@ -23,6 +23,7 @@ import {
   Scissors,
   Send,
   Layers,
+  Film,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { askTeacher, fetchSpeakTweak } from '../services/api';
@@ -39,6 +40,7 @@ interface HeroSectionProps {
   onOpenKit?: () => void;
   onAskTeacher?: () => void;
   onOpenBlog?: () => void;
+  onOpenCinema?: () => void;
   currentSpeed: number;
 }
 
@@ -52,6 +54,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onOpenKit,
   onAskTeacher,
   onOpenBlog,
+  onOpenCinema,
   currentSpeed,
 }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -240,9 +243,39 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl mx-auto text-pretty">
-            Aprende inglés a tu propio ritmo, sin salir de tu hogar o también en el coche, bus o caminando si decides descargar el auto kit de bolsillo sin conexión y a modo de colaboración para seguir manteniendo y mejorando el sitio.
-          </p>
+          {/* Luminous, Highlighted & Shimmering Callout Box as requested */}
+          <div className="relative max-w-3xl mx-auto p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#1E113A]/90 via-[#261645]/90 to-[#121E36]/90 border-2 border-amber-400/80 shadow-2xl shadow-amber-400/25 backdrop-blur-md overflow-hidden group hover:border-amber-300 transition-all text-left sm:text-center">
+            {/* Shimmer light beam running across */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+
+            <div className="flex items-start sm:items-center justify-center gap-2.5">
+              {/* Pulsing beacon dot (titilante) */}
+              <div className="shrink-0 mt-0.5 sm:mt-0">
+                <span className="relative flex h-3.5 w-3.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-gradient-to-tr from-amber-400 to-emerald-400 shadow-md"></span>
+                </span>
+              </div>
+
+              <p className="text-sm sm:text-base text-slate-100 leading-relaxed text-pretty">
+                <span className="font-extrabold bg-gradient-to-r from-amber-300 via-amber-100 to-emerald-300 bg-clip-text text-transparent">
+                  Aprende inglés a tu propio ritmo, sin salir de tu hogar
+                </span>{' '}
+                o también en el{' '}
+                <strong className="text-sky-300 font-bold underline decoration-sky-400 decoration-2 underline-offset-2">
+                  coche, bus o caminando
+                </strong>{' '}
+                si decides descargar el{' '}
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-amber-400/20 border border-amber-400/60 text-amber-300 font-black shadow-xs">
+                  <span>🎧 auto kit de bolsillo sin conexión</span>
+                </span>{' '}
+                <span className="inline-block mt-1 sm:mt-0 px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-400/70 text-emerald-300 font-black shadow-md animate-pulse">
+                  ✨ y a modo de colaboración para seguir manteniendo y mejorando el sitio
+                </span>
+                .
+              </p>
+            </div>
+          </div>
 
           {/* Quick Action Buttons - Centered & Tactile */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -262,6 +295,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <Radio className="w-4 h-4 text-slate-950" />
               <span>Simulador de Charlas Reales</span>
             </button>
+            {onOpenCinema && (
+              <button
+                onClick={onOpenCinema}
+                className="group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-red-600 via-amber-600 to-amber-500 hover:from-red-500 hover:to-amber-400 border border-amber-300/60 rounded-xl shadow-lg shadow-red-900/40 transition-all cursor-pointer hover:scale-103 flex items-center gap-2"
+                title="Aprende inglés con películas famosas y subtítulos en español"
+              >
+                <Film className="w-4 h-4 text-amber-200 animate-pulse" />
+                <span>🎬 Películas & Oído</span>
+              </button>
+            )}
             {onExploreEntrecasa && (
               <button
                 onClick={onExploreEntrecasa}

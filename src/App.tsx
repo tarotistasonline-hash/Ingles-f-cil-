@@ -16,6 +16,7 @@ import { FluencyDashboard } from './components/FluencyDashboard';
 import { CoachLeoChat } from './components/CoachLeoChat';
 import { CommunityBlog } from './components/CommunityBlog';
 import { OfflineKitSection } from './components/OfflineKitSection';
+import { CinemaEarLab } from './components/CinemaEarLab';
 import { AudioKitModal } from './components/AudioKitModal';
 import { AudioKitFloatingTrigger } from './components/AudioKitFloatingTrigger';
 import { PackDownloadVaultModal } from './components/PackDownloadVaultModal';
@@ -41,6 +42,7 @@ export default function App() {
         'desde-cero',
         'entrecasa',
         'simulator',
+        'cinema',
         'method',
         'tweak',
         'chunks',
@@ -137,6 +139,7 @@ export default function App() {
         'desde-cero',
         'entrecasa',
         'simulator',
+        'cinema',
         'method',
         'tweak',
         'chunks',
@@ -220,6 +223,15 @@ export default function App() {
             <RoleplaySimulator
               currentSpeed={currentSpeed}
               onSpeedChange={handleSpeedChange}
+            />
+          </div>
+        );
+      case 'cinema':
+        return (
+          <div id="cinema">
+            <CinemaEarLab
+              currentSpeed={currentSpeed}
+              onNavigateToSimulator={() => navigateTo('simulator')}
             />
           </div>
         );
@@ -307,8 +319,93 @@ export default function App() {
       />
 
       <main className="flex-1">
-        {/* MODULAR & COMPACT VIEW (Short, fast, organized in thematic panels) */}
-        {activeTab === 'hero' ? (
+        {viewMode === 'full' ? (
+          <div className="space-y-16 pb-16">
+            <div id="hero">
+              <HeroSection
+                onStartSimulator={() => navigateTo('simulator')}
+                onExploreChunks={() => navigateTo('chunks')}
+                onTryTweak={() => navigateTo('tweak')}
+                onExploreEntrecasa={() => navigateTo('entrecasa')}
+                onStartDesdeCero={() => navigateTo('desde-cero')}
+                onStartGym={() => navigateTo('gym')}
+                onOpenKit={() => setIsKitModalOpen(true)}
+                onAskTeacher={() => navigateTo('coach')}
+                onOpenBlog={() => navigateTo('blog')}
+                onOpenCinema={() => navigateTo('cinema')}
+                currentSpeed={currentSpeed}
+              />
+            </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <LevelSelectorBar
+                currentLevel={activeLevel}
+                onSelectLevel={handleLevelSelect}
+              />
+            </div>
+            <div id="desde-cero">
+              <DesdeCeroGuide
+                currentSpeed={currentSpeed}
+                onExploreNextLevel={() => navigateTo('entrecasa')}
+              />
+            </div>
+            <div id="entrecasa">
+              <EntrecasaGuide
+                currentSpeed={currentSpeed}
+                onGoToSimulator={() => navigateTo('simulator')}
+                onGoToTweak={() => navigateTo('tweak')}
+              />
+            </div>
+            <div id="simulator">
+              <RoleplaySimulator
+                currentSpeed={currentSpeed}
+                onSpeedChange={handleSpeedChange}
+              />
+            </div>
+            <div id="cinema">
+              <CinemaEarLab
+                currentSpeed={currentSpeed}
+                onNavigateToSimulator={() => navigateTo('simulator')}
+              />
+            </div>
+            <div id="tweak">
+              <SpeakTweakTool currentSpeed={currentSpeed} />
+            </div>
+            <div id="chunks">
+              <PowerChunksExplorer currentSpeed={currentSpeed} />
+            </div>
+            <div id="gym">
+              <ReflexGym currentSpeed={currentSpeed} />
+            </div>
+            <div id="connected">
+              <ConnectedSpeechLab currentSpeed={currentSpeed} />
+            </div>
+            <div id="dashboard">
+              <FluencyDashboard
+                onNavigateToGym={() => navigateTo('gym')}
+                onNavigateToSimulator={() => navigateTo('simulator')}
+                onNavigateToTweak={() => navigateTo('tweak')}
+              />
+            </div>
+            <div id="coach">
+              <CoachLeoChat currentSpeed={currentSpeed} />
+            </div>
+            <div id="method">
+              <MethodComparison
+                onNavigateToSimulator={() => navigateTo('simulator')}
+              />
+            </div>
+            <div id="blog">
+              <CommunityBlog currentSpeed={currentSpeed} />
+            </div>
+            <div id="kit">
+              <OfflineKitSection
+                onNavigateHome={() => navigateTo('hero')}
+                onNavigateToGym={() => navigateTo('gym')}
+                onOpenVault={() => setIsVaultModalOpen(true)}
+              />
+            </div>
+          </div>
+        ) : activeTab === 'hero' ? (
           <>
             {/* Hero Section */}
             <div id="hero">
@@ -322,6 +419,7 @@ export default function App() {
                 onOpenKit={() => setIsKitModalOpen(true)}
                 onAskTeacher={() => navigateTo('coach')}
                 onOpenBlog={() => navigateTo('blog')}
+                onOpenCinema={() => navigateTo('cinema')}
                 currentSpeed={currentSpeed}
               />
             </div>
