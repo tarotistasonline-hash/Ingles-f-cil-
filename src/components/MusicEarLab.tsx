@@ -4,36 +4,26 @@ import {
   Volume2,
   Sparkles,
   CheckCircle2,
-  RotateCw,
-  Eye,
   EyeOff,
   Languages,
   Headphones,
   Play,
+  Pause,
   Square,
   Award,
   Search,
   BookOpen,
   Mic2,
-  Radio,
   Disc3,
   Heart,
   ExternalLink,
-  VolumeX,
-  HelpCircle,
-  Sliders,
   Youtube,
-  AlertCircle,
-  Check,
+  Radio,
+  Sliders,
+  ChevronRight,
+  ChevronLeft,
 } from 'lucide-react';
-import {
-  playEnglishVoice,
-  speakWithWebSpeech,
-  stopAllAudio,
-  testMobileSpeaker,
-  unlockMobileAudio,
-} from '../services/audio';
-import { playSongMusicMotif, stopMusicSynth } from '../services/musicSynthesizer';
+import { playEnglishVoice, stopAllAudio, unlockMobileAudio } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
 
 export interface SongItem {
@@ -45,6 +35,7 @@ export interface SongItem {
   category: 'clasicos' | 'baladas' | 'pop' | 'swing';
   albumContext: string;
   badgeTag: string;
+  youtubeId: string;
   lyricsEnglish: string;
   lyricsSpanish: string;
   phoneticSimple: string;
@@ -52,9 +43,7 @@ export interface SongItem {
   powerChunk: string;
   chunkMeaning: string;
   whyGoodForEar: string;
-  youtubeUrl: string;
   spotifyUrl: string;
-  melodyDesc: string;
   quiz: {
     question: string;
     options: string[];
@@ -76,20 +65,16 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSongIndex, setActiveSongIndex] = useState(0);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [isPlayingWithMelody, setIsPlayingWithMelody] = useState(false);
-  const [playingSpeed, setPlayingSpeed] = useState<number | null>(null);
+  const [isPlayingRealSong, setIsPlayingRealSong] = useState(false);
+  const [isPlayingSlowVoice, setIsPlayingSlowVoice] = useState(false);
+  const [slowVoiceSpeed, setSlowVoiceSpeed] = useState<number | null>(null);
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
   const [showQuizFeedback, setShowQuizFeedback] = useState(false);
   const [likedSongs, setLikedSongs] = useState<Record<string, boolean>>({});
-  const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
-  const [soundTestStatus, setSoundTestStatus] = useState<string | null>(null);
-  const [audioMode, setAudioMode] = useState<'melodic' | 'studio' | 'device'>('melodic');
 
-  // Stop all audio when unmounting
+  // Stop audio on unmount
   useEffect(() => {
     return () => {
-      stopMusicSynth();
       stopAllAudio();
     };
   }, []);
@@ -103,17 +88,16 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       genre: 'Balada Rock Acústica',
       category: 'clasicos',
       albumContext: 'Un clásico universal con piano calmado, ritmo pausado y dicción británica impecable.',
-      badgeTag: '🌱 Nivel Cero / Principiante · Súper Pausada',
+      badgeTag: '🌱 Principiante · Piano & Cadencia Lenta',
+      youtubeId: 'QDYfEBY9NM4',
       lyricsEnglish: 'When I find myself in times of trouble, Mother Mary comes to me, speaking words of wisdom: let it be.',
       lyricsSpanish: 'Cuando me encuentro en momentos de dificultad, la madre María viene a mí, diciendo palabras de sabiduría: déjalo estar / que así sea.',
       phoneticSimple: 'Wen ai fáind maisélf in táims av tróbl, Máder Méri kams tu mi, spíking werds av wísdam: le-ri-bí.',
-      musicalEarSecret: "En 'let it be', la 't' entre dos sonidos vocálicos se suaviza como una 'r' suave de 'pera' (/lɛ-rɪ-bi/). Cantarlo así entrena a tu lengua y a tu oído a no frenar entre palabras.",
+      musicalEarSecret: "En 'let it be', la 't' entre dos vocales se suaviza como una 'r' suave de 'pera' (/lɛ-rɪ-bi/). Cantarlo así entrena a tu lengua y a tu oído a no frenar entre palabras.",
       powerChunk: 'In times of trouble...',
       chunkMeaning: 'En momentos de dificultad / cuando las cosas se ponen difíciles...',
       whyGoodForEar: 'El tempo es lento (72 BPM) y cada sílaba cae exactamente sobre el pulso del piano, ideal para principiantes absolutos.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=The+Beatles+Let+It+Be+lyrics',
       spotifyUrl: 'https://open.spotify.com/search/The%20Beatles%20Let%20It%20Be',
-      melodyDesc: '🎹 Piano acústico en C - G - Am - F',
       quiz: {
         question: "¿Cómo suena naturalmente la unión de 'Let it be' cantada en inglés?",
         options: [
@@ -133,7 +117,8 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       genre: 'Pop / Balada Emotiva',
       category: 'baladas',
       albumContext: 'Balada de piano con frases sentidas de la vida cotidiana y conectores conversacionales de oro.',
-      badgeTag: '☕ Inglés de Todos los Días · Expresivo',
+      badgeTag: '☕ Vida Real · Balada Expresiva',
+      youtubeId: 'hLQl3WQQoQ0',
       lyricsEnglish: "Never mind, I'll find someone like you. I wish nothing but the best for you, too. Don't forget me, I beg.",
       lyricsSpanish: 'No pasa nada / olvídalo, encontraré a alguien como tú. No te deseo más que lo mejor a ti también. No me olvides, te lo ruego.',
       phoneticSimple: 'Néver máind, ail fáind samwan láik iú. Ai wish nózing bat de best for iú, tu. Dóunt forgét mi, ai beg.',
@@ -141,9 +126,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'Never mind, I will...',
       chunkMeaning: 'No pasa nada / olvídalo, yo me encargo de...',
       whyGoodForEar: 'La voz de Adele acentúa las palabras clave con vibrato lento, permitiendo que tu oído registre cada vocal larga en inglés.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Adele+Someone+Like+You+lyrics',
       spotifyUrl: 'https://open.spotify.com/search/Adele%20Someone%20Like%20You',
-      melodyDesc: '🎹 Arpegio de piano en A - E/G# - F#m - D',
       quiz: {
         question: "¿Qué significa el comodín 'Never mind' en una conversación real?",
         options: [
@@ -164,6 +147,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       category: 'swing',
       albumContext: 'La melodía optimista más famosa del mundo. Dicción lenta, descriptiva y cargada de imágenes sencillas.',
       badgeTag: '🎷 Cadencia Suave · Dicción Magistral',
+      youtubeId: 'A3yCcXgbKrE',
       lyricsEnglish: 'I see trees of green, red roses too. I see them bloom for me and you. And I think to myself: what a wonderful world.',
       lyricsSpanish: 'Veo árboles verdes, y rosas rojas también. Las veo florecer para ti y para mí. Y pienso para mis adentros: qué mundo tan maravilloso.',
       phoneticSimple: 'Ai si tris av grin, red róusis tu. Ai si dem blum for mi end iú. End ai zink tu maisélf: wat a wánderful werld.',
@@ -171,9 +155,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'And I think to myself...',
       chunkMeaning: 'Y pienso para mis adentros / reflexiono...',
       whyGoodForEar: 'La voz profunda y rasgada de Armstrong alarga las vocales, permitiendo identificar los colores fonéticos sin apuros.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Louis+Armstrong+What+A+Wonderful+World+lyrics',
       spotifyUrl: 'https://open.spotify.com/search/Louis%20Armstrong%20What%20A%20Wonderful%20World',
-      melodyDesc: '🎷 Acordes jazzísticos en F - Am - Bb - C',
       quiz: {
         question: "¿Cómo se une la frase 'trees of green' al cantar?",
         options: [
@@ -194,6 +176,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       category: 'clasicos',
       albumContext: 'El ritmo de palmas y pisadas más reconocible de la historia. Perfecto para asimilar el acento rítmico del inglés.',
       badgeTag: '⚡ Ritmo Puro · Acento Rítmico',
+      youtubeId: '-tJYN-eG1zk',
       lyricsEnglish: "Buddy, you're a boy, make a big noise, playin' in the street, gonna be a big man someday!",
       lyricsSpanish: '¡Compañero, eres un chico, haciendo mucho ruido, jugando en la calle, algún día serás un gran hombre!',
       phoneticSimple: 'Bádi, ior a bói, méik a big nóis, pléin in de strit, góna bi a big men sámdei!',
@@ -201,9 +184,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'Gonna be a big... someday!',
       chunkMeaning: 'Algún día voy a ser un gran [profesional / músico]...',
       whyGoodForEar: 'El pulso de dos golpes y una palma marca los tiempos acentuados donde caen las palabras más importantes de la frase.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Queen+We+Will+Rock+You+official',
       spotifyUrl: 'https://open.spotify.com/search/Queen%20We%20Will%20Rock%20You',
-      melodyDesc: '🥁 Percusión rítmica: Stomp, Stomp, CLAP!',
       quiz: {
         question: "¿Por qué en la canción dicen 'playin' en vez de 'playing'?",
         options: [
@@ -223,7 +204,8 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       genre: 'Jazz / Big Band Swing',
       category: 'swing',
       albumContext: 'La cúspide de la elegancia y la dicción. Sinatra era elogiado por no perder jamás la claridad de una sola sílaba.',
-      badgeTag: '🎩 Dicción Perfecta · Conectores de Oro',
+      badgeTag: '🎩 Dicción Perfecta · Swing Clásico',
+      youtubeId: 'ZEcqHA7dbwM',
       lyricsEnglish: 'Fly me to the moon, let me play among the stars. In other words, hold my hand. In other words, baby, kiss me.',
       lyricsSpanish: 'Llévame volando a la luna, déjame jugar entre las estrellas. En otras palabras, toma mi mano. En otras palabras, cariño, bésame.',
       phoneticSimple: 'Flái mi tu de mun, let mi pléi amáng de stars. In áder werds, hóuld mái jend. In áder werds, béibi, kis mi.',
@@ -231,9 +213,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'In other words...',
       chunkMeaning: 'En otras palabras... / dicho de forma sencilla...',
       whyGoodForEar: 'Sinatra respiraba como un cantante de ópera: su fraseo respeta la acentuación natural de la gramática inglesa al 100%.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Frank+Sinatra+Fly+Me+To+The+Moon+official',
       spotifyUrl: 'https://open.spotify.com/search/Frank%20Sinatra%20Fly%20Me%20To%20The%20Moon',
-      melodyDesc: '🎩 Swing jazz en walking bass & piano',
       quiz: {
         question: "¿Para qué te sirve en la vida real el bloque 'In other words'?",
         options: [
@@ -254,6 +234,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       category: 'pop',
       albumContext: 'Narración épica con el ritmo contagioso de campanas y violines, ideal para aprender a contar historias pasadas.',
       badgeTag: '🎻 Estructura de Oro · Pasado Hablado',
+      youtubeId: 'dvgZkm1xWPE',
       lyricsEnglish: 'I used to rule the world, seas would rise when I gave the word. Now in the morning I sleep alone, sweep the streets I used to own.',
       lyricsSpanish: 'Solía gobernar el mundo, los mares se elevaban cuando daba la orden. Ahora por la mañana duermo solo, barro las calles que solían ser mías.',
       phoneticSimple: 'Ai iúst-tu rul de werld, sis wud ráis wen ai géiv de werd. Náu in de mórning ai slip alóun, suíp de strits ai iúst-tu óun.',
@@ -261,9 +242,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'I used to...',
       chunkMeaning: 'Yo antes solía [hacer algo / vivir en / trabajar en]...',
       whyGoodForEar: 'Chris Martin canta con cadencia constante de 138 BPM, entrenando a tu cerebro a anticipar el compás métrico del inglés.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Coldplay+Viva+La+Vida+official+lyrics',
       spotifyUrl: 'https://open.spotify.com/search/Coldplay%20Viva%20La%20Vida',
-      melodyDesc: '🎻 Ostinato de cuerdas en Db - Eb - Ab - Fm',
       quiz: {
         question: "¿Cómo pronuncian los nativos el bloque 'I used to'?",
         options: [
@@ -284,6 +263,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       category: 'clasicos',
       albumContext: 'El himno de tranquilidad más coreado de la tierra. Mensaje simple, positivo y lleno de ritmo cálido.',
       badgeTag: '☀️ Cero Estrés · Frase de Ánimo',
+      youtubeId: 'zaGUr6AKvyU',
       lyricsEnglish: "Don't worry about a thing, 'cause every little thing is gonna be alright!",
       lyricsSpanish: '¡No te preocupes por nada, porque cada pequeña cosita va a estar bien!',
       phoneticSimple: "Dóunt wórri abáut a zing, koz évri lí-rl zing is góna bi olráit!",
@@ -291,9 +271,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: "Don't worry about...",
       chunkMeaning: 'No te preocupes por [el dinero / la hora / los errores]...',
       whyGoodForEar: 'El ritmo síncopado del reggae te enseña a relajarte y no apresurar las palabras, hablando con calma.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Bob+Marley+Three+Little+Birds+lyrics',
       spotifyUrl: 'https://open.spotify.com/search/Bob%20Marley%20Three%20Little%20Birds',
-      melodyDesc: '☀️ Ritmo reggae con guitarras en contratiempo',
       quiz: {
         question: "¿Qué significa la palabra corta ''cause' en la canción?",
         options: [
@@ -313,7 +291,8 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       genre: 'Balada Romántica Contemporánea',
       category: 'baladas',
       albumContext: 'Una de las canciones más dedicadas del siglo XXI. Vocabulario moderno, natural y de alta frecuencia cotidiana.',
-      badgeTag: '❤️ Conversacional · Expresiones Actuales',
+      badgeTag: '❤️ Conversacional · Balada Acústica',
+      youtubeId: '2Vv-BfVoq4g',
       lyricsEnglish: 'I found a love for me. Darling, just dive right in and follow my lead. Well, I found a girl, beautiful and sweet.',
       lyricsSpanish: 'Encontré un amor para mí. Cariño, simplemente lánzate de lleno y sigue mi paso. Bueno, encontré a una chica, hermosa y dulce.',
       phoneticSimple: 'Ai fáund a lav for mi. Dárling, dyast dáiv ráit in end fálou mái lid. Wel, ai fáund a gerl, biútiful end suit.',
@@ -321,9 +300,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'Follow my lead...',
       chunkMeaning: 'Sigue mi paso / déjame guiarte / haz lo que yo haga...',
       whyGoodForEar: 'Ed Sheeran combina ritmo de vals suave con una pronunciación inglesa contemporánea super limpia.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Ed+Sheeran+Perfect+official+audio',
       spotifyUrl: 'https://open.spotify.com/search/Ed%20Sheeran%20Perfect',
-      melodyDesc: '❤️ Arpegio acústico en vals 12/8',
       quiz: {
         question: "¿Qué transmite la frase 'Dive right in' en inglés?",
         options: [
@@ -344,6 +321,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       category: 'pop',
       albumContext: 'La línea de bajo más famosa del pop. MJ utiliza inflexiones rítmicas rápidas y advertencias conversacionales.',
       badgeTag: '🕺 Agilidad Auditiva · Pop Legendario',
+      youtubeId: 'Zi_XLOBDo_Y',
       lyricsEnglish: "People always told me: be careful of what you do. Don't go around breaking young girls' hearts.",
       lyricsSpanish: 'La gente siempre me decía: ten cuidado con lo que haces. No te la pases por ahí rompiendo los corazones de las jóvenes.',
       phoneticSimple: 'Pípl ólwis tóuld mi: bi kérful av wat iú du. Dóunt gou aráund bréiking iang gerls harts.',
@@ -351,9 +329,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'Be careful of what you...',
       chunkMeaning: 'Ten cuidado con lo que [haces / dices / compras]...',
       whyGoodForEar: 'Michael canta con respiraciones rítmicas cortas que ayudan a notar cómo se agrupan las palabras en paquetes de 3 o 4 sílabas.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=Michael+Jackson+Billie+Jean+remastered',
       spotifyUrl: 'https://open.spotify.com/search/Michael%20Jackson%20Billie%20Jean',
-      melodyDesc: '🕺 Línea de bajo funk icónica en F#m',
       quiz: {
         question: "¿Para qué sirve el patrón 'Be careful of what you...'?",
         options: [
@@ -374,6 +350,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       category: 'clasicos',
       albumContext: 'Riff de guitarra hipnótico con rimas constantes en terminación de consonante seca (-k).',
       badgeTag: '🎸 Precisión de Consonantes · Rima Limpia',
+      youtubeId: 'OMOGaugKpzs',
       lyricsEnglish: "Every breath you take, and every move you make, every bond you break, every step you take: I'll be watching you.",
       lyricsSpanish: 'Cada respiración que tomes, y cada movimiento que hagas, cada lazo que rompas, cada paso que des: te estaré observando.',
       phoneticSimple: 'Évri brez iú téik, end évri muv iú méik, évri band iú bréik, évri step iú téik: ail bi wáching iú.',
@@ -381,9 +358,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
       powerChunk: 'Every step you take...',
       chunkMeaning: 'Cada paso que des / en cada momento...',
       whyGoodForEar: 'El ritmo es metronómico (como un reloj constante), lo que permite que tu cerebro sincronice cada palabra sin esfuerzo.',
-      youtubeUrl: 'https://www.youtube.com/results?search_query=The+Police+Every+Breath+You+Take+lyrics',
       spotifyUrl: 'https://open.spotify.com/search/The%20Police%20Every%20Breath%20You%20Take',
-      melodyDesc: '🎸 Riff de guitarra arpegiada en A - F#m - D - E',
       quiz: {
         question: "¿Cómo termina la palabra 'take' o 'make' en la boca de un nativo?",
         options: [
@@ -411,96 +386,41 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
 
   const currentSong = filteredSongs[activeSongIndex] || songs[0];
 
-  // 1. Play with Web Audio synthesized musical accompaniment + lyrics in synchrony (100% reliable, zero lag)
-  const handlePlayWithMelody = () => {
+  // PRIMARY ACTION: Play the REAL original song with music & original singer
+  const handleStartRealSong = () => {
+    stopAllAudio();
+    setIsPlayingSlowVoice(false);
+    setIsPlayingRealSong(true);
+  };
+
+  const handleStopRealSong = () => {
+    setIsPlayingRealSong(false);
+  };
+
+  // SECONDARY / STUDY TOOL: Slow pronunciation breakdown voice
+  const handlePlaySlowVoice = (speed: number = 0.85) => {
     unlockMobileAudio();
     stopAllAudio();
-    stopMusicSynth();
+    setIsPlayingRealSong(false);
+    setIsPlayingSlowVoice(true);
+    setSlowVoiceSpeed(speed);
 
-    setIsPlayingWithMelody(true);
-    setIsPlayingAudio(true);
-    setPlayingSpeed(0.85);
-
-    // Play the authentic chord progression & melody via Web Audio API
-    playSongMusicMotif(currentSong.id, 10);
-
-    // Concurrently speak the lyrics in rhythm with Web Speech API for guaranteed instant playback
-    speakWithWebSpeech(
-      currentSong.lyricsEnglish,
-      0.85,
-      () => {
-        setIsPlayingAudio(true);
+    playEnglishVoice(currentSong.lyricsEnglish, 'Kore', speed, {
+      onStart: () => setIsPlayingSlowVoice(true),
+      onEnd: () => {
+        setIsPlayingSlowVoice(false);
+        setSlowVoiceSpeed(null);
       },
-      () => {
-        setIsPlayingAudio(false);
-        setIsPlayingWithMelody(false);
-        setPlayingSpeed(null);
-        stopMusicSynth();
-      }
-    );
-  };
-
-  // 2. Play speech audio at custom speed
-  const handlePlaySongAudio = (speedMultiplier: number = 0.85) => {
-    unlockMobileAudio();
-    stopMusicSynth();
-    setIsPlayingWithMelody(false);
-    setIsPlayingAudio(true);
-    setPlayingSpeed(speedMultiplier);
-
-    if (audioMode === 'device') {
-      // Direct Web Speech API with 0ms network latency
-      speakWithWebSpeech(
-        currentSong.lyricsEnglish,
-        speedMultiplier,
-        () => setIsPlayingAudio(true),
-        () => {
-          setIsPlayingAudio(false);
-          setPlayingSpeed(null);
-        }
-      );
-    } else {
-      // Natural Studio voice (Gemini TTS) with automatic fallback
-      playEnglishVoice(currentSong.lyricsEnglish, 'Kore', speedMultiplier, {
-        onStart: () => setIsPlayingAudio(true),
-        onEnd: () => {
-          setIsPlayingAudio(false);
-          setPlayingSpeed(null);
-        },
-        onError: () => {
-          // Fallback to device speech immediately
-          speakWithWebSpeech(
-            currentSong.lyricsEnglish,
-            speedMultiplier,
-            () => setIsPlayingAudio(true),
-            () => {
-              setIsPlayingAudio(false);
-              setPlayingSpeed(null);
-            }
-          );
-        },
-      });
-    }
-  };
-
-  const handleStopAll = () => {
-    stopMusicSynth();
-    stopAllAudio();
-    setIsPlayingAudio(false);
-    setIsPlayingWithMelody(false);
-    setPlayingSpeed(null);
+      onError: () => {
+        setIsPlayingSlowVoice(false);
+        setSlowVoiceSpeed(null);
+      },
+    });
   };
 
   const handlePlayChunkAudio = (chunkText: string) => {
     unlockMobileAudio();
-    stopMusicSynth();
     playEnglishVoice(chunkText, 'Kore', 0.85);
-  };
-
-  const handleTestSpeaker = async () => {
-    setSoundTestStatus('Probando altavoz de tu celular...');
-    const result = await testMobileSpeaker();
-    setSoundTestStatus(result.message);
   };
 
   const handleSelectQuizOption = (index: number) => {
@@ -511,30 +431,39 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
     }
   };
 
+  const handleSelectSongFromList = (index: number) => {
+    stopAllAudio();
+    setIsPlayingSlowVoice(false);
+    setActiveSongIndex(index);
+    setQuizAnswer(null);
+    setShowQuizFeedback(false);
+    // Automatically prepare and play the real song for 1-click ease
+    setIsPlayingRealSong(true);
+    window.scrollTo({ top: 320, behavior: 'smooth' });
+  };
+
   const handleNextSong = () => {
-    handleStopAll();
+    stopAllAudio();
+    setIsPlayingSlowVoice(false);
     if (activeSongIndex < filteredSongs.length - 1) {
       setActiveSongIndex((prev) => prev + 1);
-      setQuizAnswer(null);
-      setShowQuizFeedback(false);
     } else {
       setActiveSongIndex(0);
-      setQuizAnswer(null);
-      setShowQuizFeedback(false);
     }
+    setQuizAnswer(null);
+    setShowQuizFeedback(false);
   };
 
   const handlePrevSong = () => {
-    handleStopAll();
+    stopAllAudio();
+    setIsPlayingSlowVoice(false);
     if (activeSongIndex > 0) {
       setActiveSongIndex((prev) => prev - 1);
-      setQuizAnswer(null);
-      setShowQuizFeedback(false);
     } else {
       setActiveSongIndex(filteredSongs.length - 1);
-      setQuizAnswer(null);
-      setShowQuizFeedback(false);
     }
+    setQuizAnswer(null);
+    setShowQuizFeedback(false);
   };
 
   const toggleLikeSong = (songId: string) => {
@@ -546,8 +475,8 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 animate-fade-in">
-      {/* Hero Banner for Music Ear Training */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1A0B2E] via-[#2D124D] to-[#0D061F] border border-fuchsia-500/30 p-6 sm:p-10 shadow-2xl">
+      {/* Top Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1B0B2E] via-[#2F1152] to-[#0D061F] border border-fuchsia-500/30 p-6 sm:p-10 shadow-2xl">
         <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-fuchsia-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-10 -top-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -555,9 +484,9 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
           <div className="space-y-3 max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuchsia-500/20 border border-fuchsia-400/40 text-fuchsia-300 text-xs font-bold uppercase tracking-wider">
               <Disc3 className="w-4 h-4 animate-spin text-fuchsia-400" />
-              <span>Gimnasio Auditivo Musical</span>
+              <span>Música Real & Oído</span>
               <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400 animate-pulse" />
-              <span className="text-amber-300">10 Canciones Célebres</span>
+              <span className="text-amber-300">10 Canciones Famosas</span>
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
@@ -566,14 +495,14 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
             </h1>
 
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              La música es el truco definitivo para tu cerebro: el ritmo exagera las palabras importantes y une los sonidos exactamente como hablan los nativos en la calle. Escucha canciones con <strong className="text-amber-300">subtítulos en español</strong>, fonética figurada, melodía sintetizada y acceso directo a las versiones originales.
+              Escucha la <strong className="text-amber-300">música y voz real de los artistas originales</strong> (The Beatles, Queen, Adele, Sinatra, Coldplay) con <strong className="text-emerald-300">subtítulos en español</strong> para entender cada verso al instante sin frustración.
             </p>
 
             {/* Subtitles Mode Selector Badges */}
             <div className="pt-2 flex flex-wrap items-center gap-2">
               <span className="text-xs font-bold text-slate-400 mr-1 flex items-center gap-1">
                 <Languages className="w-3.5 h-3.5 text-amber-400" />
-                Modo de Letra:
+                Modo de Subtítulos:
               </span>
               <button
                 onClick={() => setSubtitleMode('spanish')}
@@ -622,79 +551,20 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
             </div>
           </div>
 
-          {/* Quick Sound Troubleshooter & Cinema Navigation */}
-          <div className="flex flex-row lg:flex-col items-center sm:items-end justify-between gap-3 pt-3 lg:pt-0 border-t lg:border-t-0 lg:border-l border-fuchsia-500/20 lg:pl-6">
-            <button
-              onClick={() => {
-                setShowDiagnosticModal(true);
-                handleTestSpeaker();
-              }}
-              className="px-4 py-2.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-300 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:scale-102"
-              title="¿No escuchas el audio? Haz clic para verificar el sonido de tu celular o computadora"
-            >
-              <Volume2 className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>¿No escuchas sonido? Toca aquí</span>
-            </button>
-
-            {onNavigateToCinema && (
+          {/* Quick Shortcut to Cinema */}
+          {onNavigateToCinema && (
+            <div className="pt-2 lg:pt-0 shrink-0">
               <button
                 onClick={onNavigateToCinema}
-                className="px-4 py-2 rounded-xl bg-[#241245] hover:bg-[#341B61] text-xs font-bold text-amber-300 border border-amber-400/30 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+                className="px-4 py-2.5 rounded-xl bg-[#241245] hover:bg-[#341B61] text-xs font-bold text-amber-300 border border-amber-400/30 transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:scale-102"
               >
                 <span>🎬</span>
                 <span>Ver Películas en Inglés</span>
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Sound Diagnostic Alert Banner if user opened it */}
-      {showDiagnosticModal && (
-        <div className="bg-[#1C123D] border-2 border-amber-400/70 rounded-2xl p-5 shadow-2xl relative animate-fade-in">
-          <button
-            onClick={() => setShowDiagnosticModal(false)}
-            className="absolute top-4 right-4 text-slate-400 hover:text-white text-xs font-bold px-2 py-1 bg-slate-800 rounded-lg cursor-pointer"
-          >
-            ✕ Cerrar
-          </button>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
-              <HelpCircle className="w-5 h-5 text-amber-400" />
-              <span>Diagnóstico de Sonido y Altavoz</span>
-            </div>
-            <p className="text-xs text-slate-200 leading-relaxed">
-              Si no escuchas nada al presionar reproducir, el 99% de las veces se debe a dos motivos habituales:
-            </p>
-            <ul className="text-xs text-slate-300 space-y-1.5 list-disc pl-5">
-              <li>
-                <strong className="text-amber-300">En iPhone / iPad:</strong> La palanquita física lateral de silencio (o el interruptor del Centro de Control) suele estar en naranja/silencio. Desactívala y sube el volumen multimedia.
-              </li>
-              <li>
-                <strong className="text-amber-300">En Android / Computadora:</strong> Verifica que el volumen multimedia no esté en cero o en modo 'No Molestar'.
-              </li>
-              <li>
-                <strong className="text-amber-300">Permiso del navegador:</strong> Algunos navegadores requieren un primer toque en la pantalla para activar el audio.
-              </li>
-            </ul>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                onClick={handleTestSpeaker}
-                className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
-              >
-                <Volume2 className="w-4 h-4" />
-                <span>Tocar timbre de prueba ahora</span>
-              </button>
-              {soundTestStatus && (
-                <span className="text-xs text-emerald-300 font-medium bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-500/30">
-                  {soundTestStatus}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Category Pills & Search Bar */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
@@ -710,9 +580,10 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
             <button
               key={cat.id}
               onClick={() => {
-                handleStopAll();
                 setSelectedCategory(cat.id);
                 setActiveSongIndex(0);
+                setIsPlayingRealSong(false);
+                setIsPlayingSlowVoice(false);
                 setQuizAnswer(null);
                 setShowQuizFeedback(false);
               }}
@@ -737,6 +608,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
             onChange={(e) => {
               setSearchQuery(e.target.value);
               setActiveSongIndex(0);
+              setIsPlayingRealSong(false);
             }}
             placeholder="Buscar por artista, tema o letra..."
             className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#130E2A] border border-[#2B2056] text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-fuchsia-400 transition-all"
@@ -749,12 +621,12 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
         {/* Left: Song Disc & Player Box (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
           <div className="bg-[#140D2E] border border-fuchsia-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-            {/* Top Bar inside card: Artist, Title & Navigation Controls */}
+            {/* Top Bar: Artist, Title & Navigation Controls */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2C1C5A] pb-5">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-fuchsia-600 to-amber-400 p-0.5 shadow-lg flex items-center justify-center">
                   <div className="w-full h-full bg-[#140D2E] rounded-[14px] flex items-center justify-center">
-                    <Disc3 className={`w-6 h-6 text-fuchsia-400 ${isPlayingAudio ? 'animate-spin' : ''}`} />
+                    <Disc3 className={`w-6 h-6 text-fuchsia-400 ${isPlayingRealSong ? 'animate-spin' : ''}`} />
                   </div>
                 </div>
                 <div>
@@ -792,25 +664,79 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
               </div>
             </div>
 
-            {/* Context Note & Melody info */}
-            <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-l-2 border-fuchsia-400 pl-3">
-              <p className="text-xs sm:text-sm text-slate-300 italic">
-                "{currentSong.albumContext}"
-              </p>
-              <span className="text-[11px] font-semibold text-fuchsia-300 bg-fuchsia-950/60 border border-fuchsia-500/30 px-2.5 py-1 rounded-lg shrink-0">
-                {currentSong.melodyDesc}
-              </span>
+            {/* Context Note */}
+            <p className="mt-4 text-xs sm:text-sm text-slate-300 italic border-l-2 border-fuchsia-400 pl-3">
+              "{currentSong.albumContext}"
+            </p>
+
+            {/* ======================================================== */}
+            {/* THE REAL SONG PLAYER (Embedded Video & Audio)            */}
+            {/* ======================================================== */}
+            <div className="mt-6 rounded-2xl overflow-hidden border-2 border-fuchsia-500/40 bg-[#0A0618] shadow-2xl">
+              {isPlayingRealSong ? (
+                <div className="space-y-3 p-3">
+                  <div className="relative aspect-video w-full rounded-xl overflow-hidden shadow-inner bg-black">
+                    <iframe
+                      className="w-full h-full"
+                      src={`https://www.youtube-nocookie.com/embed/${currentSong.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                      title={`${currentSong.songTitle} - ${currentSong.artist}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="flex items-center justify-between px-2 text-xs">
+                    <span className="text-emerald-300 font-bold flex items-center gap-1.5 animate-pulse">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      Sonando canción original de {currentSong.artist}
+                    </span>
+                    <button
+                      onClick={handleStopRealSong}
+                      className="px-3 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 font-bold transition-all cursor-pointer"
+                    >
+                      Pausar video
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative p-8 sm:p-12 text-center flex flex-col items-center justify-center space-y-4 bg-gradient-to-b from-[#1C1038] to-[#0E0822]">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-fuchsia-600 to-amber-400 p-1 shadow-2xl shadow-fuchsia-600/40 animate-pulse flex items-center justify-center">
+                    <div className="w-full h-full bg-[#150A2E] rounded-full flex items-center justify-center">
+                      <Play className="w-8 h-8 sm:w-10 sm:h-10 text-amber-300 fill-amber-300 ml-1" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 max-w-md">
+                    <div className="inline-block px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-extrabold uppercase tracking-wider border border-emerald-500/30">
+                      Música y Voz Original
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-black text-white">
+                      Escuchar "{currentSong.songTitle}" de {currentSong.artist}
+                    </h3>
+                    <p className="text-xs text-slate-300">
+                      Toca el botón para reproducir la canción real completa con su música, coro y ritmo original.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleStartRealSong}
+                    className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black text-sm transition-all duration-200 cursor-pointer shadow-xl shadow-amber-400/25 flex items-center gap-2.5 hover:scale-105 active:scale-95"
+                  >
+                    <Play className="w-5 h-5 fill-slate-950" />
+                    <span>▶️ REPRODUCIR CANCIÓN ORIGINAL</span>
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Lyrics Card with Interactive Karaoke Subtitles */}
+            {/* Lyrics Card with Interactive Subtitles */}
             <div className="mt-6 rounded-2xl bg-[#0C081E] border border-fuchsia-500/20 p-6 sm:p-8 space-y-4 shadow-inner relative">
               <div className="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-800/80 pb-2">
                 <span className="flex items-center gap-1.5 text-fuchsia-300">
                   <Mic2 className="w-3.5 h-3.5" />
-                  Estrofa & Letra Clave
+                  Letra Clave & Subtítulos
                 </span>
                 <span className="text-[11px] text-amber-300 font-normal">
-                  {subtitleMode === 'spanish' && '🇪🇸 Subtítulos en español visibles'}
+                  {subtitleMode === 'spanish' && '🇪🇸 Subtítulos en español activos'}
                   {subtitleMode === 'both' && '🌐 Modo bilingüe activo'}
                   {subtitleMode === 'english' && '🇬🇧 Solo letra en inglés'}
                   {subtitleMode === 'hidden' && '🙈 Letra oculta (Reto auditivo)'}
@@ -825,7 +751,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
                   </div>
                   <h4 className="text-base font-bold text-white">Letra Oculta para Entrenar el Oído</h4>
                   <p className="text-xs text-slate-400 max-w-md mx-auto">
-                    Dale reproducir abajo con melodía o a distintas velocidades e intenta captar las palabras sin leer. Cuando quieras comprobar tu oído, cambia el modo de subtítulo arriba.
+                    Escucha la canción original arriba e intenta captar las palabras sin leer. Cuando quieras comprobar lo que entendiste, cambia a subtítulo en español.
                   </p>
                 </div>
               ) : (
@@ -834,7 +760,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
                   {(subtitleMode === 'english' || subtitleMode === 'both' || subtitleMode === 'spanish') && (
                     <div className="space-y-1">
                       <div className="text-[11px] font-bold uppercase tracking-wider text-fuchsia-300/80">
-                        Inglés Original (Lyrics):
+                        Letra en Inglés (Lyrics):
                       </div>
                       <blockquote className="text-lg sm:text-2xl font-bold text-white tracking-normal leading-snug">
                         "{currentSong.lyricsEnglish}"
@@ -869,117 +795,36 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
               )}
             </div>
 
-            {/* DUAL HIGH-POWER AUDIO CONTROL BAR */}
-            <div className="mt-6 space-y-4">
-              {/* PRIMARY PLAYER: Authentic Web Audio Melodic Synth + Voice In Sync */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#24134B] via-[#1E113F] to-[#120B29] border-2 border-fuchsia-500/40 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-                <div className="space-y-1 text-center sm:text-left">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 text-[11px] font-bold">
-                    <Music className="w-3.5 h-3.5 animate-bounce" />
-                    <span>Reproductor Musical con Acompañamiento</span>
-                  </div>
-                  <h4 className="text-sm sm:text-base font-bold text-white">
-                    Escucha la Melodía & el Ritmo de la Canción
-                  </h4>
-                  <p className="text-[11px] text-slate-300">
-                    Sintetizado al instante en tu celular: acordes reales de piano, cuerdas o bajo con voz sincronizada.
+            {/* OPTIONAL PRONUNCIATION STUDY TOOL (SLOW VOICE) */}
+            <div className="mt-6 p-4 rounded-2xl bg-[#1A113B]/80 border border-[#3A2770] space-y-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                    <Volume2 className="w-4 h-4 text-fuchsia-400" />
+                    <span>Práctica adicional: Desglose lento de pronunciación</span>
+                  </span>
+                  <p className="text-[11px] text-slate-400">
+                    Voz guiada palabra por palabra para estudiar cada sonido con calma.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  {isPlayingAudio || isPlayingWithMelody ? (
-                    <button
-                      onClick={handleStopAll}
-                      className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs transition-all cursor-pointer shadow-lg shadow-rose-900/40 flex items-center gap-2 scale-102"
-                    >
-                      <Square className="w-4 h-4 fill-white" />
-                      <span>Detener Sonido</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handlePlayWithMelody}
-                      className="px-5 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 to-amber-400 hover:from-fuchsia-400 hover:to-amber-300 text-slate-950 font-black text-xs sm:text-sm transition-all cursor-pointer shadow-xl shadow-fuchsia-500/30 flex items-center gap-2 hover:scale-103"
-                      title="Reproducir acordes y melodía musical con voz sincronizada"
-                    >
-                      <Play className="w-4 h-4 fill-slate-950" />
-                      <span>▶️ Escuchar con Melodía</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* SECONDARY PLAYER: Speech Pronunciation in 3 Speeds */}
-              <div className="p-3.5 rounded-2xl bg-[#1A113B] border border-[#3A2770] flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-300 flex items-center gap-1">
-                    <Volume2 className="w-4 h-4 text-fuchsia-400" />
-                    <span>Pronunciación Hablada (Solo Voz):</span>
-                  </span>
-                  {isPlayingAudio && !isPlayingWithMelody && (
-                    <span className="text-xs text-amber-300 font-bold animate-pulse flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                      Sonando a {playingSpeed}x...
-                    </span>
-                  )}
-                </div>
-
-                {/* Multi-speed Audio Buttons */}
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handlePlaySongAudio(0.65)}
+                    onClick={() => handlePlaySlowVoice(0.65)}
                     className="px-3 py-1.5 rounded-xl bg-[#281854] hover:bg-[#392275] text-xs font-bold text-amber-300 border border-amber-400/40 transition-all cursor-pointer flex items-center gap-1 shadow-xs"
-                    title="Audio muy lento para no perderte ni una consonante"
+                    title="Voz muy lenta para estudiar la articulación"
                   >
                     <Play className="w-3 h-3 text-amber-400 fill-amber-400" />
-                    <span>0.65x Lento</span>
+                    <span>0.65x Muy Lento</span>
                   </button>
                   <button
-                    onClick={() => handlePlaySongAudio(0.85)}
-                    className="px-3 py-1.5 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-xs font-bold text-white transition-all cursor-pointer flex items-center gap-1 shadow-md shadow-fuchsia-600/25"
-                    title="Audio pausado y cantable (Recomendado)"
-                  >
-                    <Play className="w-3 h-3 text-white fill-white" />
-                    <span>0.85x Pausado</span>
-                  </button>
-                  <button
-                    onClick={() => handlePlaySongAudio(1.0)}
+                    onClick={() => handlePlaySlowVoice(0.85)}
                     className="px-3 py-1.5 rounded-xl bg-[#281854] hover:bg-[#392275] text-xs font-bold text-slate-200 border border-slate-600 transition-all cursor-pointer flex items-center gap-1"
-                    title="Velocidad normal nativa"
+                    title="Voz pausada"
                   >
                     <Play className="w-3 h-3 text-slate-300 fill-slate-300" />
-                    <span>1.0x Nativo</span>
+                    <span>0.85x Pausado</span>
                   </button>
-                </div>
-              </div>
-
-              {/* EXTERNAL ORIGINAL ARTIST RECORDINGS: YouTube & Spotify */}
-              <div className="p-3.5 rounded-2xl bg-[#0F0A24] border border-slate-800 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-300 font-medium">
-                    ¿Quieres escuchar la voz original de <strong>{currentSong.artist}</strong>?
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <a
-                    href={currentSong.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-                  >
-                    <Youtube className="w-3.5 h-3.5 text-red-400" />
-                    <span>Ver en YouTube Oficial</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                  <a
-                    href={currentSong.spotifyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-                  >
-                    <Disc3 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Abrir en Spotify</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
                 </div>
               </div>
             </div>
@@ -990,13 +835,15 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
                 onClick={handlePrevSong}
                 className="px-4 py-2 rounded-xl bg-[#1A123C] hover:bg-[#281C5C] text-xs font-bold text-slate-200 border border-[#382672] transition-colors cursor-pointer flex items-center gap-2"
               >
-                <span>← Canción Anterior</span>
+                <ChevronLeft className="w-4 h-4" />
+                <span>Canción Anterior</span>
               </button>
               <button
                 onClick={handleNextSong}
                 className="px-5 py-2 rounded-xl bg-fuchsia-500 hover:bg-fuchsia-400 text-white text-xs font-bold transition-all cursor-pointer shadow-md shadow-fuchsia-500/20 flex items-center gap-2"
               >
-                <span>Siguiente Canción →</span>
+                <span>Siguiente Canción</span>
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -1093,54 +940,59 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
         </div>
       </div>
 
-      {/* Grid of All Available Songs (Quick Picker) */}
+      {/* Grid of All Available Songs (Quick 1-Click Song Picker) */}
       <div className="space-y-4 pt-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
               <Disc3 className="w-5 h-5 text-fuchsia-400" />
-              <span>Explora el Catálogo Musical Completo</span>
+              <span>Explora el Catálogo Musical Completo (Acceso Directo en 1 Clic)</span>
             </h3>
             <p className="text-xs text-slate-400">
-              Haz clic en cualquier canción para abrir su reproductor de oído, melodía y subtítulos en español.
+              Haz clic en cualquier canción para escuchar su música real y ver los subtítulos en español al instante.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
           {filteredSongs.map((s, index) => {
             const isSelected = index === activeSongIndex;
             return (
-              <button
+              <div
                 key={s.id}
-                onClick={() => {
-                  handleStopAll();
-                  setActiveSongIndex(index);
-                  setQuizAnswer(null);
-                  setShowQuizFeedback(false);
-                  window.scrollTo({ top: 350, behavior: 'smooth' });
-                }}
-                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between h-full ${
+                onClick={() => handleSelectSongFromList(index)}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between h-full group ${
                   isSelected
-                    ? 'bg-fuchsia-950/40 border-fuchsia-400 shadow-lg shadow-fuchsia-500/20 ring-1 ring-fuchsia-400/50'
-                    : 'bg-[#130E2A] hover:bg-[#1C143D] border-[#2A1D54] hover:border-fuchsia-500/40'
+                    ? 'bg-fuchsia-950/50 border-amber-400 shadow-xl shadow-fuchsia-500/20 ring-2 ring-amber-400/50'
+                    : 'bg-[#130E2A] hover:bg-[#1C143D] border-[#2A1D54] hover:border-fuchsia-500/50'
                 }`}
               >
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-bold text-amber-300">
                       {s.genre}
                     </span>
                     <span className="text-[11px] text-slate-500">{s.year}</span>
                   </div>
-                  <h4 className="text-sm font-bold text-white truncate">{s.songTitle}</h4>
-                  <p className="text-xs text-fuchsia-300 font-medium truncate">{s.artist}</p>
+                  <div>
+                    <h4 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
+                      {s.songTitle}
+                    </h4>
+                    <p className="text-xs text-fuchsia-300 font-medium truncate">{s.artist}</p>
+                  </div>
+                  <p className="text-[11px] text-slate-400 italic line-clamp-2">
+                    "{s.lyricsSpanish}"
+                  </p>
                 </div>
-                <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span className="truncate max-w-[120px]">{s.powerChunk}</span>
-                  <span className="text-amber-400 font-bold">Escuchar →</span>
+
+                <div className="mt-4 pt-2.5 border-t border-slate-800/80 flex items-center justify-between">
+                  <span className="text-[10px] text-slate-400 font-medium">Original</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 text-xs font-black flex items-center gap-1 shadow-sm group-hover:scale-105 transition-transform">
+                    <Play className="w-3 h-3 fill-slate-950" />
+                    <span>Escuchar</span>
+                  </span>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
