@@ -18,6 +18,7 @@ import {
   Scissors,
   Award,
   Film,
+  Music,
 } from 'lucide-react';
 import { SkillLevel } from '../types';
 
@@ -118,7 +119,7 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
       shortLabel: 'Práctica con Voz',
       icon: '🎙️',
       tagline: 'Simulación interactiva, películas míticas y agilidad mental',
-      badge: '3 Módulos',
+      badge: '4 Módulos',
       themeColor: 'text-amber-400',
       activeBorder: 'border-amber-400/80 shadow-amber-950/40',
       activeBg: 'bg-amber-950/30 text-amber-300',
@@ -136,6 +137,20 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
           borderColor: 'border-amber-400/50 hover:border-amber-400 ring-1 ring-amber-400/30',
           hoverBg: 'hover:bg-amber-950/20',
           features: ['Escenas célebres del cine', 'Subtítulos en español ajustables', 'Audio a 0.65x y 1.0x'],
+        },
+        {
+          id: 'music',
+          title: 'Música & Canciones en Inglés',
+          tagline: '🎵 Acostumbra tu oído con canciones célebres',
+          description:
+            'Entrena tu oído musical con The Beatles, Queen, Adele, Sinatra, Coldplay y más. Incluye subtítulos en español, fonética cantada y secretos de ritmo.',
+          levelBadge: '🎵 Letra & Subtítulos',
+          levelColor: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-400/50 font-bold',
+          icon: <Music className="w-5 h-5 text-fuchsia-400" />,
+          accentColor: 'text-fuchsia-400',
+          borderColor: 'border-fuchsia-400/50 hover:border-fuchsia-400 ring-1 ring-fuchsia-400/30',
+          hoverBg: 'hover:bg-fuchsia-950/20',
+          features: ['10 himnos musicales universales', 'Subtítulos en español y bilingües', 'Audio a 3 velocidades y fonética'],
         },
         {
           id: 'simulator',

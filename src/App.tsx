@@ -17,6 +17,7 @@ import { CoachLeoChat } from './components/CoachLeoChat';
 import { CommunityBlog } from './components/CommunityBlog';
 import { OfflineKitSection } from './components/OfflineKitSection';
 import { CinemaEarLab } from './components/CinemaEarLab';
+import { MusicEarLab } from './components/MusicEarLab';
 import { AudioKitModal } from './components/AudioKitModal';
 import { AudioKitFloatingTrigger } from './components/AudioKitFloatingTrigger';
 import { PackDownloadVaultModal } from './components/PackDownloadVaultModal';
@@ -43,6 +44,7 @@ export default function App() {
         'entrecasa',
         'simulator',
         'cinema',
+        'music',
         'method',
         'tweak',
         'chunks',
@@ -140,6 +142,7 @@ export default function App() {
         'entrecasa',
         'simulator',
         'cinema',
+        'music',
         'method',
         'tweak',
         'chunks',
@@ -232,6 +235,16 @@ export default function App() {
             <CinemaEarLab
               currentSpeed={currentSpeed}
               onNavigateToSimulator={() => navigateTo('simulator')}
+              onNavigateToMusic={() => navigateTo('music')}
+            />
+          </div>
+        );
+      case 'music':
+        return (
+          <div id="music">
+            <MusicEarLab
+              currentSpeed={currentSpeed}
+              onNavigateToCinema={() => navigateTo('cinema')}
             />
           </div>
         );
@@ -365,6 +378,13 @@ export default function App() {
               <CinemaEarLab
                 currentSpeed={currentSpeed}
                 onNavigateToSimulator={() => navigateTo('simulator')}
+                onNavigateToMusic={() => navigateTo('music')}
+              />
+            </div>
+            <div id="music">
+              <MusicEarLab
+                currentSpeed={currentSpeed}
+                onNavigateToCinema={() => navigateTo('cinema')}
               />
             </div>
             <div id="tweak">
@@ -420,6 +440,7 @@ export default function App() {
                 onAskTeacher={() => navigateTo('coach')}
                 onOpenBlog={() => navigateTo('blog')}
                 onOpenCinema={() => navigateTo('cinema')}
+                onOpenMusic={() => navigateTo('music')}
                 currentSpeed={currentSpeed}
               />
             </div>

@@ -16,6 +16,7 @@ import {
   Award,
   Search,
   BookOpen,
+  Music,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
@@ -47,11 +48,13 @@ interface MovieScene {
 interface CinemaEarLabProps {
   currentSpeed: number;
   onNavigateToSimulator?: () => void;
+  onNavigateToMusic?: () => void;
 }
 
 export const CinemaEarLab: React.FC<CinemaEarLabProps> = ({
   currentSpeed,
   onNavigateToSimulator,
+  onNavigateToMusic,
 }) => {
   const [subtitleMode, setSubtitleMode] = useState<'spanish' | 'english' | 'both' | 'hidden'>('spanish');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -363,6 +366,15 @@ export const CinemaEarLab: React.FC<CinemaEarLabProps> = ({
                 🙈 Ocultar (Reto)
               </button>
             </div>
+            {onNavigateToMusic && (
+              <button
+                onClick={onNavigateToMusic}
+                className="w-full pt-1.5 border-t border-slate-800/80 text-[11px] font-bold text-fuchsia-300 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <Music className="w-3.5 h-3.5 text-fuchsia-400" />
+                <span>¿Quieres entrenar con música? Ver canciones célebres →</span>
+              </button>
+            )}
           </div>
         </div>
 

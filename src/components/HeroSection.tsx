@@ -24,6 +24,7 @@ import {
   Send,
   Layers,
   Film,
+  Music,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { askTeacher, fetchSpeakTweak } from '../services/api';
@@ -41,6 +42,7 @@ interface HeroSectionProps {
   onAskTeacher?: () => void;
   onOpenBlog?: () => void;
   onOpenCinema?: () => void;
+  onOpenMusic?: () => void;
   currentSpeed: number;
 }
 
@@ -55,6 +57,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onAskTeacher,
   onOpenBlog,
   onOpenCinema,
+  onOpenMusic,
   currentSpeed,
 }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -303,6 +306,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               >
                 <Film className="w-4 h-4 text-amber-200 animate-pulse" />
                 <span>🎬 Películas & Oído</span>
+              </button>
+            )}
+            {onOpenMusic && (
+              <button
+                onClick={onOpenMusic}
+                className="group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-fuchsia-700 via-purple-600 to-amber-500 hover:from-fuchsia-600 hover:to-amber-400 border border-fuchsia-300/60 rounded-xl shadow-lg shadow-fuchsia-950/50 transition-all cursor-pointer hover:scale-103 flex items-center gap-2"
+                title="Aprende inglés con canciones famosas y subtítulos en español"
+              >
+                <Music className="w-4 h-4 text-fuchsia-200 animate-pulse" />
+                <span>🎵 Música & Oído</span>
               </button>
             )}
             {onExploreEntrecasa && (

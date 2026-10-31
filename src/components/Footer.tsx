@@ -35,6 +35,18 @@ export const Footer: React.FC<FooterProps> = ({
               Simulador de Voz
             </button>
             <button
+              onClick={() => onNavigate('cinema')}
+              className="hover:text-amber-400 transition-colors cursor-pointer text-amber-200"
+            >
+              🎬 Cine & Oído
+            </button>
+            <button
+              onClick={() => onNavigate('music')}
+              className="hover:text-fuchsia-300 transition-colors cursor-pointer text-fuchsia-300"
+            >
+              🎵 Música & Oído
+            </button>
+            <button
               onClick={() => onNavigate('method')}
               className="hover:text-amber-400 transition-colors cursor-pointer"
             >

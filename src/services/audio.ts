@@ -381,9 +381,9 @@ export async function playEnglishVoice(
     audio.src = streamUrl;
     const playPromise = audio.play();
 
-    // Fast 2.5-second buffer for mobile networks before seamless fallback to device speech
+    // 8-second buffer to allow Gemini TTS synthesis on network without premature cutoff
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Audio stream buffering exceeded 2.5s')), 2500)
+      setTimeout(() => reject(new Error('Audio stream buffering exceeded 8s')), 8000)
     );
 
     if (playPromise !== undefined) {

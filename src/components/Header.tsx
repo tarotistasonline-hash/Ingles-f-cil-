@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('cinema')}
-            className={`transition-all flex items-center gap-1.5 px-3 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+            className={`transition-all flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
               activeTab === 'cinema'
                 ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
                 : 'bg-red-950/40 hover:bg-red-900/60 border-red-500/40 hover:border-amber-400 text-amber-200 hover:text-white'
@@ -100,7 +100,19 @@ export const Header: React.FC<HeaderProps> = ({
             title="Aprende inglés con películas famosas y subtítulos en español"
           >
             <span>🎬</span>
-            <span>Películas & Oído</span>
+            <span>Películas</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('music')}
+            className={`transition-all flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+              activeTab === 'music'
+                ? 'bg-fuchsia-400 text-slate-950 border-fuchsia-400 shadow-md shadow-fuchsia-400/20'
+                : 'bg-fuchsia-950/40 hover:bg-fuchsia-900/60 border-fuchsia-500/40 hover:border-fuchsia-400 text-fuchsia-200 hover:text-white'
+            }`}
+            title="Aprende inglés con canciones famosas y subtítulos en español"
+          >
+            <span>🎵</span>
+            <span>Música & Oído</span>
           </button>
           <button
             onClick={() => setActiveTab('gym')}
