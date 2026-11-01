@@ -1067,3 +1067,214 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+/**
+ * Generates the Free Pocket Sample HTML file with 15 Golden Survival Blocks + Direct Upgrade Offer
+ */
+export function generateFreePocketSampleHtml(): string {
+  const freeBlocks = [
+    { num: 1, sit: '☕ En la Cafetería', en: 'Can I grab a large iced coffee to go?', es: '¿Me das un café helado grande para llevar?', pho: 'ken ai grab a lardch aist káfi tu gou?', tip: 'Los nativos dicen "Can I grab" en el 90% de sus pedidos sin dudar.' },
+    { num: 2, sit: '🍽️ Al pedir la cuenta', en: 'Could we get the check whenever you have a second?', es: '¿Nos traés la cuenta cuando tengas un segundo?', pho: 'kud wii get de chek wen-éver iu jav a sékend?', tip: 'Súper educado y natural. "Whenever you have a second" suena 100% nativo.' },
+    { num: 3, sit: '🛟 Pedir que hablen despacio', en: 'Sorry, I did not catch that. Could you say it again slower?', es: 'Disculpá, no llegué a escuchar. ¿Me lo decís más despacio?', pho: 'sóri, ai dídnt catch dat. kud iu séi it aguéin slóuer?', tip: 'Tu comodín de rescate para no quedarte congelado si te hablan rápido.' },
+    { num: 4, sit: '🛍️ En una tienda', en: "I'm just looking around, thanks!", es: 'Solo estoy mirando, ¡gracias!', pho: 'aim dyast lúking aráund, zenks!', tip: 'Para responder con soltura cuando el vendedor se te acerca amablemente.' },
+    { num: 5, sit: '✈️ En el Aeropuerto', en: 'Which gate is the flight to Miami boarding at?', es: '¿En qué puerta está embarcando el vuelo a Miami?', pho: 'wich géit is de flait tu maiámi bórding at?', tip: 'Pregunta directa sin rodeos para ubicar tu puerta de embarque.' },
+    { num: 6, sit: '🏨 En el Hotel', en: 'Could I leave my luggage here until check-in time?', es: '¿Podría dejar mi equipaje aquí hasta la hora del check-in?', pho: 'kud ai liiv mái láguedch jíar antíl chek-in táim?', tip: 'Te ahorra cargar valijas pesadas antes de que te den la habitación.' },
+    { num: 7, sit: '🚕 En el Taxi / Uber', en: 'Could you drop me off at the next corner, please?', es: '¿Me podés dejar en la próxima esquina, por favor?', pho: 'kud iu drap mi of at de nekst kórner, pliiz?', tip: '"Drop me off" es el verbo exacto que usan los locales.' },
+    { num: 8, sit: '🤝 Presentarse relajado', en: 'Nice to meet you! How long have you been living here?', es: '¡Un gusto conocerte! ¿Cuánto tiempo llevas viviendo acá?', pho: 'náis tu miit iu! jáu long jav iu bin líving jíar?', tip: 'El mejor rompehielos para entablar conversación con cualquier persona.' },
+    { num: 9, sit: '❓ Pedir una recomendación', en: 'What do you recommend around here?', es: '¿Qué me recomendás por acá cerca?', pho: 'wat du iu rékamend aráund jíar?', tip: 'Fórmula corta para que el mozo o vecino te sugiera lo mejor del lugar.' },
+    { num: 10, sit: '🧭 Ubicación y calles', en: 'Is it within walking distance from here?', es: '¿Queda a distancia caminable desde acá?', pho: 'is it wid-ín wóking dístans fram jíar?', tip: 'Para saber si vas a pie o necesitas pedir transporte.' },
+    { num: 11, sit: '💳 Método de pago', en: 'Do you take card or cash only?', es: '¿Aceptan tarjeta o solo efectivo?', pho: 'du iu téik kard or kash óunli?', tip: 'Simple, rápida y directa antes de pedir o consumir.' },
+    { num: 12, sit: '📶 Preguntar por WiFi', en: 'What is the WiFi password, please?', es: '¿Cuál es la clave del WiFi, por favor?', pho: 'wat is de wái-fai páswerd, pliiz?', tip: 'Imprescindible cuando llegas a cualquier café o aeropuerto.' },
+    { num: 13, sit: '⏰ La hora y apuro', en: 'What time are you guys closing tonight?', es: '¿A qué hora cierran esta noche?', pho: 'wat táim ar iu gáis klóusing tunáit?', tip: '"You guys" es la forma coloquial de decir "ustedes".' },
+    { num: 14, sit: '🙌 Agradecer de entrecasa', en: 'No worries at all! I appreciate your help.', es: '¡Cero drama / no es nada! Agradezco mucho tu ayuda.', pho: 'nóu wórris at ol! ai apríshieit ior jelp.', tip: '"No worries" reemplaza a "You are welcome" con total naturalidad.' },
+    { num: 15, sit: '👋 Despedirse amablemente', en: 'Have a good one! Take care.', es: '¡Que tengas un buen día! Cuidate.', pho: 'jav a gud wan! téik ker.', tip: 'La despedida cotidiana más usada por los nativos en todo el mundo.' },
+  ];
+
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muestra Gratis - Guía de Bolsillo de Supervivencia (15 Bloques de Oro)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #0C0A1D;
+      color: #F8FAFC;
+      line-height: 1.5;
+      padding: 20px;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    .header {
+      background: linear-gradient(135deg, #1E113A, #2D1452);
+      border: 2px solid #F59E0B;
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.15);
+    }
+    .badge {
+      display: inline-block;
+      background: #10B981;
+      color: #022C22;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    h1 { font-size: 24px; font-weight: 800; color: #FFFFFF; margin-bottom: 8px; }
+    .subtitle { font-size: 14px; color: #CBD5E1; max-width: 600px; margin: 0 auto; }
+    .print-btn {
+      margin-top: 16px;
+      display: inline-block;
+      background: #F59E0B;
+      color: #0F172A;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 30px; }
+    @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    .card {
+      background: #150F30;
+      border: 1px solid #2B215E;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-top { margin-bottom: 8px; }
+    .sit { font-size: 11px; font-weight: 700; color: #F59E0B; text-transform: uppercase; margin-bottom: 4px; }
+    .en { font-size: 15px; font-weight: 700; color: #FFFFFF; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+    .es { font-size: 13px; color: #CBD5E1; margin-bottom: 6px; }
+    .pho { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #34D399; background: #064E3B; padding: 4px 8px; border-radius: 8px; display: inline-block; margin-bottom: 6px; }
+    .tip { font-size: 11px; color: #94A3B8; font-style: italic; border-top: 1px solid #2B215E; padding-top: 6px; margin-top: 4px; }
+    .cta-box {
+      background: linear-gradient(135deg, #180C33, #3B1259);
+      border: 2px solid #F59E0B;
+      border-radius: 20px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+    .cta-title { font-size: 20px; font-weight: 800; color: #FDE68A; margin-bottom: 10px; }
+    .cta-desc { font-size: 14px; color: #E2E8F0; margin-bottom: 18px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .cta-features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .cta-feature {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    .cta-price {
+      font-size: 26px;
+      font-weight: 800;
+      color: #F59E0B;
+      margin-bottom: 16px;
+    }
+    .buy-btn {
+      display: inline-block;
+      background: linear-gradient(to right, #F59E0B, #FBBF24);
+      color: #020617;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 14px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+      transition: transform 0.2s;
+    }
+    .buy-btn:hover { transform: scale(1.03); }
+    .cta-subnote { font-size: 11px; color: #94A3B8; margin-top: 12px; }
+    @media print {
+      body { background: #FFFFFF; color: #000000; padding: 0; }
+      .header { border-color: #000; box-shadow: none; background: #FFF; color: #000; }
+      .card { border-color: #CCC; background: #FFF; page-break-inside: avoid; }
+      .pho { background: #EEE; color: #000; }
+      .print-btn, .buy-btn { display: none; }
+      .en { color: #000; }
+      h1 { color: #000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="badge">🎁 Regalo de Bienvenida · Muestra Oficial</div>
+      <h1>Guía de Bolsillo de Supervivencia en Inglés</h1>
+      <p class="subtitle">15 Bloques de Oro para comunicarte sin rodeos en viajes, cafés, hoteles y la calle sin pensar en gramática.</p>
+      <button class="print-btn" onclick="window.print()">🖨️ Imprimir o Guardar en PDF</button>
+    </div>
+
+    <div class="grid">
+      ${freeBlocks.map((b) => `
+        <div class="card">
+          <div class="card-top">
+            <div class="sit">#${b.num} ${escapeHtml(b.sit)}</div>
+            <div class="en">${escapeHtml(b.en)}</div>
+            <div class="es">${escapeHtml(b.es)}</div>
+            <div class="pho">🗣️ ${escapeHtml(b.pho)}</div>
+          </div>
+          <div class="tip">💡 ${escapeHtml(b.tip)}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">🚀 ¿Te gustó esta muestra de 15 frases?</div>
+      <p class="cta-desc">
+        Desbloquea el <strong>Auto-Kit de Bolsillo Completo</strong> con 120 audios MP3 continuos para escuchar con pantalla apagada en el auto, bus o caminando, 300 situaciones cotidianas y la Guía Maestra Imprimible de 100 bloques.
+      </p>
+      <div class="cta-features">
+        <span class="cta-feature">🎧 120 Audios MP3 en Bucle</span>
+        <span class="cta-feature">📱 100% Sin Conexión (Cero Datos)</span>
+        <span class="cta-feature">📖 Guía Maestra Completa PDF</span>
+        <span class="cta-feature">🛡️ Garantía de 7 Días</span>
+      </div>
+      <div class="cta-price">Solo $9.990 ARS (Pago Único · De por vida)</div>
+      <div>
+        <a class="buy-btn" href="https://mpago.li/1PhcDv4" target="_blank" rel="noopener noreferrer">
+          ⚡ Desbloquear Auto-Kit Completo en Mercado Pago ($9.990)
+        </a>
+      </div>
+      <div class="cta-subnote">
+        Entrega inmediata y acceso automático · Dudas o pago por Alias: inglesfacilyfluido@gmail.com
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Downloads the free sample pocket guide directly
+ */
+export function downloadFreePocketSample(): string {
+  const html = generateFreePocketSampleHtml();
+  return downloadTextFile(
+    html,
+    'Muestra_Gratis_Ingles_Facil_15_Bloques_de_Oro.html',
+    'text/html;charset=utf-8'
+  );
+}
+

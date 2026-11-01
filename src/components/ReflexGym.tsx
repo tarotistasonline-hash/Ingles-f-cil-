@@ -20,13 +20,18 @@ import {
   ArrowRight,
   PartyPopper,
   Sparkles,
+  Headphones,
+  Gift,
+  Download,
 } from 'lucide-react';
+import { downloadFreePocketSample } from '../utils/packGenerator';
 
 interface ReflexGymProps {
   currentSpeed: number;
+  onOpenKit?: () => void;
 }
 
-export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed }) => {
+export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit }) => {
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [gameState, setGameState] = useState<'idle' | 'running' | 'evaluated'>('idle');
   const [timeLeft, setTimeLeft] = useState(6);
@@ -446,6 +451,33 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed }) => {
                         ⚡ <strong className="font-semibold text-amber-300">Ritmo:</strong> {evalResult.rhythmHint}
                       </p>
                     )}
+
+                    {/* Contextual Victory Anchor: Take these reflexes to the car with screen off */}
+                    <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-slate-900 border border-amber-400/30 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                      <div className="flex items-center gap-2">
+                        <Headphones className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span className="text-xs text-slate-200">
+                          ¿Querés automatizar estos reflejos en el auto con la <strong className="text-amber-300">pantalla apagada</strong>?
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => downloadFreePocketSample()}
+                          className="px-2.5 py-1 text-[11px] font-bold text-emerald-300 bg-emerald-400/20 hover:bg-emerald-400/30 rounded-lg border border-emerald-400/40 cursor-pointer transition-colors"
+                          title="Descargar 15 Bloques de Oro en PDF gratis"
+                        >
+                          🎁 Muestra Gratis
+                        </button>
+                        {onOpenKit && (
+                          <button
+                            onClick={onOpenKit}
+                            className="px-3 py-1 text-[11px] font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg cursor-pointer transition-colors"
+                          >
+                            ⚡ Auto-Kit ($9.990)
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="pt-2 flex justify-end gap-3">

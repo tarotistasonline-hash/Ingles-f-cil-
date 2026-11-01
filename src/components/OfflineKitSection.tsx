@@ -16,7 +16,6 @@ import {
   ArrowRight,
   RefreshCw,
   Gift,
-  MessageCircle,
   Copy,
   CheckCheck,
   KeyRound,
@@ -35,6 +34,7 @@ import {
   generateCsvFlashcards,
   generateStudyPlan,
   generateOfflinePocketPlayerHtml,
+  downloadFreePocketSample,
 } from '../utils/packGenerator';
 import { Loader2, Printer } from 'lucide-react';
 
@@ -105,18 +105,17 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
       return OFFICIAL_MERCADO_PAGO_URL;
     }
   });
-  const [sellerWhatsApp, setSellerWhatsApp] = useState<string>(() => {
-    try {
-      return localStorage.getItem('vibe_whatsapp_number') || '';
-    } catch {
-      return '';
-    }
-  });
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [tempCheckoutUrl, setTempCheckoutUrl] = useState(customCheckoutUrl);
-  const [tempSellerWhatsApp, setTempSellerWhatsApp] = useState(sellerWhatsApp);
   const [copiedDeliveryMsg, setCopiedDeliveryMsg] = useState(false);
   const [copiedRedirectUrl, setCopiedRedirectUrl] = useState(false);
+  const [downloadedFreeSample, setDownloadedFreeSample] = useState(false);
+
+  const handleDownloadFreeSample = () => {
+    downloadFreePocketSample();
+    setDownloadedFreeSample(true);
+    triggerConfetti({ particleCount: 75, spread: 80 });
+  };
 
   const getDeliveryUrl = () => {
     if (typeof window !== 'undefined' && window.location && window.location.origin) {
@@ -125,14 +124,14 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
     return 'https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/?code=INGLES9990';
   };
 
-  const getWhatsAppDeliveryMessage = () => {
+  const getDeliveryMessage = () => {
     const url = getDeliveryUrl();
     return `¡Hola! Muchas gracias por tu compra del Audio-Kit de Inglés Fácil y Fluido ($9.990 ARS). 🚀\n\nTu Código de Acceso VIP para desbloquear los materiales es: INGLES9990\n\nAccedé a tu enlace seguro para ver y descargar todos los archivos a tu celular:\n👉 ${url}\n\n💡 NOTA IMPORTANTE PARA CELULARES:\nSi tu teléfono no tiene cómo abrir o descomprimir archivos .ZIP, ¡no te preocupes! En ese mismo enlace podés tocar "Abrir Guía Maestra PDF" y "Escuchar Audios en la Web" para usar todo directamente desde tu navegador sin instalar nada, o bajar cada archivo individual suelto. ¡Que lo disfrutes mucho!`;
   };
 
   const handleCopyDeliveryMsg = async () => {
     try {
-      await navigator.clipboard.writeText(getWhatsAppDeliveryMessage());
+      await navigator.clipboard.writeText(getDeliveryMessage());
       setCopiedDeliveryMsg(true);
       setTimeout(() => setCopiedDeliveryMsg(false), 3000);
     } catch {
@@ -193,22 +192,13 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
   const handleSaveConfig = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanUrl = tempCheckoutUrl.trim();
-    const cleanPhone = tempSellerWhatsApp.trim();
     setCustomCheckoutUrl(cleanUrl);
-    setSellerWhatsApp(cleanPhone);
     try {
       if (cleanUrl) {
         localStorage.setItem('vibe_custom_checkout_url', cleanUrl);
       } else {
         localStorage.removeItem('vibe_custom_checkout_url');
       }
-
-      if (cleanPhone) {
-        localStorage.setItem('vibe_whatsapp_number', cleanPhone);
-      } else {
-        localStorage.removeItem('vibe_whatsapp_number');
-      }
-      window.dispatchEvent(new Event('vibe_whatsapp_updated'));
     } catch {
       // ignore
     }
@@ -347,15 +337,27 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
           </div>
         </div>
 
-        {/* Action Button to Test / Download Pack */}
+        {/* Action Buttons: Free Sample Lead Magnet & Pack Testing */}
         <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={handleDownloadFreeSample}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500/25 to-amber-500/20 hover:from-emerald-500/35 hover:to-amber-500/30 border border-emerald-400/60 text-emerald-300 font-extrabold text-xs flex items-center gap-2 cursor-pointer transition-all shadow-md hover:scale-102"
+          >
+            <Gift className="w-4 h-4 text-emerald-400 animate-bounce" />
+            <span>
+              {downloadedFreeSample
+                ? '✓ ¡Muestra Gratis Descargada! (Ver archivo)'
+                : '🎁 Descargar Muestra Gratis (15 Bloques de Oro en PDF)'}
+            </span>
+          </button>
+
           <button
             onClick={() => {
               handleSimulatePurchase();
             }}
-            className="px-5 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 font-bold text-xs flex items-center gap-2 cursor-pointer transition-all shadow-sm"
+            className="px-5 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 font-bold text-xs flex items-center gap-2 cursor-pointer transition-all shadow-sm"
           >
-            <Download className="w-4 h-4 text-emerald-400" />
+            <Download className="w-4 h-4 text-amber-400" />
             <span>{hasPurchasedMock ? '📦 Acceder a Descargas de tu Pack' : '📦 Probar Descarga del Pack de Entrega'}</span>
           </button>
         </div>
@@ -668,8 +670,8 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
             ))}
           </div>
 
-          {/* Big Price Highlight */}
-          <div className="space-y-1">
+          {/* Big Price Highlight & Price Anchoring */}
+          <div className="space-y-2">
             <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
               Inversión única · Acceso de por vida
             </span>
@@ -682,9 +684,32 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                 {activeCurrencyObj.code}
               </span>
             </div>
-            <p className="text-xs text-emerald-400 font-medium">
-              ✓ {activeCurrencyObj.note} · Sin cuotas sorpresas ni renovaciones automáticas
+            <p className="text-xs sm:text-sm text-emerald-400 font-bold">
+              ✓ Menos de lo que cuestan 2 cafés o 1 pizza (frente a $50.000/mes de un instituto)
             </p>
+            <p className="text-[11px] text-slate-400">
+              {activeCurrencyObj.note} · Sin cuotas sorpresa ni renovaciones automáticas
+            </p>
+          </div>
+
+          {/* 7-Day Money-Back Guarantee Card */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-[#0F262B] to-[#131E3D] border-2 border-emerald-400/50 flex flex-col sm:flex-row items-center gap-3 text-left shadow-lg">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-400/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-400/40">
+              <ShieldCheck className="w-6 h-6 text-emerald-400" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="text-sm font-black text-white">
+                  Garantía Incondicional de Devolución de 7 Días
+                </h4>
+                <span className="text-[10px] bg-emerald-400/20 text-emerald-300 font-extrabold uppercase px-2 py-0.5 rounded-full border border-emerald-400/30">
+                  100% Cero Riesgo
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Descargá el kit y escuchalo en tu celular durante una semana entera. Si sentís que no soltaste la lengua o no te sirvió, nos enviás un correo a <strong className="text-white">inglesfacilyfluido@gmail.com</strong> y te reembolsamos el 100% de tu dinero de inmediato. Sin letra chica ni preguntas incómodas.
+              </p>
+            </div>
           </div>
 
           {/* Action Buy Button */}
@@ -693,27 +718,42 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               href={customCheckoutUrl || OFFICIAL_MERCADO_PAGO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-extrabold text-base sm:text-lg shadow-xl shadow-amber-400/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer text-center no-underline"
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black text-base sm:text-lg shadow-xl shadow-amber-400/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer text-center no-underline hover:scale-102"
             >
               <span>Obtener el Audio-Kit con Mercado Pago ($9.990)</span>
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5 text-slate-950" />
             </a>
 
+            {/* Direct Instant Unlock Notice */}
+            <div className="flex items-center justify-center gap-2 text-xs text-amber-300 font-bold bg-amber-400/10 px-4 py-2 rounded-xl border border-amber-400/30">
+              <KeyRound className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>¿Ya pagaste en Mercado Pago? Ingresá tu N° de Operación abajo para descargar al instante</span>
+            </div>
+
+            {/* Quick Free Lead Magnet Reminder */}
+            <button
+              onClick={handleDownloadFreeSample}
+              className="inline-flex items-center gap-2 text-xs text-amber-300 hover:text-amber-200 font-semibold cursor-pointer underline underline-offset-4 pt-1"
+            >
+              <Gift className="w-3.5 h-3.5" />
+              <span>¿Querés probar primero? Descargá gratis los 15 Bloques de Oro en PDF</span>
+            </button>
+
             {/* Support Email Reassurance */}
-            <div className="space-y-2 text-center pt-1">
+            <div className="space-y-2 text-center pt-2">
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <a
                   href="mailto:inglesfacilyfluido@gmail.com?subject=Ayuda%20Descarga%20Audio-Kit%20Ingl%C3%A9s&body=%C2%A1Hola!%20Abon%C3%A9%20el%20Audio-Kit%20y%20necesito%20asistencia%20para%20descargar%20los%20archivos.%20Mi%20n%C3%BAmero%20de%20operaci%C3%B3n%20es%3A%20"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/50 text-emerald-300 text-xs sm:text-sm font-bold transition-all no-underline cursor-pointer shadow-lg shadow-emerald-500/10"
                 >
                   <Mail className="w-4 h-4 text-emerald-400" />
-                  <span>Solo en caso de no poder descargar el pack: <strong className="text-white underline">inglesfacilyfluido@gmail.com</strong></span>
+                  <span>Soporte personalizado directo: <strong className="text-white underline">inglesfacilyfluido@gmail.com</strong></span>
                 </a>
               </div>
 
               <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Compra 100% protegida por Mercado Pago · Entrega inmediata</span>
+                <span>Compra 100% protegida por Mercado Pago · Entrega inmediata garantizada</span>
               </div>
               <div className="text-[11px] text-emerald-400 font-mono flex items-center justify-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -1017,7 +1057,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-black/60 border border-slate-800 text-[11px] text-slate-300 font-mono leading-relaxed select-all">
-                  {getWhatsAppDeliveryMessage()}
+                  {getDeliveryMessage()}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 pt-1">
                   <button
@@ -1168,7 +1208,6 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
                   type="button"
                   onClick={() => {
                     setTempCheckoutUrl(OFFICIAL_MERCADO_PAGO_URL);
-                    setTempSellerWhatsApp('');
                   }}
                   className="text-xs text-rose-400 hover:underline cursor-pointer"
                 >

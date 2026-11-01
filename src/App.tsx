@@ -277,7 +277,10 @@ export default function App() {
       case 'gym':
         return (
           <div id="gym">
-            <ReflexGym currentSpeed={currentSpeed} />
+            <ReflexGym
+              currentSpeed={currentSpeed}
+              onOpenKit={() => setIsKitModalOpen(true)}
+            />
           </div>
         );
       case 'dashboard':
@@ -394,7 +397,10 @@ export default function App() {
               <PowerChunksExplorer currentSpeed={currentSpeed} />
             </div>
             <div id="gym">
-              <ReflexGym currentSpeed={currentSpeed} />
+              <ReflexGym
+                currentSpeed={currentSpeed}
+                onOpenKit={() => setIsKitModalOpen(true)}
+              />
             </div>
             <div id="connected">
               <ConnectedSpeechLab currentSpeed={currentSpeed} />

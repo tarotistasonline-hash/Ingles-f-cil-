@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Lock,
   KeyRound,
+  Gift,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { triggerConfetti } from '../utils/confetti';
@@ -20,6 +21,7 @@ import {
   downloadTextFile,
   generateMasterPdfHtml,
   generateOfflinePocketPlayerHtml,
+  downloadFreePocketSample,
 } from '../utils/packGenerator';
 import { Loader2 } from 'lucide-react';
 
@@ -76,6 +78,7 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
   const [showDirectDownloadSuccess, setShowDirectDownloadSuccess] = useState(false);
   const [isZipping, setIsZipping] = useState(false);
   const [zipProgress, setZipProgress] = useState(0);
+  const [freeSampleDownloaded, setFreeSampleDownloaded] = useState(false);
 
   const activeCurrencyObj =
     CURRENCIES.find((c) => c.code === selectedCurrency) || CURRENCIES[0];
@@ -328,6 +331,50 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
             </div>
           </div>
 
+          {/* 7-Day Money Back Guarantee Banner */}
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/70 via-[#10272B] to-[#141B3B] border border-emerald-400/40 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-400/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-400/30">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="space-y-0.5 text-left">
+              <h4 className="text-xs font-black text-white flex items-center gap-1.5">
+                <span>Garantía de Satisfacción Total de 7 Días</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-400/20 text-emerald-300 font-bold uppercase">
+                  100% Sin Riesgo
+                </span>
+              </h4>
+              <p className="text-[11px] text-slate-300 leading-snug">
+                Si en los primeros 7 días no sentís que soltaste la lengua al escuchar los audios en tu celular, te devolvemos el 100% de tu dinero sin preguntas.
+              </p>
+            </div>
+          </div>
+
+          {/* Try Free Sample Lead Magnet Card */}
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-400/10 to-emerald-400/10 border border-amber-400/30 flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Gift className="w-4 h-4 text-amber-400 shrink-0" />
+              <div className="text-left">
+                <span className="text-xs text-amber-200 font-bold block">
+                  ¿Querés probar la metodología antes?
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  Descargá los 15 Bloques de Oro con fonética masticada en PDF gratis
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                downloadFreePocketSample();
+                setFreeSampleDownloaded(true);
+                triggerConfetti({ particleCount: 60, spread: 70 });
+              }}
+              className="px-3 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/50 text-amber-300 hover:text-white text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5 text-amber-400" />
+              <span>{freeSampleDownloaded ? '✓ Muestra Descargada' : '🎁 Bajar Muestra Gratis (PDF)'}</span>
+            </button>
+          </div>
+
           {/* Direct Download Active Card */}
           {showDirectDownloadSuccess && (
             <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/90 via-[#0E262A] to-[#141F3B] border border-emerald-400/50 text-emerald-200 space-y-3 animate-fade-in shadow-xl">
@@ -406,7 +453,7 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-emerald-400 font-semibold">
-                ✓ Acceso de por vida · Sin suscripciones mensuales
+                ✓ Menos de 2 cafés · Acceso de por vida sin suscripciones
               </p>
             </div>
 
@@ -433,8 +480,15 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
             </div>
           </div>
 
-          {/* Already Paid Quick Access with Verification Gate */}
-          <div className="pt-2 text-center border-t border-white/5">
+          {/* Automatic Unlock via Mercado Pago Operation Number */}
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#1A1242] via-[#120B2E] to-[#0D0824] border border-amber-400/40 text-center space-y-2 mt-2">
+            <div className="flex items-center justify-center gap-2 text-xs font-bold text-amber-300">
+              <KeyRound className="w-4 h-4 text-amber-400" />
+              <span>Descarga 100% Automática con tu N° de Operación de Mercado Pago</span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed max-w-lg mx-auto">
+              Al pagar, Mercado Pago te entrega tu comprobante con el N° de Operación (ej: #1048593812). Tocá abajo para ingresarlo y descargar tus 120 audios y PDF inmediatamente:
+            </p>
             <button
               onClick={() => {
                 onClose();
@@ -442,9 +496,9 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
                   onOpenVault();
                 }
               }}
-              className="text-xs text-amber-300 hover:text-amber-200 font-semibold inline-flex items-center gap-1.5 hover:underline cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-400 to-emerald-300 hover:from-emerald-300 hover:to-emerald-200 text-slate-950 text-xs font-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
             >
-              <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+              <KeyRound className="w-3.5 h-3.5 text-slate-950" />
               <span>¿Ya pagaste en Mercado Pago? Desbloquear con tu N° de Operación</span>
             </button>
           </div>

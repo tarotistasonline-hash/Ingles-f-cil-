@@ -25,9 +25,14 @@ import {
   Layers,
   Film,
   Music,
+  Download,
+  ShieldCheck,
+  Gift,
 } from 'lucide-react';
 import { playEnglishVoice } from '../services/audio';
 import { askTeacher, fetchSpeakTweak } from '../services/api';
+import { downloadFreePocketSample } from '../utils/packGenerator';
+import { triggerConfetti } from '../utils/confetti';
 import { RealVisitsBadge } from './RealVisitsBadge';
 import { DailyChallengeWidget } from './DailyChallengeWidget';
 
@@ -63,6 +68,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [playingSpeed, setPlayingSpeed] = useState<number | null>(null);
   const [activeDemoIndex, setActiveDemoIndex] = useState(0);
+  const [downloadedFreeSample, setDownloadedFreeSample] = useState(false);
+
+  const handleDownloadSample = () => {
+    downloadFreePocketSample();
+    setDownloadedFreeSample(true);
+    triggerConfetti({ particleCount: 70, spread: 80 });
+  };
 
   // Multi-panel interactive state (shortens page into organized switchable panels)
   const [activePanelTab, setActivePanelTab] = useState<'profe' | 'tweak' | 'challenge' | 'blog'>('profe');
@@ -246,38 +258,107 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </span>
           </h1>
 
-          {/* Luminous, Highlighted & Shimmering Callout Box as requested */}
-          <div className="relative max-w-3xl mx-auto p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#1E113A]/90 via-[#261645]/90 to-[#121E36]/90 border-2 border-amber-400/80 shadow-2xl shadow-amber-400/25 backdrop-blur-md overflow-hidden group hover:border-amber-300 transition-all text-left sm:text-center">
+          {/* Luminous, Highlighted & Shimmering Callout Box - High Conversion & Titilante Letters */}
+          <div className="relative max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-[#1E113A]/95 via-[#261645]/95 to-[#121E36]/95 border-2 border-amber-400/90 shadow-2xl shadow-amber-400/30 backdrop-blur-md overflow-hidden group hover:border-amber-300 transition-all text-left sm:text-center space-y-4">
             {/* Shimmer light beam running across */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
-            <div className="flex items-start sm:items-center justify-center gap-2.5">
-              {/* Pulsing beacon dot (titilante) */}
-              <div className="shrink-0 mt-0.5 sm:mt-0">
-                <span className="relative flex h-3.5 w-3.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-gradient-to-tr from-amber-400 to-emerald-400 shadow-md"></span>
+            {/* Glowing Header Sentence with Distinct, Vibrant, Titilante Letters */}
+            <div className="flex items-start sm:items-center justify-center gap-3">
+              {/* Pulsing Beacon Dot */}
+              <div className="shrink-0 mt-1 sm:mt-0">
+                <span className="relative flex h-4 w-4">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-80"></span>
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-gradient-to-tr from-amber-400 via-emerald-400 to-sky-400 shadow-lg shadow-amber-400/50"></span>
                 </span>
               </div>
 
-              <p className="text-sm sm:text-base text-slate-100 leading-relaxed text-pretty">
-                <span className="font-extrabold bg-gradient-to-r from-amber-300 via-amber-100 to-emerald-300 bg-clip-text text-transparent">
+              <p className="text-sm sm:text-base text-slate-100 leading-relaxed text-pretty font-subheading">
+                <span className="font-extrabold text-white tracking-wide">
                   Aprende inglés a tu propio ritmo, sin salir de tu hogar
                 </span>{' '}
                 o también en el{' '}
-                <strong className="text-sky-300 font-bold underline decoration-sky-400 decoration-2 underline-offset-2">
+                <strong className="text-sky-300 font-extrabold underline decoration-sky-400 decoration-2 underline-offset-4 tracking-tight">
                   coche, bus o caminando
                 </strong>{' '}
                 si decides descargar el{' '}
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-amber-400/20 border border-amber-400/60 text-amber-300 font-black shadow-xs">
-                  <span>🎧 auto kit de bolsillo sin conexión</span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500/30 to-amber-600/30 border-2 border-amber-400/90 text-amber-200 font-black shadow-lg shadow-amber-500/20 animate-titilante">
+                  <span className="text-amber-300 font-black">🎧 auto kit de bolsillo sin conexión</span>
                 </span>{' '}
-                <span className="inline-block mt-1 sm:mt-0 px-2.5 py-0.5 rounded-lg bg-emerald-950/90 border border-emerald-400/70 text-emerald-300 font-black shadow-md animate-pulse">
-                  ✨ y a modo de colaboración para seguir manteniendo y mejorando el sitio
+                <span className="inline-block mt-1.5 sm:mt-0 px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-950/95 via-[#132B2B] to-[#1C1844] border-2 border-emerald-400/80 shadow-lg shadow-emerald-500/25">
+                  <span className="font-black text-sm sm:text-base animate-rainbow-text tracking-wide">
+                    ✨ y a modo de colaboración para seguir manteniendo y mejorando el sitio
+                  </span>
                 </span>
                 .
               </p>
             </div>
+
+            {/* Value Highlights: Why this kit is indispensable */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-left">
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                <span className="text-base">🎧</span>
+                <div className="text-[11px] leading-tight text-slate-200">
+                  <strong className="text-white block font-bold">120 Audios en MP3</strong>
+                  Pantalla apagada en el auto o bus
+                </div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                <span className="text-base">📄</span>
+                <div className="text-[11px] leading-tight text-slate-200">
+                  <strong className="text-white block font-bold">Guía PDF Imprimible</strong>
+                  Fonética masticada en español
+                </div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                <span className="text-base">🛡️</span>
+                <div className="text-[11px] leading-tight text-slate-200">
+                  <strong className="text-emerald-300 block font-bold">Garantía 7 Días</strong>
+                  100% de devolución sin preguntas
+                </div>
+              </div>
+            </div>
+
+            {/* Seamless 3-step Delivery Clarity Notice */}
+            <div className="p-2.5 rounded-xl bg-[#0F0B24] border border-amber-400/30 text-[11px] text-slate-300 flex items-center justify-center gap-2 flex-wrap">
+              <span className="font-bold text-amber-300">Descarga automática:</span>
+              <span>1. Pagás con Mercado Pago ($9.990)</span>
+              <span className="text-slate-500">➔</span>
+              <span>2. Ponés tu N° de Operación</span>
+              <span className="text-slate-500">➔</span>
+              <span className="text-emerald-300 font-bold">3. Descargás tu pack de inmediato</span>
+            </div>
+
+            {/* Direct High-Conversion CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-0.5">
+              {/* Free Lead Magnet Download Button */}
+              <button
+                onClick={handleDownloadSample}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/60 text-emerald-300 font-black text-xs flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-102 shadow-sm"
+                title="Descargar gratis los 15 Bloques de Oro en PDF"
+              >
+                <Gift className="w-4 h-4 text-emerald-400 animate-bounce" />
+                <span>
+                  {downloadedFreeSample
+                    ? '✓ ¡Muestra Gratis Descargada! (Ver archivo)'
+                    : '🎁 Descargar Muestra Gratis (15 Bloques en PDF)'}
+                </span>
+              </button>
+
+              {/* Direct Purchase Trigger */}
+              <button
+                onClick={onOpenKit}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-400/25 transition-all hover:scale-102"
+              >
+                <span>⚡ Obtener Auto-Kit Completo ($9.990 ARS)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Price Anchoring & Micro-reassurance */}
+            <p className="text-[11px] text-slate-400 font-medium">
+              ☕ <strong className="text-slate-200">Menos de lo que cuestan 2 cafés</strong> · Inversión única de por vida (frente a $50.000/mes de un instituto).
+            </p>
           </div>
 
           {/* Quick Action Buttons - Centered & Tactile */}
