@@ -69,51 +69,54 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [playingSpeed, setPlayingSpeed] = useState<number | null>(null);
   const [activeDemoIndex, setActiveDemoIndex] = useState(0);
   const [downloadedFreeSample, setDownloadedFreeSample] = useState(false);
-  // Auto-play short spoken welcome message by default without having to click anything
+  const [isWelcomePlaying, setIsWelcomePlaying] = useState(false);
+
+  // Auto-play short spoken welcome message with robust autoplay & first-gesture trigger
   useEffect(() => {
     const SHORT_WELCOME =
       '¡Hola! Estás en el lugar correcto si querés aprender inglés rápido y fácil. ¡Bienvenido!';
 
     let hasSuccessfullyPlayed = false;
 
-    const playWelcome = () => {
-      if (hasSuccessfullyPlayed) return;
-      speakSpanishVoice(
-        SHORT_WELCOME,
-        1.0,
-        () => {
-          hasSuccessfullyPlayed = true;
-          cleanupPassiveListeners();
-        },
-        () => {}
-      );
+    const gestureEvents = ['click', 'touchstart', 'pointerdown', 'scroll', 'keydown'];
+
+    const cleanupGestureListeners = () => {
+      gestureEvents.forEach((ev) => window.removeEventListener(ev, handleGesture));
     };
 
-    // 1. Trigger immediately on page entrance
-    const timer1 = setTimeout(playWelcome, 150);
-    const timer2 = setTimeout(playWelcome, 600);
-
-    // 2. Passive document interaction listener: if browser autoplay policies hold speech synthesis,
-    // any initial scroll, touch or pointer movement immediately triggers it without clicking any button.
-    const passiveEvents = ['pointerdown', 'touchstart', 'scroll', 'keydown'];
-    const handlePassive = () => {
-      if (!hasSuccessfullyPlayed) {
-        playWelcome();
+    const tryPlayWelcome = async () => {
+      if (hasSuccessfullyPlayed) return;
+      const started = await speakSpanishVoice(
+        SHORT_WELCOME,
+        1.0,
+        () => setIsWelcomePlaying(true),
+        () => setIsWelcomePlaying(false)
+      );
+      if (started) {
+        hasSuccessfullyPlayed = true;
+        cleanupGestureListeners();
       }
     };
 
-    const cleanupPassiveListeners = () => {
-      passiveEvents.forEach((ev) => window.removeEventListener(ev, handlePassive));
+    // 1. Initial automatic trigger (works immediately when browser allows unmuted autoplay)
+    const timer = setTimeout(() => {
+      tryPlayWelcome();
+    }, 300);
+
+    // 2. Unrestricted user gesture listener (fires on first touch, click, scroll or keypress)
+    const handleGesture = () => {
+      if (!hasSuccessfullyPlayed) {
+        tryPlayWelcome();
+      }
     };
 
-    passiveEvents.forEach((ev) =>
-      window.addEventListener(ev, handlePassive, { once: true, passive: true })
+    gestureEvents.forEach((ev) =>
+      window.addEventListener(ev, handleGesture, { once: true, passive: true })
     );
 
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      cleanupPassiveListeners();
+      clearTimeout(timer);
+      cleanupGestureListeners();
     };
   }, []);
 
@@ -291,6 +294,29 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <span aria-hidden="true" className="text-slate-600">·</span>
             <span className="text-violet-400 font-bold">⚡ Fluidez Real</span>
           </div>
+
+          {/* Spoken Welcome Voice Button (Automatic on entry + 1-click replay) */}
+          <button
+            type="button"
+            onClick={() => {
+              speakSpanishVoice(
+                '¡Hola! Estás en el lugar correcto si querés aprender inglés rápido y fácil. ¡Bienvenido!',
+                1.0,
+                () => setIsWelcomePlaying(true),
+                () => setIsWelcomePlaying(false)
+              );
+            }}
+            className={`inline-flex items-center gap-2 text-xs font-semibold px-4 py-1.5 rounded-full border shadow-lg backdrop-blur-md transition-all cursor-pointer active:scale-95 ${
+              isWelcomePlaying
+                ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-amber-400/30 animate-pulse font-bold'
+                : 'text-emerald-300 bg-[#16113A]/90 border-emerald-500/40 hover:bg-emerald-500/20 hover:border-emerald-400'
+            }`}
+            title="Escuchar saludo de bienvenida en voz masculina latino neutro"
+          >
+            <Volume2 className={`w-3.5 h-3.5 ${isWelcomePlaying ? 'animate-bounce text-slate-950' : 'text-emerald-400'}`} />
+            <span>{isWelcomePlaying ? 'Reproduciendo bienvenida...' : '🔊 Escuchar Bienvenida'}</span>
+          </button>
+
           <RealVisitsBadge compact={true} />
         </div>
 
