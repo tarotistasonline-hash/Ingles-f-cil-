@@ -319,6 +319,46 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
           la guía visual para imprimir y 300 frases extra de rescate diario.
         </p>
 
+        {/* Luminous Callout Box with Titilante & Rainbow Letters - Located at the end for the kit */}
+        <div className="relative max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-[#1E113A]/95 via-[#261645]/95 to-[#121E36]/95 border-2 border-amber-400/90 shadow-2xl shadow-amber-400/30 backdrop-blur-md overflow-hidden group hover:border-amber-300 transition-all text-left sm:text-center space-y-3">
+          {/* Shimmer light beam running across */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+
+          {/* Glowing Header Sentence with Distinct, Vibrant, Titilante Letters */}
+          <div className="flex items-start sm:items-center justify-center gap-3">
+            {/* Pulsing Beacon Dot */}
+            <div className="shrink-0 mt-1 sm:mt-0">
+              <span className="relative flex h-4 w-4">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-80"></span>
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-gradient-to-tr from-amber-400 via-emerald-400 to-sky-400 shadow-lg shadow-amber-400/50"></span>
+              </span>
+            </div>
+
+            <p className="text-sm sm:text-base text-slate-100 leading-relaxed text-pretty font-subheading">
+              <span className="font-extrabold text-white tracking-wide">
+                Aprende inglés a tu propio ritmo, sin salir de tu hogar
+              </span>{' '}
+              o también en el{' '}
+              <strong className="text-sky-300 font-extrabold underline decoration-sky-400 decoration-2 underline-offset-4 tracking-tight">
+                coche, bus o caminando
+              </strong>{' '}
+              si decides descargar el{' '}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500/30 to-amber-600/30 border-2 border-amber-400/90 text-amber-200 font-black shadow-lg shadow-amber-500/20 animate-titilante">
+                <span className="text-amber-300 font-black">🎧 auto kit de bolsillo sin conexión</span>
+              </span>{' '}
+              <span className="inline-block mt-1.5 sm:mt-0 px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-950/95 via-[#132B2B] to-[#1C1844] border-2 border-emerald-400/80 shadow-lg shadow-emerald-500/25">
+                <span className="font-black text-sm sm:text-base animate-rainbow-text tracking-wide">
+                  ✨ y a modo de colaboración para seguir manteniendo y mejorando el sitio
+                </span>
+              </span>
+              .
+            </p>
+          </div>
+          <p className="text-xs text-amber-300/90 font-medium">
+            💡 Todo el material de la web es 100% gratuito. Este kit descargable es un complemento opcional para escuchar en tu celular sin internet con la pantalla apagada.
+          </p>
+        </div>
+
         {/* Clear Guarantee Highlights */}
         <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs text-slate-400 pt-2">
           <div className="flex items-center gap-1.5 text-emerald-400">

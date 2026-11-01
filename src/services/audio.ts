@@ -294,6 +294,278 @@ export function speakWithWebSpeech(
   }
 }
 
+/**
+ * Speaks a Spanish message (e.g. welcome message) with:
+ * 1. High-fidelity audio file `/audio/welcome_latino_neutro.wav` (natural male neutral Latin American voice).
+ * 2. Web Speech API fallback strictly filtered to MALE Latin American voices (es-419, es-MX, es-US, es-CO, es-AR).
+ *    Strictly REJECTS all Peninsular/Castizo Spanish voices (es-ES, Spain, España, Castellano)
+ *    and excludes female voices.
+ */
+export async function speakSpanishVoice(
+  text: string,
+  speed: number = 1.0,
+  onStart?: () => void,
+  onEnd?: () => void
+): Promise<boolean> {
+  if (typeof window === 'undefined') {
+    if (onEnd) onEnd();
+    return false;
+  }
+
+  stopAllAudio();
+  unlockMobileAudio();
+
+  const isWelcomeMessage =
+    text.toLowerCase().includes('lugar correcto') ||
+    text.toLowerCase().includes('bienvenido');
+
+  // 1. High-fidelity pre-rendered audio asset for welcome message (male neutral Latin American voice)
+  if (isWelcomeMessage) {
+    const audioSources = [
+      '/audio/welcome_latino_neutro.mp3',
+      '/audio/welcome_latino_neutro.wav',
+    ];
+
+    for (const src of audioSources) {
+      try {
+        const audio = new Audio();
+        audio.preload = 'auto';
+        audio.src = src;
+        audio.playbackRate = 1.0;
+        currentAudio = audio;
+
+        const started = await new Promise<boolean>((resolve) => {
+          let resolved = false;
+
+          audio.onplay = () => {
+            if (!resolved) {
+              resolved = true;
+              if (onStart) onStart();
+              resolve(true);
+            }
+          };
+
+          audio.onended = () => {
+            if (onEnd) onEnd();
+          };
+
+          audio.onerror = () => {
+            if (!resolved) {
+              resolved = true;
+              resolve(false);
+            } else if (onEnd) {
+              onEnd();
+            }
+          };
+
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                if (!resolved) {
+                  resolved = true;
+                  if (onStart) onStart();
+                  resolve(true);
+                }
+              })
+              .catch(() => {
+                if (!resolved) {
+                  resolved = true;
+                  resolve(false);
+                }
+              });
+          }
+        });
+
+        if (started) {
+          return true;
+        }
+      } catch {
+        // try next audio source
+      }
+    }
+  }
+
+  return fallbackWebSpeechLatinMale(text, speed, onStart, onEnd);
+}
+
+/**
+ * Web Speech synthesizer strictly tuned for a Male Voice with Neutral Latin American accent.
+ * Explicitly rejects Castizo (es-ES / Spain) and excludes female voices.
+ */
+function fallbackWebSpeechLatinMale(
+  text: string,
+  speed: number = 1.0,
+  onStart?: () => void,
+  onEnd?: () => void
+): boolean {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    if (onEnd) onEnd();
+    return false;
+  }
+
+  try {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+
+    const clean = cleanSpeechText(text);
+    const utterance = new SpeechSynthesisUtterance(clean);
+
+    // Strictly set Latin American Spanish (neutral standard)
+    utterance.lang = 'es-419';
+    // Slightly lower pitch for a warm, distinct masculine voice tone
+    utterance.pitch = 0.88;
+    utterance.rate = Math.max(0.85, Math.min(1.15, speed));
+
+    if (onStart) utterance.onstart = () => onStart();
+    if (onEnd) {
+      utterance.onend = () => onEnd();
+      utterance.onerror = () => onEnd();
+    }
+
+    const selectVoiceAndSpeak = () => {
+      const allVoices = window.speechSynthesis.getVoices();
+
+      // 1. Completely exclude Castizo / Spain / Peninsular Spanish
+      const isCastizo = (v: SpeechSynthesisVoice) => {
+        const lang = (v.lang || '').toLowerCase();
+        const name = (v.name || '').toLowerCase();
+        return (
+          lang === 'es-es' ||
+          lang.startsWith('es-es') ||
+          name.includes('spain') ||
+          name.includes('españa') ||
+          name.includes('peninsular') ||
+          name.includes('castilian') ||
+          name.includes('iberian')
+        );
+      };
+
+      // 2. Exclude known female voices to guarantee a male tone
+      const isFemale = (v: SpeechSynthesisVoice) => {
+        const name = (v.name || '').toLowerCase();
+        const femaleKeywords = [
+          'female',
+          'mujer',
+          'sabina',
+          'elena',
+          'monica',
+          'mónica',
+          'paulina',
+          'luciana',
+          'rosa',
+          'soledad',
+          'laura',
+          'sofia',
+          'marisol',
+          'francisca',
+          'conchita',
+          'carmen',
+          'mia',
+          'andrea',
+          'victoria',
+          'paloma',
+          'ximena',
+          'valentina',
+          'camila',
+          'zira',
+          'eva',
+          'dalia',
+          'elvira',
+          'hilda',
+          'angie',
+          'lupe',
+        ];
+        return femaleKeywords.some((k) => name.includes(k));
+      };
+
+      // Candidate Spanish voices that are NOT Castizo
+      const latinSpanishVoices = allVoices.filter(
+        (v) => v.lang.toLowerCase().startsWith('es') && !isCastizo(v)
+      );
+
+      // Well-known Latin American male voices across OS & browsers
+      const maleLatinNames = [
+        'jorge',
+        'diego',
+        'carlos',
+        'gonzalo',
+        'miguel',
+        'alonso',
+        'mateo',
+        'raul',
+        'raúl',
+        'emilio',
+        'juan',
+        'pablo',
+        'andres',
+        'andrés',
+        'david',
+        'gerardo',
+        'sebastián',
+        'sebastian',
+        'male',
+        'hombre',
+      ];
+
+      // Priority A: Latin American male named voice
+      let chosenVoice = latinSpanishVoices.find((v) => {
+        if (isFemale(v)) return false;
+        const lowerName = v.name.toLowerCase();
+        return maleLatinNames.some((m) => lowerName.includes(m));
+      });
+
+      // Priority B: Any Latin voice from es-419, es-MX, es-US, es-CO, es-AR not flagged female
+      if (!chosenVoice) {
+        chosenVoice = latinSpanishVoices.find((v) => {
+          if (isFemale(v)) return false;
+          const lang = v.lang.toLowerCase();
+          return (
+            lang.startsWith('es-419') ||
+            lang.startsWith('es-mx') ||
+            lang.startsWith('es-us') ||
+            lang.startsWith('es-co') ||
+            lang.startsWith('es-ar')
+          );
+        });
+      }
+
+      // Priority C: Any Latin Spanish voice not flagged female
+      if (!chosenVoice) {
+        chosenVoice = latinSpanishVoices.find((v) => !isFemale(v));
+      }
+
+      // Priority D: Any non-Castizo Spanish voice
+      if (!chosenVoice && latinSpanishVoices.length > 0) {
+        chosenVoice = latinSpanishVoices[0];
+      }
+
+      if (chosenVoice) {
+        utterance.voice = chosenVoice;
+        utterance.lang = chosenVoice.lang;
+      }
+
+      window.speechSynthesis.speak(utterance);
+    };
+
+    const initialVoices = window.speechSynthesis.getVoices();
+    if (initialVoices.length > 0) {
+      selectVoiceAndSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        selectVoiceAndSpeak();
+      };
+      setTimeout(selectVoiceAndSpeak, 150);
+    }
+
+    return true;
+  } catch (err) {
+    console.warn('Latin male Spanish speech synthesis failed', err);
+    if (onEnd) onEnd();
+    return false;
+  }
+}
+
 export interface PlayVoiceOptions {
   voiceName?: 'Kore' | 'Puck' | 'Zephyr';
   speed?: number;
