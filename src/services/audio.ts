@@ -301,120 +301,85 @@ export function speakWithWebSpeech(
  *    Strictly REJECTS all Peninsular/Castizo Spanish voices (es-ES, Spain, España, Castellano)
  *    and excludes female voices.
  */
-export async function speakSpanishVoice(
+/**
+ * Speaks a Spanish message (e.g. welcome message) with a MALE voice and NEUTRAL LATIN AMERICAN accent.
+ * 1. Plays high-fidelity audio asset `/audio/welcome_latino_neutro.mp3` via HTML5 Audio element.
+ * 2. Web Speech API fallback strictly filtered for MALE Latin American voices (es-MX, es-US, es-CO, es-AR),
+ *    strictly excluding all Castizo (es-ES / Spain) and female voices.
+ */
+export function speakSpanishVoice(
   text: string,
   speed: number = 1.0,
   onStart?: () => void,
   onEnd?: () => void
-): Promise<boolean> {
+): void {
   if (typeof window === 'undefined') {
     if (onEnd) onEnd();
-    return false;
+    return;
   }
 
-  stopAllAudio();
-  unlockMobileAudio();
-
-  const isWelcomeMessage =
+  const isWelcome =
     text.toLowerCase().includes('lugar correcto') ||
     text.toLowerCase().includes('bienvenido');
 
-  // 1. High-fidelity pre-rendered audio asset for welcome message (male neutral Latin American voice)
-  if (isWelcomeMessage) {
-    const audioSources = [
-      '/audio/welcome_latino_neutro.mp3',
-      '/audio/welcome_latino_neutro.wav',
-    ];
+  // Strategy 1: HTML5 Audio with pre-rendered studio Latin American neutral male voice
+  if (isWelcome) {
+    const existing = document.getElementById('vibe-welcome-audio') as HTMLAudioElement;
+    const audio = existing || new Audio('/audio/welcome_latino_neutro.mp3');
+    audio.playbackRate = 1.0;
+    audio.volume = 1.0;
 
-    for (const src of audioSources) {
-      try {
-        const audio = new Audio();
-        audio.preload = 'auto';
-        audio.src = src;
-        audio.playbackRate = 1.0;
-        currentAudio = audio;
+    let started = false;
+    audio.onplay = () => {
+      started = true;
+      if (onStart) onStart();
+    };
+    audio.onended = () => {
+      if (onEnd) onEnd();
+    };
 
-        const started = await new Promise<boolean>((resolve) => {
-          let resolved = false;
-
-          audio.onplay = () => {
-            if (!resolved) {
-              resolved = true;
-              if (onStart) onStart();
-              resolve(true);
-            }
-          };
-
-          audio.onended = () => {
-            if (onEnd) onEnd();
-          };
-
-          audio.onerror = () => {
-            if (!resolved) {
-              resolved = true;
-              resolve(false);
-            } else if (onEnd) {
-              onEnd();
-            }
-          };
-
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                if (!resolved) {
-                  resolved = true;
-                  if (onStart) onStart();
-                  resolve(true);
-                }
-              })
-              .catch(() => {
-                if (!resolved) {
-                  resolved = true;
-                  resolve(false);
-                }
-              });
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // Playing successfully!
+        })
+        .catch(() => {
+          // If HTML5 audio is blocked by browser autoplay policy, attempt Web Speech Latin Male
+          if (!started) {
+            speakWithWebSpeechLatinMale(text, speed, onStart, onEnd);
           }
         });
-
-        if (started) {
-          return true;
-        }
-      } catch {
-        // try next audio source
-      }
+      return;
     }
   }
 
-  return fallbackWebSpeechLatinMale(text, speed, onStart, onEnd);
+  speakWithWebSpeechLatinMale(text, speed, onStart, onEnd);
 }
 
-/**
- * Web Speech synthesizer strictly tuned for a Male Voice with Neutral Latin American accent.
- * Explicitly rejects Castizo (es-ES / Spain) and excludes female voices.
- */
-function fallbackWebSpeechLatinMale(
+function speakWithWebSpeechLatinMale(
   text: string,
   speed: number = 1.0,
   onStart?: () => void,
   onEnd?: () => void
-): boolean {
+): void {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     if (onEnd) onEnd();
-    return false;
+    return;
   }
 
   try {
+    stopAllAudio();
+    unlockMobileAudio();
     window.speechSynthesis.cancel();
     window.speechSynthesis.resume();
 
     const clean = cleanSpeechText(text);
     const utterance = new SpeechSynthesisUtterance(clean);
 
-    // Strictly set Latin American Spanish (neutral standard)
-    utterance.lang = 'es-419';
-    // Slightly lower pitch for a warm, distinct masculine voice tone
-    utterance.pitch = 0.88;
+    // Default to es-MX (widely recognized across Windows, Android, iOS and macOS)
+    utterance.lang = 'es-MX';
+    utterance.pitch = 0.85;
     utterance.rate = Math.max(0.85, Math.min(1.15, speed));
 
     if (onStart) utterance.onstart = () => onStart();
@@ -423,7 +388,7 @@ function fallbackWebSpeechLatinMale(
       utterance.onerror = () => onEnd();
     }
 
-    const selectVoiceAndSpeak = () => {
+    const selectAndSpeak = () => {
       const allVoices = window.speechSynthesis.getVoices();
 
       // 1. Completely exclude Castizo / Spain / Peninsular Spanish
@@ -437,6 +402,7 @@ function fallbackWebSpeechLatinMale(
           name.includes('españa') ||
           name.includes('peninsular') ||
           name.includes('castilian') ||
+          name.includes('castellano') ||
           name.includes('iberian')
         );
       };
@@ -545,24 +511,22 @@ function fallbackWebSpeechLatinMale(
         utterance.lang = chosenVoice.lang;
       }
 
+      window.speechSynthesis.resume();
       window.speechSynthesis.speak(utterance);
     };
 
     const initialVoices = window.speechSynthesis.getVoices();
-    if (initialVoices.length > 0) {
-      selectVoiceAndSpeak();
+    if (initialVoices && initialVoices.length > 0) {
+      selectAndSpeak();
     } else {
       window.speechSynthesis.onvoiceschanged = () => {
-        selectVoiceAndSpeak();
+        selectAndSpeak();
       };
-      setTimeout(selectVoiceAndSpeak, 150);
+      setTimeout(selectAndSpeak, 60);
     }
-
-    return true;
   } catch (err) {
     console.warn('Latin male Spanish speech synthesis failed', err);
     if (onEnd) onEnd();
-    return false;
   }
 }
 

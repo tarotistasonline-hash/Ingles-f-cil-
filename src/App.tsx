@@ -32,6 +32,7 @@ import {
   getStoredSessionToken,
 } from './services/purchaseVerification';
 import { recordVisit } from './services/visitorTracker';
+import { initWelcomeVoice } from './services/welcomeVoice';
 
 export default function App() {
   const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
@@ -70,6 +71,8 @@ export default function App() {
   React.useEffect(() => {
     // Record visit globally on root mount across all devices, routes and tabs
     recordVisit();
+    // Automatic spoken welcome greeting (male neutral Latin American voice)
+    initWelcomeVoice();
   }, []);
 
   React.useEffect(() => {
