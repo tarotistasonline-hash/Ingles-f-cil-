@@ -52,8 +52,11 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8099027931324700" crossorigin="anonymous"></script>
   </head>
   <body class="bg-[#0C0A1D] text-[#F8FAFC] antialiased selection:bg-amber-400 selection:text-slate-950">
-    <!-- Embedded Native Spoken Welcome Audio Player -->
-    <audio id="site-welcome-audio" src="/audio/welcome_latino_neutro.mp3" preload="auto" playsinline style="display:none"></audio>
+    <!-- Embedded Native Spoken Welcome Audio Player (Completely invisible & spontaneous) -->
+    <audio id="site-welcome-audio" preload="auto" autoplay playsinline style="display:none">
+      <source src="/audio/welcome_latino_neutro.mp3" type="audio/mpeg" />
+      <source src="/audio/welcome_latino_neutro.wav" type="audio/wav" />
+    </audio>
 
     <script>
       (function() {
@@ -70,13 +73,23 @@
                 window.__welcomeAudioStarted = true;
                 removeEarlyListeners();
               }).catch(function() {
-                // Autoplay blocked by browser policy without gesture; early listeners will unlock on first touch
+                // If browser autoplay restriction delays playback until user gesture/scroll
               });
             }
           } catch(e) {}
         }
 
-        var earlyEvents = ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click', 'scroll', 'wheel'];
+        var earlyEvents = [
+          'pointerdown',
+          'touchstart',
+          'mousedown',
+          'keydown',
+          'click',
+          'scroll',
+          'wheel',
+          'touchmove',
+          'mousemove'
+        ];
 
         function onEarlyGesture() {
           if (started) return;
@@ -104,7 +117,7 @@
         // 3. Window load attempt
         window.addEventListener('load', tryPlayImmediate);
 
-        // Expose global references for welcomeVoice service coordination
+        // Expose global references
         window.__welcomeAudio = audio;
         window.__tryPlayWelcomeVoice = tryPlayImmediate;
       })();

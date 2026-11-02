@@ -288,7 +288,7 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
               </li>
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-400 font-bold">✓</span>
-                <span><strong>Guardado permanente:</strong> Tus visitas quedan almacenadas de forma segura para que nunca se reinicien a cero.</span>
+                <span><strong>Audio de Bienvenida público:</strong> El saludo de bienvenida está configurado para sonar de forma espontánea para todos los visitantes que abren la web (no depende ni está limitado a este panel).</span>
               </li>
             </ul>
           </div>
