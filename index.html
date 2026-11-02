@@ -91,8 +91,14 @@
           'mousemove'
         ];
 
-        function onEarlyGesture() {
+        function onEarlyGesture(e) {
           if (started) return;
+          // Exclude any click on creator panel or visits badge
+          if (e && e.target && e.target.closest) {
+            if (e.target.closest('[data-creator-panel]') || e.target.closest('[data-visits-badge]')) {
+              return;
+            }
+          }
           tryPlayImmediate();
         }
 

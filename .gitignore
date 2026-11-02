@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+.audio_cache/
+visits_data.json
+known_visitors.json
+blog_data.json

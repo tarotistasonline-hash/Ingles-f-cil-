@@ -316,12 +316,19 @@ const GESTURE_EVENTS = [
 ];
 let unlockListenersAttached = false;
 
-function onAnyUserInteraction() {
+function onAnyUserInteraction(e?: Event) {
   if (state.hasStarted || state.isPlaying) {
     removeGlobalUnlockListeners();
     return;
   }
-  // User interacted anywhere on the page -> immediately play the welcome greeting!
+  // Exclude creator panel and visits badge interactions completely
+  if (e && (e.target as HTMLElement)?.closest) {
+    const el = e.target as HTMLElement;
+    if (el.closest('[data-creator-panel]') || el.closest('[data-visits-badge]')) {
+      return;
+    }
+  }
+  // Spontaneous interaction from the student/visitor on the site -> play greeting
   playWelcomeVoice({ force: true });
 }
 

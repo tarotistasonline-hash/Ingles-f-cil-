@@ -84,9 +84,14 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
 
   if (compact) {
     return (
-      <div className="inline-flex items-center gap-2">
+      <div className="inline-flex items-center gap-2" data-creator-panel="true" data-visits-badge="true">
         <button
-          onClick={() => setShowModal(true)}
+          data-creator-panel="true"
+          data-visits-badge="true"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowModal(true);
+          }}
           className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 hover:border-amber-400/50 text-xs text-slate-300 transition-all cursor-pointer shadow-sm hover:shadow-amber-500/10"
           title="Ver estadísticas de visitas reales (excluyen al creador)"
         >
@@ -116,10 +121,15 @@ export const RealVisitsBadge: React.FC<RealVisitsBadgeProps> = ({ compact = fals
   function renderModal() {
     return (
       <div
+        data-creator-panel="true"
         className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
-        onClick={() => setShowModal(false)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowModal(false);
+        }}
       >
         <div
+          data-creator-panel="true"
           className="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-md w-full p-6 text-slate-200 shadow-2xl relative space-y-5"
           onClick={(e) => e.stopPropagation()}
         >
