@@ -299,7 +299,7 @@ export const CinemaEarLab: React.FC<CinemaEarLabProps> = ({
     <section id="cinema" className="py-10 sm:py-16 bg-[#0B081E] border-t border-[#261E52]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header with Cinema Aesthetic */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#281F54] pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#281F54] pb-6 reveal-on-scroll">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-amber-400 bg-amber-400/10 border border-amber-400/30 px-3.5 py-1 rounded-full">
               <Film className="w-4 h-4 text-amber-400" />
@@ -457,7 +457,7 @@ export const CinemaEarLab: React.FC<CinemaEarLabProps> = ({
         </div>
 
         {/* MAIN CINEMA INTERACTIVE THEATRE STAGE */}
-        <div className="bg-gradient-to-b from-[#14102E] via-[#0E0A24] to-[#0B081B] border-2 border-amber-400/50 rounded-3xl p-5 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-b from-[#14102E] via-[#0E0A24] to-[#0B081B] border-2 border-amber-400/50 rounded-3xl p-5 sm:p-8 shadow-2xl relative overflow-hidden reveal-on-scroll">
           {/* Ambient Cinema Spotlight Glows */}
           <div className="absolute top-0 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
           <div className="absolute bottom-0 left-10 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>

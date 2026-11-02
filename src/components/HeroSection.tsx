@@ -230,15 +230,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <section className="relative pt-6 pb-16 md:pt-12 md:pb-24 overflow-hidden bg-transparent">
-      {/* Dynamic Animated Ambient Glow Lights (Breathe & Float in background) */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[380px] bg-gradient-to-tr from-violet-600/15 via-amber-500/15 to-emerald-500/15 rounded-full blur-3xl pointer-events-none animate-pulse-ambient -z-10" />
-      <div className="absolute top-10 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none animate-float-slow -z-10" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none animate-float-reverse -z-10" />
+      {/* Dynamic Animated Ambient Glow Lights (Living Organic Float in background) */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[760px] h-[420px] bg-gradient-to-tr from-violet-600/20 via-amber-500/18 to-emerald-500/18 rounded-full blur-3xl pointer-events-none animate-hero-mesh -z-10" />
+      <div className="absolute top-8 left-8 w-80 h-80 bg-emerald-500/12 rounded-full blur-3xl pointer-events-none animate-hero-mesh-alt -z-10" />
+      <div className="absolute bottom-8 right-8 w-96 h-96 bg-amber-500/12 rounded-full blur-3xl pointer-events-none animate-float-reverse -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(245,158,11,0.08),rgba(16,185,129,0.05),transparent)] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Tagline with Real Visits Indicator - Centered & Animated */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-300 bg-[#16113A]/90 border border-[#2F2468] px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md">
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-6 reveal-on-scroll">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-300 bg-[#16113A]/90 border border-[#2F2468] px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md card-hover-lift">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -255,7 +256,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Main Centralized Hero Header with Typography Polish & Gradient Shimmer */}
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.12] text-balance">
-            <span className="inline-block bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent">
+            <span className="inline-block bg-gradient-to-r from-white via-amber-200 via-emerald-100 to-amber-300 bg-clip-text text-transparent animate-title-shimmer">
               Inglés Fácil y Fluido
             </span>
             <span className="block text-2xl sm:text-3xl lg:text-4xl font-semibold text-amber-400 mt-2 sm:mt-3 font-subheading tracking-normal">
@@ -263,10 +264,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </span>
           </h1>
 
-
-
           {/* 100% Free Access Reassurance Banner - No Paywall Mindset */}
-          <div className="relative max-w-3xl mx-auto p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#181136]/95 via-[#231442]/95 to-[#101D33]/95 border-2 border-emerald-400/70 shadow-2xl shadow-emerald-400/20 backdrop-blur-md overflow-hidden text-left sm:text-center space-y-3.5">
+          <div className="relative max-w-3xl mx-auto p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#181136]/95 via-[#231442]/95 to-[#101D33]/95 border-2 border-emerald-400/70 shadow-2xl shadow-emerald-400/20 backdrop-blur-md overflow-hidden text-left sm:text-center space-y-3.5 card-hover-lift reveal-on-scroll">
             {/* Shimmer light beam running across */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
@@ -291,21 +290,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
             {/* 3 Free Platform Highlights */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-left pt-0.5">
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 card-hover-lift">
                 <span className="text-base">🎙️</span>
                 <div className="text-[11px] leading-tight text-slate-200">
                   <strong className="text-white block font-bold">Simuladores Reales</strong>
                   Charlas con voz nativa sin costo
                 </div>
               </div>
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 card-hover-lift">
                 <span className="text-base">🎬</span>
                 <div className="text-[11px] leading-tight text-slate-200">
                   <strong className="text-white block font-bold">Películas & Música</strong>
                   Entrená el oído con subtítulos
                 </div>
               </div>
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 card-hover-lift">
                 <span className="text-base">🌱</span>
                 <div className="text-[11px] leading-tight text-slate-200">
                   <strong className="text-emerald-300 block font-bold">Cero Gramática Densa</strong>
@@ -315,20 +314,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           </div>
 
-          {/* Quick Action Buttons - Centered & Tactile */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          {/* Quick Action Buttons - Centered, Tactile & Micro-interactive */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 reveal-on-scroll">
             {onStartDesdeCero && (
               <button
                 onClick={onStartDesdeCero}
-                className="group relative px-6 py-3 text-sm font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl shadow-lg shadow-emerald-400/25 transition-all duration-300 flex items-center gap-2 cursor-pointer hover:scale-103 hover:shadow-emerald-400/40"
+                className="btn-interactive group relative px-6 py-3 text-sm font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl shadow-lg shadow-emerald-400/25 flex items-center gap-2 cursor-pointer"
               >
                 <span>🌱 Empezar Desde Cero</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
               </button>
             )}
             <button
               onClick={onStartSimulator}
-              className="px-5 py-3 text-sm font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-lg shadow-amber-400/20 transition-all duration-300 flex items-center gap-2 cursor-pointer hover:scale-103 hover:shadow-amber-400/35"
+              className="btn-interactive px-5 py-3 text-sm font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-lg shadow-amber-400/20 flex items-center gap-2 cursor-pointer"
             >
               <Radio className="w-4 h-4 text-slate-950" />
               <span>Simulador de Charlas Reales</span>
@@ -336,7 +335,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {onOpenCinema && (
               <button
                 onClick={onOpenCinema}
-                className="group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-red-600 via-amber-600 to-amber-500 hover:from-red-500 hover:to-amber-400 border border-amber-300/60 rounded-xl shadow-lg shadow-red-900/40 transition-all cursor-pointer hover:scale-103 flex items-center gap-2"
+                className="btn-interactive group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-red-600 via-amber-600 to-amber-500 hover:from-red-500 hover:to-amber-400 border border-amber-300/60 rounded-xl shadow-lg shadow-red-900/40 flex items-center gap-2 cursor-pointer"
                 title="Aprende inglés con películas famosas y subtítulos en español"
               >
                 <Film className="w-4 h-4 text-amber-200 animate-pulse" />
@@ -346,7 +345,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {onOpenMusic && (
               <button
                 onClick={onOpenMusic}
-                className="group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-fuchsia-700 via-purple-600 to-amber-500 hover:from-fuchsia-600 hover:to-amber-400 border border-fuchsia-300/60 rounded-xl shadow-lg shadow-fuchsia-950/50 transition-all cursor-pointer hover:scale-103 flex items-center gap-2"
+                className="btn-interactive group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-fuchsia-700 via-purple-600 to-amber-500 hover:from-fuchsia-600 hover:to-amber-400 border border-fuchsia-300/60 rounded-xl shadow-lg shadow-fuchsia-950/50 flex items-center gap-2 cursor-pointer"
                 title="Aprende inglés con canciones famosas y subtítulos en español"
               >
                 <Music className="w-4 h-4 text-fuchsia-200 animate-pulse" />
@@ -356,7 +355,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {onExploreEntrecasa && (
               <button
                 onClick={onExploreEntrecasa}
-                className="px-5 py-3 text-sm font-semibold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-xl transition-all cursor-pointer hover:scale-102"
+                className="btn-interactive px-5 py-3 text-sm font-semibold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-xl cursor-pointer"
               >
                 Vida Cotidiana
               </button>
@@ -430,8 +429,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         {/* Dynamic Interactive Scenario Bar with Gentle Live Ticker */}
-        <div className="mt-8 sm:mt-10 max-w-5xl mx-auto">
-          <div className="bg-[#120D2C]/90 border border-[#2B215E] rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-3">
+        <div className="mt-8 sm:mt-10 max-w-5xl mx-auto reveal-on-scroll">
+          <div className="bg-[#120D2C]/90 border border-[#2B215E] rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-3 card-hover-lift">
             <div className="flex items-center gap-2 px-2">
               <span className="flex h-2.5 w-2.5 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -451,7 +450,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   <button
                     key={idx}
                     onClick={() => setActiveDemoIndex(idx)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                    className={`btn-interactive px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer ${
                       isActive
                         ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/25 scale-102'
                         : 'bg-slate-900/80 border border-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-800'
@@ -467,9 +466,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         {/* Symmetrical 2-Column Showcase Centered under Hero with Movement */}
-        <div className="mt-6 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <div className="mt-6 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch reveal-on-scroll">
           {/* Left Column: Hero Visual Asset with Floating Motion Badges & Dynamic Scenes */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-[#2E2463] bg-[#14102E] group h-full flex flex-col justify-end min-h-[360px]">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-[#2E2463] bg-[#14102E] group h-full flex flex-col justify-end min-h-[360px] card-hover-lift">
             <img
               key={currentDemo.tag}
               src={currentDemo.image || HERO_IMAGE}
@@ -702,11 +701,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
 
         {/* PANELES INTERACTIVOS DE PRÁCTICA Y CONSULTA (Acorta la página de forma masiva) */}
-        <div id="interactive-panels" className="mt-10 sm:mt-14 max-w-5xl mx-auto">
-          <div className="rounded-3xl bg-gradient-to-b from-[#151035] via-[#100C2A] to-[#0D0922] border-2 border-[#2F2468] p-5 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div id="interactive-panels" className="mt-10 sm:mt-14 max-w-5xl mx-auto reveal-on-scroll">
+          <div className="rounded-3xl bg-gradient-to-b from-[#151035] via-[#100C2A] to-[#0D0922] border-2 border-[#2F2468] p-5 sm:p-7 shadow-2xl relative overflow-hidden card-hover-lift">
             {/* Ambient Lighting */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none animate-hero-mesh"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none animate-hero-mesh-alt"></div>
 
             {/* Top Bar with Header & Tabs */}
             <div className="relative z-10 space-y-4 pb-6 border-b border-[#281F54]">
@@ -729,7 +728,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
                 <button
                   onClick={() => setActivePanelTab('profe')}
-                  className={`p-3 rounded-2xl border transition-all text-left flex items-center gap-2.5 cursor-pointer ${
+                  className={`btn-interactive p-3 rounded-2xl border text-left flex items-center gap-2.5 cursor-pointer ${
                     activePanelTab === 'profe'
                       ? 'bg-gradient-to-r from-purple-900/60 to-indigo-900/60 border-amber-400/80 shadow-lg shadow-purple-900/40 scale-[1.02]'
                       : 'bg-[#0A071E]/80 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900'
@@ -746,7 +745,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
                 <button
                   onClick={() => setActivePanelTab('tweak')}
-                  className={`p-3 rounded-2xl border transition-all text-left flex items-center gap-2.5 cursor-pointer ${
+                  className={`btn-interactive p-3 rounded-2xl border text-left flex items-center gap-2.5 cursor-pointer ${
                     activePanelTab === 'tweak'
                       ? 'bg-gradient-to-r from-amber-950/60 to-emerald-950/60 border-amber-400/80 shadow-lg shadow-amber-950/40 scale-[1.02]'
                       : 'bg-[#0A071E]/80 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900'

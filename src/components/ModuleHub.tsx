@@ -324,10 +324,10 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
   const currentPanel = panels.find((p) => p.id === activePanelId) || panels[0];
 
   return (
-    <section id="hub-panels" className="py-8 sm:py-12 bg-gradient-to-b from-[#0C0A1D] via-[#0E0C24] to-[#0A0819] border-t border-[#251D52]">
+    <section id="hub-panels" className="py-8 sm:py-12 bg-gradient-to-b from-[#0C0A1D] via-[#0E0C24] to-[#0A0819] border-t border-[#251D52] reveal-on-scroll">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Header of the Learning Hub */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 border-b border-[#251D52] pb-5">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 border-b border-[#251D52] pb-5 reveal-on-scroll">
           <div className="space-y-1.5 max-w-2xl">
             <div className="flex items-center gap-2 text-xs font-bold tracking-wide uppercase text-amber-400">
               <Compass className="w-4 h-4 text-amber-400" />
@@ -341,21 +341,21 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-2 text-xs text-slate-300 bg-[#14102E] px-3.5 py-1.5 rounded-xl border border-[#2D2361] shrink-0">
+          <div className="inline-flex items-center gap-2 text-xs text-slate-300 bg-[#14102E] px-3.5 py-1.5 rounded-xl border border-[#2D2361] shrink-0 card-hover-lift">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Haz clic en un panel para desplegar sus ítems</span>
           </div>
         </div>
 
         {/* 1. THEMATIC PANELS SELECTOR BAR (Ultra-compact & switchable) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 reveal-on-scroll">
           {panels.map((panel) => {
             const isSelected = panel.id === activePanelId;
             return (
               <button
                 key={panel.id}
                 onClick={() => setActivePanelId(panel.id)}
-                className={`group relative p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 text-left cursor-pointer flex flex-col justify-between ${
+                className={`btn-interactive group relative p-3 sm:p-3.5 rounded-2xl border text-left cursor-pointer flex flex-col justify-between ${
                   isSelected
                     ? `bg-[#14102E] ${panel.activeBorder} ring-2 ring-amber-400/40 shadow-xl scale-[1.02]`
                     : 'bg-[#0E0B24]/90 border-slate-800/90 hover:border-slate-700 text-slate-400 hover:text-white hover:bg-[#120E2E]'
@@ -397,8 +397,8 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
         </div>
 
         {/* 2. THEMATIC PANEL CONTENT: ONLY RELATED ITEMS APPEAR (Reduces vertical length by 70%) */}
-        <div className="pt-2 animate-in fade-in duration-300">
-          <div className="bg-[#120D2C]/90 border-2 border-[#2B215E] rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div className="pt-2 animate-in fade-in duration-300 reveal-on-scroll">
+          <div className="bg-[#120D2C]/90 border-2 border-[#2B215E] rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden card-hover-lift">
             {/* Header of Active Panel */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#281F54]">
               <div>
@@ -431,11 +431,11 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
                   : 'grid-cols-1 md:grid-cols-3'
               }`}
             >
-              {currentPanel.items.map((item) => (
+              {currentPanel.items.map((item, idx) => (
                 <div
                   key={item.id}
                   onClick={() => onSelectModule(item.id)}
-                  className={`group bg-[#0A071E]/95 border ${item.borderColor} ${item.hoverBg} rounded-2xl p-5 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:shadow-xl hover:shadow-black/60 hover:-translate-y-1 relative`}
+                  className={`group bg-[#0A071E]/95 border ${item.borderColor} ${item.hoverBg} rounded-2xl p-5 card-hover-lift reveal-on-scroll reveal-delay-${(idx + 1) * 100} flex flex-col justify-between cursor-pointer relative`}
                 >
                   <div className="space-y-3.5">
                     {/* Top Badge & Icon */}

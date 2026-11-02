@@ -476,7 +476,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 animate-fade-in">
       {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1B0B2E] via-[#2F1152] to-[#0D061F] border border-fuchsia-500/30 p-6 sm:p-10 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1B0B2E] via-[#2F1152] to-[#0D061F] border border-fuchsia-500/30 p-6 sm:p-10 shadow-2xl reveal-on-scroll">
         <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-fuchsia-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-10 -top-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 

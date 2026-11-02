@@ -33,6 +33,7 @@ import {
 } from './services/purchaseVerification';
 import { recordVisit } from './services/visitorTracker';
 import { initWelcomeVoice } from './services/welcomeVoice';
+import { initScrollReveal } from './utils/scrollReveal';
 
 export default function App() {
   const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
@@ -73,6 +74,11 @@ export default function App() {
     recordVisit();
     // Automatic spoken welcome greeting (male neutral Latin American voice)
     initWelcomeVoice();
+    // Initialize scroll-driven reveal animations
+    const cleanupScroll = initScrollReveal();
+    return () => {
+      cleanupScroll();
+    };
   }, []);
 
   React.useEffect(() => {

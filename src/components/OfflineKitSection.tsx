@@ -299,7 +299,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">
       {/* 1. Header & Value Hero */}
-      <section className="text-center space-y-4 max-w-3xl mx-auto">
+      <section className="text-center space-y-4 max-w-3xl mx-auto reveal-on-scroll">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-semibold">
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span>Edición Especial Offline · Para llevar en el celular</span>
@@ -320,7 +320,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
         </p>
 
         {/* Luminous Callout Box with Titilante & Rainbow Letters - Located at the end for the kit */}
-        <div className="relative max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-[#1E113A]/95 via-[#261645]/95 to-[#121E36]/95 border-2 border-amber-400/90 shadow-2xl shadow-amber-400/30 backdrop-blur-md overflow-hidden group hover:border-amber-300 transition-all text-left sm:text-center space-y-3">
+        <div className="relative max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-[#1E113A]/95 via-[#261645]/95 to-[#121E36]/95 border-2 border-amber-400/90 shadow-2xl shadow-amber-400/30 backdrop-blur-md overflow-hidden group hover:border-amber-300 transition-all text-left sm:text-center space-y-3 card-hover-lift">
           {/* Shimmer light beam running across */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-300/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
@@ -515,9 +515,9 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
     )}
 
       {/* 2. What is inside the Kit (The 3 Pillars) */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-on-scroll">
         {/* Pillar 1: Audio Pack */}
-        <div className="bg-[#130E2E]/90 border border-[#2B205D] rounded-2xl p-6 relative flex flex-col justify-between hover:border-amber-400/40 transition-colors">
+        <div className="bg-[#130E2E]/90 border border-[#2B205D] rounded-2xl p-6 relative flex flex-col justify-between hover:border-amber-400/40 transition-all card-hover-lift">
           <div className="space-y-4">
             <div className="w-12 h-12 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
               <Headphones className="w-6 h-6" />
@@ -553,7 +553,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
         </div>
 
         {/* Pillar 2: Printable PDF Cheatsheet */}
-        <div className="bg-[#130E2E]/90 border border-[#2B205D] rounded-2xl p-6 relative flex flex-col justify-between hover:border-emerald-400/40 transition-colors">
+        <div className="bg-[#130E2E]/90 border border-[#2B205D] rounded-2xl p-6 relative flex flex-col justify-between hover:border-emerald-400/40 transition-all card-hover-lift reveal-delay-100">
           <div className="space-y-4">
             <div className="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center text-emerald-400">
               <FileText className="w-6 h-6" />
@@ -589,7 +589,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
         </div>
 
         {/* Pillar 3: Bonus 300 Phrases */}
-        <div className="bg-[#130E2E]/90 border border-[#2B205D] rounded-2xl p-6 relative flex flex-col justify-between hover:border-violet-400/40 transition-colors">
+        <div className="bg-[#130E2E]/90 border border-[#2B205D] rounded-2xl p-6 relative flex flex-col justify-between hover:border-violet-400/40 transition-all card-hover-lift reveal-delay-200">
           <div className="space-y-4">
             <div className="w-12 h-12 rounded-xl bg-violet-400/10 border border-violet-400/20 flex items-center justify-center text-violet-400">
               <Gift className="w-6 h-6" />
@@ -626,7 +626,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
       </section>
 
       {/* 3. Interactive Audio Samples Preview */}
-      <section className="bg-[#100C27] border border-[#2B205D] rounded-2xl p-6 sm:p-8 space-y-6">
+      <section className="bg-[#100C27] border border-[#2B205D] rounded-2xl p-6 sm:p-8 space-y-6 reveal-on-scroll">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
@@ -647,7 +647,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
           {AUDIO_SAMPLES.map((sample) => (
             <div
               key={sample.id}
-              className="bg-[#181339] border border-[#2C215A] rounded-xl p-4 flex flex-col justify-between space-y-3"
+              className="bg-[#181339] border border-[#2C215A] rounded-xl p-4 flex flex-col justify-between space-y-3 card-hover-lift transition-all"
             >
               <div>
                 <span className="text-xs font-semibold text-slate-300 block mb-1">
@@ -688,7 +688,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
       </section>
 
       {/* 4. Pricing Box & Checkout Action */}
-      <section className="bg-gradient-to-br from-[#16103A] to-[#0D0924] border-2 border-amber-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#16103A] to-[#0D0924] border-2 border-amber-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden reveal-on-scroll">
         {/* Glow ambient */}
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -733,7 +733,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
           </div>
 
           {/* 7-Day Money-Back Guarantee Card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-[#0F262B] to-[#131E3D] border-2 border-emerald-400/50 flex flex-col sm:flex-row items-center gap-3 text-left shadow-lg">
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-[#0F262B] to-[#131E3D] border-2 border-emerald-400/50 flex flex-col sm:flex-row items-center gap-3 text-left shadow-lg card-hover-lift">
             <div className="w-12 h-12 rounded-2xl bg-emerald-400/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-400/40">
               <ShieldCheck className="w-6 h-6 text-emerald-400" />
             </div>
@@ -758,7 +758,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               href={customCheckoutUrl || OFFICIAL_MERCADO_PAGO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black text-base sm:text-lg shadow-xl shadow-amber-400/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer text-center no-underline hover:scale-102"
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black text-base sm:text-lg shadow-xl shadow-amber-400/30 transition-all flex items-center justify-center gap-3 cursor-pointer text-center no-underline btn-interactive"
             >
               <span>Obtener el Audio-Kit con Mercado Pago ($9.990)</span>
               <ArrowRight className="w-5 h-5 text-slate-950" />

@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
         <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
           <button
             onClick={() => setActiveTab('desde-cero')}
-            className={`transition-colors hover:text-emerald-300 flex items-center gap-1.5 py-1 ${
+            className={`nav-link-item transition-colors hover:text-emerald-300 flex items-center gap-1.5 py-1 ${
               activeTab === 'desde-cero'
                 ? 'text-emerald-400 font-bold underline decoration-2 underline-offset-4'
                 : 'text-emerald-300/90'
@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('entrecasa')}
-            className={`transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
+            className={`nav-link-item transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
               activeTab === 'entrecasa' || activeTab === 'simulator' || activeTab === 'chunks'
                 ? 'text-amber-400 font-bold underline decoration-2 underline-offset-4'
                 : ''
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('cinema')}
-            className={`transition-all flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+            className={`btn-interactive flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
               activeTab === 'cinema'
                 ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
                 : 'bg-red-950/40 hover:bg-red-900/60 border-red-500/40 hover:border-amber-400 text-amber-200 hover:text-white'
@@ -104,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('music')}
-            className={`transition-all flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+            className={`btn-interactive flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
               activeTab === 'music'
                 ? 'bg-fuchsia-400 text-slate-950 border-fuchsia-400 shadow-md shadow-fuchsia-400/20'
                 : 'bg-fuchsia-950/40 hover:bg-fuchsia-900/60 border-fuchsia-500/40 hover:border-fuchsia-400 text-fuchsia-200 hover:text-white'
@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('gym')}
-            className={`transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
+            className={`nav-link-item transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
               activeTab === 'gym'
                 ? 'text-amber-400 font-bold underline decoration-2 underline-offset-4'
                 : ''
@@ -127,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('coach')}
-            className={`transition-all flex items-center gap-1.5 px-3 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+            className={`btn-interactive flex items-center gap-1.5 px-3 py-1 rounded-lg border font-bold text-xs shadow-xs ${
               activeTab === 'coach'
                 ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
                 : 'bg-purple-950/40 hover:bg-purple-900/60 border-purple-400/40 hover:border-amber-400 text-purple-200 hover:text-white'
@@ -139,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`transition-colors hover:text-white flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400/10 border border-amber-400/25 ${
+            className={`btn-interactive flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400/10 border border-amber-400/25 ${
               activeTab === 'dashboard'
                 ? 'text-amber-400 font-bold border-amber-400/60'
                 : 'text-amber-300'
@@ -149,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('blog')}
-            className={`transition-all flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold shadow-xs ${
+            className={`btn-interactive flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold shadow-xs ${
               activeTab === 'blog'
                 ? 'bg-amber-400 text-slate-950 font-bold border-amber-400'
                 : 'bg-slate-900 border-slate-700/80 text-slate-300 hover:text-white hover:border-amber-400/50'
@@ -161,7 +161,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={onOpenKitModal || (() => setActiveTab('kit'))}
-            className={`transition-colors hover:text-white flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/40 hover:border-amber-400 text-amber-300 font-bold shadow-xs ${
+            className={`btn-interactive flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/40 hover:border-amber-400 text-amber-300 font-bold shadow-xs ${
               activeTab === 'kit'
                 ? 'ring-2 ring-amber-400 text-white'
                 : 'hover:text-amber-200'
