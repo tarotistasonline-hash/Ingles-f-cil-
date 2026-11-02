@@ -44,8 +44,69 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;0,900;1,700&family=Lexend:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Instant Preload of Neutral Latin American Spoken Welcome Voice -->
+    <link rel="preload" href="/audio/welcome_latino_neutro.mp3" as="audio" type="audio/mpeg">
   </head>
   <body class="bg-[#0C0A1D] text-[#F8FAFC] antialiased selection:bg-amber-400 selection:text-slate-950">
+    <!-- Embedded Native Spoken Welcome Audio Player -->
+    <audio id="site-welcome-audio" src="/audio/welcome_latino_neutro.mp3" preload="auto" playsinline style="display:none"></audio>
+
+    <script>
+      (function() {
+        var audio = document.getElementById('site-welcome-audio');
+        var started = false;
+
+        function tryPlayImmediate() {
+          if (started || !audio) return;
+          try {
+            var promise = audio.play();
+            if (promise !== undefined) {
+              promise.then(function() {
+                started = true;
+                window.__welcomeAudioStarted = true;
+                removeEarlyListeners();
+              }).catch(function() {
+                // Autoplay blocked by browser policy without gesture; early listeners will unlock on first touch
+              });
+            }
+          } catch(e) {}
+        }
+
+        var earlyEvents = ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click', 'scroll', 'wheel'];
+
+        function onEarlyGesture() {
+          if (started) return;
+          tryPlayImmediate();
+        }
+
+        function removeEarlyListeners() {
+          earlyEvents.forEach(function(ev) {
+            window.removeEventListener(ev, onEarlyGesture, true);
+            document.removeEventListener(ev, onEarlyGesture, true);
+          });
+        }
+
+        earlyEvents.forEach(function(ev) {
+          window.addEventListener(ev, onEarlyGesture, { capture: true, passive: true });
+          document.addEventListener(ev, onEarlyGesture, { capture: true, passive: true });
+        });
+
+        // 1. Millisecond-zero immediate attempt
+        tryPlayImmediate();
+
+        // 2. DOM ready attempt
+        document.addEventListener('DOMContentLoaded', tryPlayImmediate);
+
+        // 3. Window load attempt
+        window.addEventListener('load', tryPlayImmediate);
+
+        // Expose global references for welcomeVoice service coordination
+        window.__welcomeAudio = audio;
+        window.__tryPlayWelcomeVoice = tryPlayImmediate;
+      })();
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
