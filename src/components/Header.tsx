@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Volume2, LayoutGrid, ScrollText, Headphones, HelpCircle, X, Check, Info } from 'lucide-react';
 import { SPEED_LEVELS } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
-import { ImportantListenNotice } from './ImportantListenNotice';
 
 interface HeaderProps {
   activeTab: string;
@@ -196,9 +195,6 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="hidden lg:block">
             <RealVisitsBadge compact={true} />
           </div>
-
-          {/* Clickable Important Listen Badge */}
-          <ImportantListenNotice variant="header-badge" />
 
           {/* Beginner-friendly Speed Selector with Clear Explanation Popover */}
           <div className="relative" ref={speedHelpRef}>
