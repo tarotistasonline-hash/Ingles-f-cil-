@@ -19,8 +19,18 @@ type WelcomeListener = (state: WelcomeVoiceState) => void;
 
 const listeners = new Set<WelcomeListener>();
 
-const AUDIO_SRC_MP3 = '/audio/welcome_latino_neutro.mp3';
-const AUDIO_SRC_WAV = '/audio/welcome_latino_neutro.wav';
+function resolveAudioPath(filename: string): string {
+  if (typeof window === 'undefined') return `/audio/${filename}`;
+  // If hosted in a GitHub Pages subdirectory (e.g. /my-repo/) or root
+  const pathname = window.location.pathname;
+  const base = pathname.endsWith('/') ? pathname.slice(0, -1) : (pathname.includes('.') ? pathname.substring(0, pathname.lastIndexOf('/')) : pathname);
+  const cleanBase = base.replace(/\/+$/, '');
+  return `${cleanBase}/audio/${filename}`;
+}
+
+const AUDIO_SRC_MP3 = resolveAudioPath('welcome_latino_neutro.mp3');
+const AUDIO_SRC_WAV = resolveAudioPath('welcome_latino_neutro.wav');
+const FALLBACK_SRC_MP3 = './audio/welcome_latino_neutro.mp3';
 const WELCOME_TEXT =
   '¡Hola! Estás en el lugar correcto si querés aprender inglés rápido y fácil. ¡Bienvenido!';
 
@@ -85,14 +95,23 @@ export function getOrCreateWelcomeAudio(): HTMLAudioElement {
     welcomeAudio.volume = 1.0;
     (welcomeAudio as any).playsInline = true;
 
-    // Fallback to WAV if MP3 fails to decode
+    // Fallback if initial MP3 fails to load
+    let retryCount = 0;
     welcomeAudio.onerror = () => {
-      if (welcomeAudio && welcomeAudio.src.endsWith('.mp3')) {
+      if (!welcomeAudio) return;
+      retryCount++;
+      if (retryCount === 1) {
+        welcomeAudio.src = FALLBACK_SRC_MP3;
+        welcomeAudio.load();
+        welcomeAudio.play().catch(() => {});
+      } else if (retryCount === 2) {
         welcomeAudio.src = AUDIO_SRC_WAV;
         welcomeAudio.load();
         welcomeAudio.play().catch(() => {
           fallbackWebSpeechMale();
         });
+      } else {
+        fallbackWebSpeechMale();
       }
     };
 
