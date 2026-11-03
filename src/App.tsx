@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
-import { ImportantListenNotice } from './components/ImportantListenNotice';
 import { HeroSection } from './components/HeroSection';
 import { LevelSelectorBar } from './components/LevelSelectorBar';
 import { ModuleHub } from './components/ModuleHub';
@@ -332,9 +331,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans-clean bg-vibrant-dark text-slate-100 selection:bg-amber-400 selection:text-slate-950">
-      {/* Dedicated clickable welcome panel */}
-      <ImportantListenNotice />
-
       {/* Top Bar Navigation with Audio Speed Selector and View Switcher */}
       <Header
         activeTab={activeTab}

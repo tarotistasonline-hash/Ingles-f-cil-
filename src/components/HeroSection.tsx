@@ -32,7 +32,6 @@ import {
 import { playEnglishVoice, stopAllAudio } from '../services/audio';
 import { initWelcomeVoice } from '../services/welcomeVoice';
 import { askTeacher, fetchSpeakTweak } from '../services/api';
-import { downloadFreePocketSample } from '../utils/packGenerator';
 import { triggerConfetti } from '../utils/confetti';
 import { RealVisitsBadge } from './RealVisitsBadge';
 import { DailyChallengeWidget } from './DailyChallengeWidget';
@@ -69,17 +68,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [playingSpeed, setPlayingSpeed] = useState<number | null>(null);
   const [activeDemoIndex, setActiveDemoIndex] = useState(0);
-  const [downloadedFreeSample, setDownloadedFreeSample] = useState(false);
   // Auto-play short spoken welcome message by default on entrance
   useEffect(() => {
     initWelcomeVoice();
   }, []);
-
-  const handleDownloadSample = () => {
-    downloadFreePocketSample();
-    setDownloadedFreeSample(true);
-    triggerConfetti({ particleCount: 70, spread: 80 });
-  };
 
   // Multi-panel interactive state (shortens page into organized switchable panels)
   const [activePanelTab, setActivePanelTab] = useState<'profe' | 'tweak' | 'challenge' | 'blog'>('profe');

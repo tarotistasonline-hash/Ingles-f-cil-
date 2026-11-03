@@ -24,7 +24,6 @@ import {
   Gift,
   Download,
 } from 'lucide-react';
-import { downloadFreePocketSample } from '../utils/packGenerator';
 
 interface ReflexGymProps {
   currentSpeed: number;
@@ -481,19 +480,13 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit })
                         </span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          onClick={() => downloadFreePocketSample()}
-                          className="px-2.5 py-1 text-[11px] font-bold text-emerald-300 bg-emerald-400/20 hover:bg-emerald-400/30 rounded-lg border border-emerald-400/40 cursor-pointer transition-colors"
-                          title="Descargar 15 Bloques de Oro en PDF gratis"
-                        >
-                          🎁 Muestra Gratis
-                        </button>
                         {onOpenKit && (
                           <button
                             onClick={onOpenKit}
-                            className="px-3 py-1 text-[11px] font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg cursor-pointer transition-colors"
+                            className="px-3.5 py-1.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-xl cursor-pointer transition-colors shadow-sm flex items-center gap-1.5"
                           >
-                            ⚡ Auto-Kit ($9.990)
+                            <span>⚡ Ver Pack Completo ($9.990)</span>
+                            <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
                           </button>
                         )}
                       </div>

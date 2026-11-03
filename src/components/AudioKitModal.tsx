@@ -21,7 +21,6 @@ import {
   downloadTextFile,
   generateMasterPdfHtml,
   generateOfflinePocketPlayerHtml,
-  downloadFreePocketSample,
 } from '../utils/packGenerator';
 import { Loader2 } from 'lucide-react';
 
@@ -78,7 +77,6 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
   const [showDirectDownloadSuccess, setShowDirectDownloadSuccess] = useState(false);
   const [isZipping, setIsZipping] = useState(false);
   const [zipProgress, setZipProgress] = useState(0);
-  const [freeSampleDownloaded, setFreeSampleDownloaded] = useState(false);
 
   const activeCurrencyObj =
     CURRENCIES.find((c) => c.code === selectedCurrency) || CURRENCIES[0];
@@ -349,30 +347,40 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
             </div>
           </div>
 
-          {/* Try Free Sample Lead Magnet Card */}
-          <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-400/10 to-emerald-400/10 border border-amber-400/30 flex items-center justify-between gap-3 flex-wrap">
+          {/* Complete Pack Content Breakdown Card */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-[#151034] to-[#0D1B2A] border border-amber-400/30 text-left space-y-2.5">
             <div className="flex items-center gap-2">
-              <Gift className="w-4 h-4 text-amber-400 shrink-0" />
-              <div className="text-left">
-                <span className="text-xs text-amber-200 font-bold block">
-                  ¿Querés probar la metodología antes?
-                </span>
-                <span className="text-[10px] text-slate-400">
-                  Descargá los 15 Bloques de Oro con fonética masticada en PDF gratis
-                </span>
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+              <h4 className="text-xs sm:text-sm font-black text-white">
+                ¿Qué incluye exactamente el Pack Completo?
+              </h4>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-300">
+              <div className="flex items-start gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>100 Bloques de Oro:</strong> Frases de entrecasa agrupadas por situaciones reales.</span>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>120+ Audios MP3:</strong> En 4 velocidades (0.5x con pausas, 0.65x, 0.8x y 1.0x).</span>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>Guía PDF Imprimible:</strong> Con fonética figurada en español y ejemplos.</span>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>Reproductor Offline:</strong> Funciona sin internet en tu navegador móvil.</span>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>300 Frases de Rescate:</strong> Para viajes, compras, comida y urgencias.</span>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>Acceso Vitalicio:</strong> Descarga inmediata, un único pago sin cuotas.</span>
               </div>
             </div>
-            <button
-              onClick={() => {
-                downloadFreePocketSample();
-                setFreeSampleDownloaded(true);
-                triggerConfetti({ particleCount: 60, spread: 70 });
-              }}
-              className="px-3 py-1.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/50 text-amber-300 hover:text-white text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5"
-            >
-              <Download className="w-3.5 h-3.5 text-amber-400" />
-              <span>{freeSampleDownloaded ? '✓ Muestra Descargada' : '🎁 Bajar Muestra Gratis (PDF)'}</span>
-            </button>
           </div>
 
           {/* Direct Download Active Card */}
