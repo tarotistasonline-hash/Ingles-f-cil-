@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import { playEnglishVoice } from '../services/audio';
+import React, { useState, useEffect } from 'react';
+import {
+  playEnglishVoice,
+  VOICE_OPTIONS,
+  getGlobalAudioVoice,
+  setGlobalAudioVoice,
+  subscribeVoiceChange,
+  AudioVoiceId,
+} from '../services/audio';
 import {
   Sprout,
   Volume2,
@@ -12,6 +19,7 @@ import {
   Sparkles,
   ArrowRight,
   Turtle,
+  Headphones,
 } from 'lucide-react';
 import { KeyTakeawaysToggle } from './KeyTakeawaysToggle';
 import { triggerConfetti, triggerSuperConfetti } from '../utils/confetti';
@@ -38,6 +46,12 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [currentVoice, setCurrentVoice] = useState<AudioVoiceId>(getGlobalAudioVoice());
+
+  useEffect(() => {
+    const unsub = subscribeVoiceChange((v) => setCurrentVoice(v));
+    return unsub;
+  }, []);
 
   const basicPhrases: BasicPhrase[] = [
     {
@@ -220,6 +234,73 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
             <p className="text-xs text-slate-300 leading-relaxed">
               Un <span className="text-indigo-300 font-semibold">"Thanks a lot!"</span> dicho con calidez vale más que una oración gramaticalmente perfecta dicha con miedo y frialdad.
             </p>
+          </div>
+        </div>
+
+        {/* Voice & Speed Preference Banner */}
+        <div className="bg-[#120E32] border border-sky-500/30 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sky-900/40 pb-3">
+            <div className="flex items-center gap-2">
+              <Headphones className="w-4 h-4 text-sky-400" />
+              <span className="text-sm font-extrabold text-white">
+                Elige la voz que te resulte más clara para repetir:
+              </span>
+            </div>
+            <span className="text-xs text-sky-300 font-medium">
+              Puedes elegir entre voces femeninas y masculinas
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {VOICE_OPTIONS.map((v) => {
+              const isSelected = currentVoice === v.id;
+              return (
+                <button
+                  key={v.id}
+                  onClick={async () => {
+                    setGlobalAudioVoice(v.id);
+                    setCurrentVoice(v.id);
+                    await playEnglishVoice(v.samplePhrase, v.id, 0.8, { forceVoice: true });
+                  }}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                    isSelected
+                      ? 'bg-sky-500/20 border-sky-400 text-white shadow-md ring-1 ring-sky-400'
+                      : 'bg-black/30 border-[#261E52] text-slate-300 hover:bg-white/5 hover:border-sky-500/40'
+                  }`}
+                  title={`Seleccionar voz de ${v.name}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg">{v.avatar}</span>
+                      <span className="font-extrabold text-xs text-white">{v.name}</span>
+                    </div>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.2 rounded font-black uppercase ${
+                        v.gender === 'Femenina'
+                          ? 'bg-pink-400/25 text-pink-300'
+                          : 'bg-blue-400/25 text-blue-300'
+                      }`}
+                    >
+                      {v.genderLabel}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-sky-200/90 leading-tight">{v.tone}</p>
+                  <div className="mt-1 flex items-center justify-between pt-1 border-t border-white/5">
+                    <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                      <Volume2 className="w-2.5 h-2.5 text-sky-400" />
+                      Probar voz
+                    </span>
+                    {isSelected ? (
+                      <span className="text-[9px] bg-sky-400 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase">
+                        ACTIVA
+                      </span>
+                    ) : (
+                      <span className="text-[9px] text-slate-400 font-semibold">Tocar para usar</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
