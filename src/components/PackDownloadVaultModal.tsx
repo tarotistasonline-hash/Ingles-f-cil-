@@ -1089,6 +1089,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
                       <div className="flex items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-slate-700 shrink-0">
                         <span className="text-[11px] text-slate-400 px-2 font-semibold">Velocidad:</span>
                         {[
+                          { speed: 0.5, label: '0.5x Paso a paso' },
                           { speed: 0.65, label: '0.65x Lento' },
                           { speed: 0.8, label: '0.8x Pausado' },
                           { speed: 1.0, label: '1.0x Nativo' },

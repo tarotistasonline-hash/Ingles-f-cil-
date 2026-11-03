@@ -416,6 +416,33 @@ function createBasicWavBuffer(sampleRate = 22050, durationSec = 1.2, baseFreq = 
   return buffer;
 }
 
+// Helper to prepare ultra-clear, word-spaced pronunciation for beginners
+function prepareSpeechTextAndStyle(rawText: string, speed: number) {
+  const isUltraSlow = speed <= 0.55;
+  const isSlow = speed < 0.75;
+  let formatted = String(rawText || '').replace(/[—–]/g, ', ').replace(/\s+/g, ' ').trim();
+
+  if (isUltraSlow) {
+    // Deliberately isolate each word with pauses so beginners with zero English can easily hear and repeat
+    const words = formatted.split(/\s+/).filter(Boolean);
+    if (words.length > 1) {
+      formatted = words.join(' ... ');
+    }
+  }
+
+  const cleanText = formatted.slice(0, 350);
+
+  const speechStyle = isUltraSlow
+    ? 'Ultra slow, crystal-clear, isolated word-by-word pronunciation for an absolute beginner with zero prior English knowledge. Speak every single word separately with a clear, deliberate pause between words. Enunciate every phoneme perfectly and distinctly without blending, linking, or connected speech.'
+    : isSlow
+    ? 'Very slow, patient, crystal-clear American English speaker enunciation for language beginners'
+    : speed < 0.9
+    ? 'Calm, clearly articulated, friendly native American English speaker at a comfortable pace'
+    : 'Natural, friendly, casual native American English speaker';
+
+  return { cleanText, speechStyle };
+}
+
 // 1. Voice TTS Endpoint
 app.post('/api/generate-tts', async (req, res) => {
   const { text, voice = 'Kore', speed = 0.8 } = req.body;
@@ -426,7 +453,8 @@ app.post('/api/generate-tts', async (req, res) => {
   const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
   const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
   const roundedSpeed = Math.round((Number(speed) || 0.8) * 100) / 100;
-  const cacheKey = `${selectedVoice}_${roundedSpeed}_${text.trim().toLowerCase()}`;
+  const { cleanText, speechStyle } = prepareSpeechTextAndStyle(text, roundedSpeed);
+  const cacheKey = `${selectedVoice}_${roundedSpeed}_${cleanText.toLowerCase()}`;
 
   // Serve from memory cache if available
   const cached = ttsAudioCache.get(cacheKey);
@@ -452,13 +480,6 @@ app.post('/api/generate-tts', async (req, res) => {
   }
 
   try {
-    const speechStyle =
-      roundedSpeed < 0.75
-        ? 'Very slow, patient, crystal-clear American English speaker enunciation for language beginners'
-        : roundedSpeed < 0.9
-        ? 'Calm, clearly articulated, friendly native American English speaker at a comfortable pace'
-        : 'Natural, friendly, casual native American English speaker';
-
     const response = await ai.models.generateContent({
       model: 'gemini-3.8-flash-lite-tts',
       contents: [
@@ -466,7 +487,7 @@ app.post('/api/generate-tts', async (req, res) => {
           role: 'user',
           parts: [
             {
-              text: text.slice(0, 300),
+              text: cleanText,
               speechMetadata: {
                 style: speechStyle,
               },
@@ -531,7 +552,7 @@ app.get('/api/audio-stream', async (req, res) => {
 
   const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
   const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
-  const cleanText = text.replace(/[—–]/g, ', ').replace(/\s+/g, ' ').slice(0, 300);
+  const { cleanText, speechStyle } = prepareSpeechTextAndStyle(text, speed);
   const cacheKey = `${selectedVoice}_${speed}_${cleanText.toLowerCase()}`;
 
   const sendAudioBuffer = (buffer: Buffer) => {
@@ -567,13 +588,6 @@ app.get('/api/audio-stream', async (req, res) => {
   }
 
   try {
-    const speechStyle =
-      speed < 0.75
-        ? 'Very slow, patient, crystal-clear American English speaker enunciation for language beginners'
-        : speed < 0.9
-        ? 'Calm, clearly articulated, friendly native American English speaker at a comfortable pace'
-        : 'Natural, friendly, casual native American English speaker';
-
     const response = await ai.models.generateContent({
       model: 'gemini-3.8-flash-lite-tts',
       contents: [
@@ -637,7 +651,7 @@ app.get('/api/audio-download', async (req, res) => {
 
   const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
   const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
-  const cleanText = text.replace(/[—–]/g, ', ').replace(/\s+/g, ' ').slice(0, 300);
+  const { cleanText, speechStyle } = prepareSpeechTextAndStyle(text, speed);
   const cacheKey = `${selectedVoice}_${speed}_${cleanText.toLowerCase()}`;
 
   const sendDownload = (buffer: Buffer) => {

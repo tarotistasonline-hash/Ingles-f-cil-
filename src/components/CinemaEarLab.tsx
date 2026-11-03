@@ -483,21 +483,34 @@ export const CinemaEarLab: React.FC<CinemaEarLabProps> = ({
               </div>
 
               {/* Multi-Speed Audio Play Bar */}
-              <div className="flex items-center gap-2 bg-[#09071A] p-2 rounded-2xl border border-slate-800 shrink-0">
+              <div className="flex flex-wrap items-center gap-2 bg-[#09071A] p-2 rounded-2xl border border-slate-800 shrink-0">
                 <div className="text-[11px] text-slate-400 font-bold px-1 hidden md:block">
                   Velocidad:
                 </div>
+                <button
+                  onClick={() => handlePlaySceneAudio(0.5)}
+                  disabled={isPlayingAudio}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    isPlayingAudio && playingSpeed === 0.5
+                      ? 'bg-amber-400 text-slate-950 shadow-md animate-pulse'
+                      : 'bg-amber-400/15 border border-amber-400/50 text-amber-300 hover:text-white hover:bg-amber-400/25'
+                  }`}
+                  title="Ultra Lento (0.5x) con palabras separadas una a una para memorizar y repetir"
+                >
+                  <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>🌱 0.5x Paso a paso</span>
+                </button>
                 <button
                   onClick={() => handlePlaySceneAudio(0.65)}
                   disabled={isPlayingAudio}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     isPlayingAudio && playingSpeed === 0.65
                       ? 'bg-amber-400 text-slate-950 shadow-md animate-pulse'
-                      : 'bg-slate-900 border border-amber-400/30 text-amber-300 hover:text-white hover:bg-slate-800'
+                      : 'bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
                   }`}
                   title="Escuchar en cámara lenta para captar cada fonema"
                 >
-                  <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                  <Volume2 className="w-3.5 h-3.5 text-slate-300" />
                   <span>0.65x Lento</span>
                 </button>
                 <button

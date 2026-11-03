@@ -253,9 +253,18 @@ export const PowerChunksExplorer: React.FC<PowerChunksExplorerProps> = ({ curren
                           <div className="flex items-center gap-1 shrink-0">
                             <button
                               onClick={() =>
+                                handlePlayVoice(ex.en, `ex-${chunk.id}-${i}-super-slow`, 0.5)
+                              }
+                              className="text-[10px] text-amber-300 hover:text-white px-1.5 py-0.5 rounded bg-amber-400/15 border border-amber-400/40 font-bold cursor-pointer"
+                              title="Ultra Lento (0.5x) con palabras separadas una a una"
+                            >
+                              0.5x
+                            </button>
+                            <button
+                              onClick={() =>
                                 handlePlayVoice(ex.en, `ex-${chunk.id}-${i}-slow`, 0.65)
                               }
-                              className="text-[10px] text-slate-400 hover:text-amber-300 px-1 py-0.5 rounded bg-slate-900 border border-slate-700 cursor-pointer"
+                              className="text-[10px] text-slate-400 hover:text-white px-1 py-0.5 rounded bg-slate-900 border border-slate-700 cursor-pointer"
                               title="Escuchar lento (0.65x)"
                             >
                               0.65x
@@ -263,7 +272,7 @@ export const PowerChunksExplorer: React.FC<PowerChunksExplorerProps> = ({ curren
                             <button
                               onClick={() => handlePlayVoice(ex.en, `ex-${chunk.id}-${i}`)}
                               className="text-slate-400 hover:text-white p-1 cursor-pointer"
-                              title="Escuchar audio"
+                              title="Escuchar audio normal"
                             >
                               <Volume2
                                 className={`w-3.5 h-3.5 ${

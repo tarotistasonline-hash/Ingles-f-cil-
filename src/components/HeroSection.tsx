@@ -32,7 +32,6 @@ import {
 import { playEnglishVoice, stopAllAudio } from '../services/audio';
 import { initWelcomeVoice } from '../services/welcomeVoice';
 import { askTeacher, fetchSpeakTweak } from '../services/api';
-import { downloadFreePocketSample } from '../utils/packGenerator';
 import { triggerConfetti } from '../utils/confetti';
 import { RealVisitsBadge } from './RealVisitsBadge';
 import { DailyChallengeWidget } from './DailyChallengeWidget';
@@ -69,17 +68,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [playingSpeed, setPlayingSpeed] = useState<number | null>(null);
   const [activeDemoIndex, setActiveDemoIndex] = useState(0);
-  const [downloadedFreeSample, setDownloadedFreeSample] = useState(false);
   // Auto-play short spoken welcome message by default on entrance
   useEffect(() => {
     initWelcomeVoice();
   }, []);
-
-  const handleDownloadSample = () => {
-    downloadFreePocketSample();
-    setDownloadedFreeSample(true);
-    triggerConfetti({ particleCount: 70, spread: 80 });
-  };
 
   // Multi-panel interactive state (shortens page into organized switchable panels)
   const [activePanelTab, setActivePanelTab] = useState<'profe' | 'tweak' | 'challenge' | 'blog'>('profe');
@@ -419,7 +411,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs shadow-amber-400"></span>
-              <span>3 velocidades de audio (0.65x Lento · 0.8x Pausado · 1.0x Nativo)</span>
+              <span>4 velocidades con audio paso a paso (0.5x Ultra Lento palabras separadas · 0.65x · 0.8x · 1.0x)</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-xs shadow-sky-400"></span>
@@ -625,33 +617,46 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     </span>
                   </div>
 
-                  {/* Dual Speed Play Buttons */}
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Multi-Speed Play Buttons */}
+                  <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={() => handlePlayAudio(currentDemo.nativeSaying, 0.5)}
+                      disabled={isPlayingAudio}
+                      className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                        isPlayingAudio && playingSpeed === 0.5
+                          ? 'bg-amber-400 text-slate-950 border-amber-300 font-black shadow-md shadow-amber-400/30 animate-pulse'
+                          : 'text-amber-300 hover:text-white bg-[#0C0A1D] hover:bg-[#161235] border-amber-500/40'
+                      }`}
+                      title="Ultra Lento (0.5x) con palabras separadas paso a paso para que quien empieza de cero pueda memorizar y repetir"
+                    >
+                      <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                      <span>0.5x Paso a paso</span>
+                    </button>
                     <button
                       onClick={() => handlePlayAudio(currentDemo.nativeSaying, 0.65)}
                       disabled={isPlayingAudio}
-                      className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                      className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1.5 rounded-lg border transition-all cursor-pointer ${
                         isPlayingAudio && playingSpeed === 0.65
                           ? 'bg-amber-400 text-slate-950 border-amber-300 font-bold shadow-md shadow-amber-400/30 animate-pulse'
                           : 'text-amber-300 hover:text-amber-200 bg-[#0C0A1D] hover:bg-[#161235] border-[#2E2463]'
                       }`}
-                      title="Escuchar en cámara lenta para principiantes"
+                      title="Escuchar en velocidad lenta (0.65x)"
                     >
                       <Volume2 className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Lento (0.65x)</span>
+                      <span>0.65x</span>
                     </button>
                     <button
                       onClick={() => handlePlayAudio(currentDemo.nativeSaying, 1.0)}
                       disabled={isPlayingAudio}
-                      className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                      className={`flex items-center gap-1 text-[11px] font-semibold px-2 py-1.5 rounded-lg border transition-all cursor-pointer ${
                         isPlayingAudio && playingSpeed === 1.0
                           ? 'bg-emerald-400 text-slate-950 border-emerald-300 font-bold shadow-md shadow-emerald-400/30 animate-pulse'
                           : 'text-emerald-300 hover:text-emerald-200 bg-[#0C0A1D] hover:bg-[#161235] border-[#2E2463]'
                       }`}
-                      title="Escuchar a velocidad normal nativa"
+                      title="Escuchar a velocidad normal nativa (1.0x)"
                     >
                       <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Nativo (1.0x)</span>
+                      <span>1.0x</span>
                     </button>
                   </div>
                 </div>
@@ -942,22 +947,29 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                                     <p className="text-[10px] text-emerald-300 font-medium">{ex.chunkNote}</p>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-1.5 shrink-0">
+                                <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                                   <button
-                                    onClick={() => handlePlayAudio(ex.en, 0.65)}
-                                    className="px-2.5 py-1 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 text-amber-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
-                                    title="Escuchar en cámara lenta (0.65x)"
+                                    onClick={() => handlePlayAudio(ex.en, 0.5)}
+                                    className="px-2 py-1 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                                    title="Ultra Lento (0.5x) con palabras separadas paso a paso"
                                   >
                                     <Volume2 className="w-3.5 h-3.5 text-amber-400" />
-                                    <span>Lento (0.65x)</span>
+                                    <span>0.5x Paso a paso</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handlePlayAudio(ex.en, 0.65)}
+                                    className="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                                    title="Escuchar en cámara lenta (0.65x)"
+                                  >
+                                    <span>0.65x</span>
                                   </button>
                                   <button
                                     onClick={() => handlePlayAudio(ex.en, 1.0)}
-                                    className="px-2.5 py-1 rounded-lg bg-emerald-400/10 hover:bg-emerald-400/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                                    className="px-2 py-1 rounded-lg bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-400/30 text-emerald-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
                                     title="Escuchar a velocidad normal (1.0x)"
                                   >
                                     <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                                    <span>Nativo (1.0x)</span>
+                                    <span>1.0x</span>
                                   </button>
                                 </div>
                               </div>
@@ -1099,14 +1111,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                             <span>Como lo dice un nativo (100% Real y sin rodeos):</span>
                           </div>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <button
-                              onClick={() => handlePlayAudio(tweakResult.nativeReal, 0.65)}
-                              className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-700 text-amber-300 hover:text-white text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
-                              title="Escuchar en cámara lenta (0.65x)"
+                              onClick={() => handlePlayAudio(tweakResult.nativeReal, 0.5)}
+                              className="px-2 py-1 rounded-lg bg-amber-400/15 border border-amber-400/40 text-amber-300 hover:text-white text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                              title="Ultra Lento (0.5x) con palabras separadas paso a paso"
                             >
                               <Volume2 className="w-3.5 h-3.5 text-amber-400" />
-                              <span>Lento (0.65x)</span>
+                              <span>0.5x Paso a paso</span>
+                            </button>
+                            <button
+                              onClick={() => handlePlayAudio(tweakResult.nativeReal, 0.65)}
+                              className="px-2 py-1 rounded-lg bg-slate-950 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                              title="Escuchar en cámara lenta (0.65x)"
+                            >
+                              <span>0.65x</span>
                             </button>
                             <button
                               onClick={() => handlePlayAudio(tweakResult.nativeReal, 1.0)}
@@ -1114,7 +1133,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                               title="Escuchar a velocidad normal nativa (1.0x)"
                             >
                               <Volume2 className="w-3.5 h-3.5 text-slate-950" />
-                              <span>Nativo (1.0x)</span>
+                              <span>1.0x</span>
                             </button>
                           </div>
                         </div>

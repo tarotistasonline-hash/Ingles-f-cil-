@@ -81,7 +81,7 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
           accentColor: 'text-emerald-400',
           borderColor: 'border-emerald-500/40 hover:border-emerald-400',
           hoverBg: 'hover:bg-emerald-950/20',
-          features: ['Fonética fácil explicada', 'Saludos y supervivencia', 'Audio pausado a 0.65x'],
+          features: ['Fonética fácil explicada', 'Saludos y supervivencia', 'Audio paso a paso a 0.5x y 0.65x'],
         },
         {
           id: 'entrecasa',

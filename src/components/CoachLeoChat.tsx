@@ -224,13 +224,20 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                           "{response.powerChunk}"
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                        <button
+                          onClick={() => handlePlayVoice(response.powerChunk, 'power-chunk-super-slow', 0.5)}
+                          className="px-2.5 py-1.5 rounded-lg bg-amber-400/20 border border-amber-400/50 text-amber-300 hover:text-white text-xs font-bold cursor-pointer hover:bg-amber-400/30 transition-colors"
+                          title="Ultra Lento (0.5x) con palabras separadas paso a paso para memorizar"
+                        >
+                          🌱 0.5x Paso a paso
+                        </button>
                         <button
                           onClick={() => handlePlayVoice(response.powerChunk, 'power-chunk-slow', 0.65)}
-                          className="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-amber-300 hover:text-white text-xs font-bold cursor-pointer hover:bg-slate-800 transition-colors"
+                          className="px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer hover:bg-slate-800 transition-colors"
                           title="Escuchar lento (0.65x)"
                         >
-                          🐢 0.65x
+                          0.65x
                         </button>
                         <button
                           onClick={() => handlePlayVoice(response.powerChunk, 'power-chunk')}
@@ -242,7 +249,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                               playingAudioKey?.startsWith('power-chunk') ? 'animate-pulse' : ''
                             }`}
                           />
-                          <span>Escuchar</span>
+                          <span>Normal</span>
                         </button>
                       </div>
                     </div>
@@ -266,8 +273,15 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                               </p>
                               <div className="flex items-center gap-1 shrink-0">
                                 <button
+                                  onClick={() => handlePlayVoice(ex.en, `ex-profe-${i}-super-slow`, 0.5)}
+                                  className="text-[10px] text-amber-300 hover:text-white px-2 py-0.5 rounded bg-amber-400/15 border border-amber-400/40 font-bold cursor-pointer"
+                                  title="Ultra Lento (0.5x) con palabras separadas"
+                                >
+                                  0.5x
+                                </button>
+                                <button
                                   onClick={() => handlePlayVoice(ex.en, `ex-profe-${i}-slow`, 0.65)}
-                                  className="text-[10px] text-slate-400 hover:text-amber-300 px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 cursor-pointer"
+                                  className="text-[10px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 cursor-pointer"
                                   title="Escuchar lento (0.65x)"
                                 >
                                   0.65x

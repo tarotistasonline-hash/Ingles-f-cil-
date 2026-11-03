@@ -112,16 +112,30 @@ export const ConnectedSpeechLab: React.FC<ConnectedSpeechLabProps> = ({ currentS
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() =>
+                  handlePlayVoice(selectedLesson.spokenAudioText, 'main-ultra-slow', 0.5)
+                }
+                className="px-3 py-1.5 rounded-xl bg-amber-400/20 border border-amber-400/60 text-amber-300 text-xs font-bold hover:bg-amber-400/30 transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Ultra Lento (0.5x) con palabras separadas paso a paso para principiantes"
+              >
+                <Volume2
+                  className={`w-3.5 h-3.5 ${
+                    playingAudioKey === 'main-ultra-slow' ? 'animate-pulse text-amber-400' : ''
+                  }`}
+                />
+                <span>🌱 0.5x (Paso a paso)</span>
+              </button>
+              <button
+                onClick={() =>
                   handlePlayVoice(selectedLesson.spokenAudioText, 'main-super-slow', 0.65)
                 }
-                className="px-3 py-1.5 rounded-xl bg-amber-400/10 border border-amber-500/40 text-amber-300 text-xs font-semibold hover:bg-amber-400/20 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Volume2
                   className={`w-3.5 h-3.5 ${
                     playingAudioKey === 'main-super-slow' ? 'animate-pulse text-amber-400' : ''
                   }`}
                 />
-                <span>0.65x (Super Lento)</span>
+                <span>0.65x (Lento)</span>
               </button>
               <button
                 onClick={() =>

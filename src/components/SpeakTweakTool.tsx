@@ -231,18 +231,25 @@ export const SpeakTweakTool: React.FC<SpeakTweakToolProps> = ({ currentSpeed }) 
                     <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                     <span>Tu Frase de Entrecasa (Sencilla, Real y Coloquial)</span>
                   </div>
-                  {/* Dual speed audio */}
-                  <div className="flex items-center gap-2">
+                  {/* Multi speed audio */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <button
+                      onClick={() => handlePlayAudio(result.nativeReal, 'native-super-slow', 0.5)}
+                      className="px-2.5 py-1.5 rounded-lg bg-amber-400/20 border border-amber-400/50 text-amber-300 hover:text-white text-xs font-bold cursor-pointer hover:bg-amber-400/30 transition-colors"
+                      title="Ultra Lento (0.5x) con palabras separadas paso a paso para memorizar"
+                    >
+                      🌱 0.5x Paso a paso
+                    </button>
                     <button
                       onClick={() => handlePlayAudio(result.nativeReal, 'native-slow', 0.65)}
-                      className="px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-amber-300 hover:text-white text-xs font-bold cursor-pointer hover:bg-slate-800 transition-colors"
-                      title="Escuchar en cámara lenta (0.65x)"
+                      className="px-2 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer hover:bg-slate-800 transition-colors"
+                      title="Escuchar en velocidad lenta (0.65x)"
                     >
-                      🐢 0.65x
+                      0.65x
                     </button>
                     <button
                       onClick={() => handlePlayAudio(result.nativeReal, 'native-normal')}
-                      className="px-3.5 py-1.5 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition-colors"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition-colors"
                       title="Escuchar a velocidad normal"
                     >
                       <Volume2
@@ -250,7 +257,7 @@ export const SpeakTweakTool: React.FC<SpeakTweakToolProps> = ({ currentSpeed }) 
                           playingAudioKey === 'native-normal' ? 'animate-pulse' : ''
                         }`}
                       />
-                      <span>Escuchar</span>
+                      <span>Normal</span>
                     </button>
                   </div>
                 </div>

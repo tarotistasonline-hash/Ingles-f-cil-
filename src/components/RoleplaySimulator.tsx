@@ -22,7 +22,6 @@ import {
   PartyPopper,
   Gift,
 } from 'lucide-react';
-import { downloadFreePocketSample } from '../utils/packGenerator';
 
 interface RoleplaySimulatorProps {
   currentSpeed: number;
@@ -507,8 +506,15 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
                           {isChar && (
                             <div className="flex items-center gap-1">
                               <button
+                                onClick={() => handlePlayVoice(msg.text, `${msg.id}-super-slow`, 0.5)}
+                                className="text-[10px] text-amber-300 hover:text-white px-1.5 py-0.5 rounded bg-amber-400/15 border border-amber-400/40 font-bold cursor-pointer"
+                                title="Ultra Lento (0.5x) con palabras separadas una a una"
+                              >
+                                0.5x
+                              </button>
+                              <button
                                 onClick={() => handlePlayVoice(msg.text, msg.id, 0.65)}
-                                className="text-[10px] text-slate-400 hover:text-amber-300 px-1 py-0.5 rounded bg-[#130F30] border border-[#2D245A] cursor-pointer"
+                                className="text-[10px] text-slate-400 hover:text-white px-1 py-0.5 rounded bg-[#130F30] border border-[#2D245A] cursor-pointer"
                                 title="Escuchar en cámara lenta (0.65x)"
                               >
                                 0.65x
@@ -516,7 +522,7 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
                               <button
                                 onClick={() => handlePlayVoice(msg.text, msg.id)}
                                 className="text-slate-400 hover:text-white p-1 cursor-pointer"
-                                title="Reproducir audio"
+                                title="Reproducir audio normal"
                               >
                                 <Volume2
                                   className={`w-3.5 h-3.5 ${
@@ -821,15 +827,17 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
                   <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-400/30 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                     <div className="text-left text-xs text-slate-300">
                       🎧 <strong className="text-white">¿Querés practicar estas conversaciones en el auto con pantalla apagada?</strong>{' '}
-                      Llevá el Audio-Kit de Bolsillo ($9.990) o descargá los 15 Bloques de Oro en PDF gratis.
+                      El Audio-Kit Completo incluye los 100 Bloques de Oro en MP3 en 4 velocidades para tu celular.
                     </div>
-                    <button
-                      onClick={() => downloadFreePocketSample()}
-                      className="px-3 py-1.5 text-xs font-bold text-emerald-300 bg-emerald-400/20 hover:bg-emerald-400/30 rounded-lg border border-emerald-400/40 cursor-pointer shrink-0 transition-colors flex items-center gap-1.5"
+                    <a
+                      href="https://mpago.li/1PhcDv4"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3.5 py-1.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg cursor-pointer shrink-0 transition-colors flex items-center gap-1.5 shadow-sm no-underline"
                     >
-                      <Gift className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Bajar Muestra Gratis</span>
-                    </button>
+                      <span>Obtener Pack ($9.990)</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
+                    </a>
                   </div>
 
                   {/* Actions Footer */}

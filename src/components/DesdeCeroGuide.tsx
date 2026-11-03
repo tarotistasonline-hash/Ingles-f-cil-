@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import { playEnglishVoice } from '../services/audio';
+import React, { useState, useEffect } from 'react';
+import {
+  playEnglishVoice,
+  VOICE_OPTIONS,
+  getGlobalAudioVoice,
+  setGlobalAudioVoice,
+  subscribeVoiceChange,
+  AudioVoiceId,
+} from '../services/audio';
 import {
   Sprout,
   Volume2,
@@ -12,6 +19,7 @@ import {
   Sparkles,
   ArrowRight,
   Turtle,
+  Headphones,
 } from 'lucide-react';
 import { KeyTakeawaysToggle } from './KeyTakeawaysToggle';
 import { triggerConfetti, triggerSuperConfetti } from '../utils/confetti';
@@ -38,6 +46,12 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [currentVoice, setCurrentVoice] = useState<AudioVoiceId>(getGlobalAudioVoice());
+
+  useEffect(() => {
+    const unsub = subscribeVoiceChange((v) => setCurrentVoice(v));
+    return unsub;
+  }, []);
 
   const basicPhrases: BasicPhrase[] = [
     {
@@ -179,9 +193,9 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
               explanation: 'Para quien arranca hoy, saber que "Where is the bathroom" suena "Uer is de baz-rum" evita que la mente se congele al intentar adivinar letras mudas.',
             },
             {
-              point: 'Escucha en las 3 velocidades (0.65x Lento, 0.8x Pausado y 1.0x Nativo)',
+              point: 'Escucha en 4 velocidades (0.5x Paso a paso palabras separadas, 0.65x, 0.8x y 1.0x)',
               highlight: 'Velocidad a tu medida',
-              explanation: 'Usa 0.65x para fijarte en cada letra y fonema sin apuro, 0.8x (pausado) para repetir con calma, y 1.0x para acostumbrar el oído a la velocidad nativa.',
+              explanation: 'Usa 0.5x para escuchar cada palabra separada con pausas deliberadas y sin sonidos pegados (ideal si empiezas de cero), 0.65x para captar cada letra, 0.8x para repetir con calma, y 1.0x para habituar el oído.',
             },
             {
               point: 'Aprende 1 o 2 frases por día',
@@ -220,6 +234,73 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
             <p className="text-xs text-slate-300 leading-relaxed">
               Un <span className="text-indigo-300 font-semibold">"Thanks a lot!"</span> dicho con calidez vale más que una oración gramaticalmente perfecta dicha con miedo y frialdad.
             </p>
+          </div>
+        </div>
+
+        {/* Voice & Speed Preference Banner */}
+        <div className="bg-[#120E32] border border-sky-500/30 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sky-900/40 pb-3">
+            <div className="flex items-center gap-2">
+              <Headphones className="w-4 h-4 text-sky-400" />
+              <span className="text-sm font-extrabold text-white">
+                Elige la voz que te resulte más clara para repetir:
+              </span>
+            </div>
+            <span className="text-xs text-sky-300 font-medium">
+              Puedes elegir entre voces femeninas y masculinas
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {VOICE_OPTIONS.map((v) => {
+              const isSelected = currentVoice === v.id;
+              return (
+                <button
+                  key={v.id}
+                  onClick={async () => {
+                    setGlobalAudioVoice(v.id);
+                    setCurrentVoice(v.id);
+                    await playEnglishVoice(v.samplePhrase, v.id, 0.8, { forceVoice: true });
+                  }}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                    isSelected
+                      ? 'bg-sky-500/20 border-sky-400 text-white shadow-md ring-1 ring-sky-400'
+                      : 'bg-black/30 border-[#261E52] text-slate-300 hover:bg-white/5 hover:border-sky-500/40'
+                  }`}
+                  title={`Seleccionar voz de ${v.name}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg">{v.avatar}</span>
+                      <span className="font-extrabold text-xs text-white">{v.name}</span>
+                    </div>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.2 rounded font-black uppercase ${
+                        v.gender === 'Femenina'
+                          ? 'bg-pink-400/25 text-pink-300'
+                          : 'bg-blue-400/25 text-blue-300'
+                      }`}
+                    >
+                      {v.genderLabel}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-sky-200/90 leading-tight">{v.tone}</p>
+                  <div className="mt-1 flex items-center justify-between pt-1 border-t border-white/5">
+                    <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                      <Volume2 className="w-2.5 h-2.5 text-sky-400" />
+                      Probar voz
+                    </span>
+                    {isSelected ? (
+                      <span className="text-[9px] bg-sky-400 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase">
+                        ACTIVA
+                      </span>
+                    ) : (
+                      <span className="text-[9px] text-slate-400 font-semibold">Tocar para usar</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -307,26 +388,36 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
                       </div>
                     </div>
 
-                    {/* Dual Audio Speed Buttons */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {/* Ultra slow button */}
+                    {/* Multi-Speed Audio Buttons */}
+                    <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                      {/* Ultra slow 0.5x button with separated words */}
+                      <button
+                        onClick={() => handlePlayAudio(item.english, item.id, 0.5)}
+                        disabled={isPlaying}
+                        className="px-2.5 py-1.5 rounded-lg bg-amber-400/20 border border-amber-400/50 text-amber-300 text-xs font-bold hover:bg-amber-400/30 transition-colors flex items-center gap-1 cursor-pointer"
+                        title="Ultra Lento (0.5x) con palabras separadas una a una para que puedas memorizar y repetir"
+                      >
+                        <Turtle className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="hidden sm:inline">0.5x Paso a paso</span>
+                        <span className="sm:hidden">0.5x</span>
+                      </button>
+
+                      {/* Slow 0.65x button */}
                       <button
                         onClick={() => handlePlayAudio(item.english, item.id, 0.65)}
                         disabled={isPlaying}
-                        className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-emerald-500/30 transition-colors flex items-center gap-1 cursor-pointer"
-                        title="Escuchar en cámara lenta (0.65x) para principiantes"
+                        className="px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center gap-1 cursor-pointer"
+                        title="Escuchar en velocidad lenta (0.65x)"
                       >
-                        <Turtle className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">0.65x</span>
-                        <span className="sm:hidden">Lento</span>
+                        <span>0.65x</span>
                       </button>
 
                       {/* Normal conversational speed */}
                       <button
                         onClick={() => handlePlayAudio(item.english, item.id, currentSpeed)}
                         disabled={isPlaying}
-                        className="px-2.5 py-1.5 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold hover:bg-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
-                        title="Escuchar a velocidad pausada recomendada (0.8x)"
+                        className="px-2.5 py-1.5 rounded-lg bg-emerald-400 text-slate-950 text-xs font-bold hover:bg-emerald-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        title="Escuchar a velocidad normal recomendada"
                       >
                         <Volume2 className="w-3.5 h-3.5" />
                         <span>Play</span>

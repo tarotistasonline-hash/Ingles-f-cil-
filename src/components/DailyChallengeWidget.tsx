@@ -404,16 +404,31 @@ export const DailyChallengeWidget: React.FC<DailyChallengeWidgetProps> = ({
             <div className="flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
+                onClick={() => handlePlayVoice(currentChallenge.targetEnglish, 0.5)}
+                disabled={isPlaying}
+                className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  isPlaying && playingSpeed === 0.5
+                    ? 'bg-amber-400 text-slate-950 ring-2 ring-amber-300 shadow-md animate-pulse'
+                    : 'bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border border-amber-400/50'
+                }`}
+                title="Ultra Lento (0.5x) con palabras separadas una a una para que puedas memorizar y repetir"
+              >
+                <Volume2 className="w-3 h-3 text-amber-400" />
+                <span>🌱 0.5x Paso a paso</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => handlePlayVoice(currentChallenge.targetEnglish, 0.65)}
                 disabled={isPlaying}
                 className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
                   isPlaying && playingSpeed === 0.65
                     ? 'bg-amber-400 text-slate-950 ring-2 ring-amber-300 shadow-md animate-pulse'
-                    : 'bg-black/50 hover:bg-black/70 text-amber-300 border border-amber-400/30'
+                    : 'bg-black/50 hover:bg-black/70 text-slate-300 border border-slate-700'
                 }`}
                 title="Escuchar lento para captar cada sonido fonético"
               >
-                <Volume2 className="w-3 h-3 text-amber-400" />
+                <Volume2 className="w-3 h-3 text-slate-300" />
                 <span>0.65x Lento</span>
               </button>
 

@@ -278,18 +278,24 @@ export function playWelcomeVoice(options?: { fromBeginning?: boolean; force?: bo
             resolve();
           })
           .catch((err) => {
-            // Autoplay rejected by browser policy without gesture
-            if (!state.hasStarted) {
+            if (options?.force) {
+              fallbackWebSpeechMale();
+            } else if (!state.hasStarted) {
               state.isBlockedByAutoplay = true;
               notifyListeners();
             }
             resolve();
           });
       } else {
+        if (options?.force) {
+          fallbackWebSpeechMale();
+        }
         resolve();
       }
     } catch (err) {
-      if (!state.hasStarted) {
+      if (options?.force) {
+        fallbackWebSpeechMale();
+      } else if (!state.hasStarted) {
         state.isBlockedByAutoplay = true;
         notifyListeners();
       }
