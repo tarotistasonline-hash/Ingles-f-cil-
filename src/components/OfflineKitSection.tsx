@@ -34,6 +34,7 @@ import {
   generateCsvFlashcards,
   generateStudyPlan,
   generateOfflinePocketPlayerHtml,
+  downloadFreePocketSample,
 } from '../utils/packGenerator';
 import { Loader2, Printer } from 'lucide-react';
 
@@ -108,6 +109,13 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
   const [tempCheckoutUrl, setTempCheckoutUrl] = useState(customCheckoutUrl);
   const [copiedDeliveryMsg, setCopiedDeliveryMsg] = useState(false);
   const [copiedRedirectUrl, setCopiedRedirectUrl] = useState(false);
+  const [downloadedFreeSample, setDownloadedFreeSample] = useState(false);
+
+  const handleDownloadFreeSample = () => {
+    downloadFreePocketSample();
+    setDownloadedFreeSample(true);
+    triggerConfetti({ particleCount: 75, spread: 80 });
+  };
 
   const getDeliveryUrl = () => {
     if (typeof window !== 'undefined' && window.location && window.location.origin) {
@@ -369,27 +377,28 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
           </div>
         </div>
 
-        {/* Direct Acquisition and Instant Access CTAs */}
-        <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
-          <a
-            href="https://mpago.li/1PhcDv4"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300 hover:from-yellow-300 hover:to-amber-200 text-slate-950 font-black text-sm sm:text-base flex items-center gap-2.5 cursor-pointer transition-all shadow-xl shadow-amber-400/30 hover:scale-102 no-underline"
+        {/* Action Buttons: Free Sample Lead Magnet & Pack Testing */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={handleDownloadFreeSample}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500/25 to-amber-500/20 hover:from-emerald-500/35 hover:to-amber-500/30 border border-emerald-400/60 text-emerald-300 font-extrabold text-xs flex items-center gap-2 cursor-pointer transition-all shadow-md hover:scale-102"
           >
-            <span>Comprar Pack Completo ($9.990 ARS)</span>
-            <ArrowRight className="w-4 h-4 text-slate-950" />
-          </a>
+            <Gift className="w-4 h-4 text-emerald-400 animate-bounce" />
+            <span>
+              {downloadedFreeSample
+                ? '✓ ¡Muestra Gratis Descargada! (Ver archivo)'
+                : '🎁 Descargar Muestra Gratis (15 Bloques de Oro en PDF)'}
+            </span>
+          </button>
 
           <button
             onClick={() => {
-              const el = document.getElementById('manual-validator');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
+              handleSimulatePurchase();
             }}
-            className="px-5 py-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-amber-400/50 text-amber-300 font-extrabold text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-all shadow-sm"
+            className="px-5 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 font-bold text-xs flex items-center gap-2 cursor-pointer transition-all shadow-sm"
           >
-            <KeyRound className="w-4 h-4 text-amber-400" />
-            <span>¿Ya compraste? Validar Código de Operación</span>
+            <Download className="w-4 h-4 text-amber-400" />
+            <span>{hasPurchasedMock ? '📦 Acceder a Descargas de tu Pack' : '📦 Probar Descarga del Pack de Entrega'}</span>
           </button>
         </div>
       </section>
@@ -760,6 +769,15 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               <KeyRound className="w-4 h-4 text-amber-400 shrink-0" />
               <span>¿Ya pagaste en Mercado Pago? Ingresá tu N° de Operación abajo para descargar al instante</span>
             </div>
+
+            {/* Quick Free Lead Magnet Reminder */}
+            <button
+              onClick={handleDownloadFreeSample}
+              className="inline-flex items-center gap-2 text-xs text-amber-300 hover:text-amber-200 font-semibold cursor-pointer underline underline-offset-4 pt-1"
+            >
+              <Gift className="w-3.5 h-3.5" />
+              <span>¿Querés probar primero? Descargá gratis los 15 Bloques de Oro en PDF</span>
+            </button>
 
             {/* Support Email Reassurance */}
             <div className="space-y-2 text-center pt-2">

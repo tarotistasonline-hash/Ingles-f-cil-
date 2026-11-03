@@ -32,6 +32,7 @@ import {
 import { playEnglishVoice, stopAllAudio } from '../services/audio';
 import { initWelcomeVoice } from '../services/welcomeVoice';
 import { askTeacher, fetchSpeakTweak } from '../services/api';
+import { downloadFreePocketSample } from '../utils/packGenerator';
 import { triggerConfetti } from '../utils/confetti';
 import { RealVisitsBadge } from './RealVisitsBadge';
 import { DailyChallengeWidget } from './DailyChallengeWidget';
@@ -68,10 +69,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [playingSpeed, setPlayingSpeed] = useState<number | null>(null);
   const [activeDemoIndex, setActiveDemoIndex] = useState(0);
+  const [downloadedFreeSample, setDownloadedFreeSample] = useState(false);
   // Auto-play short spoken welcome message by default on entrance
   useEffect(() => {
     initWelcomeVoice();
   }, []);
+
+  const handleDownloadSample = () => {
+    downloadFreePocketSample();
+    setDownloadedFreeSample(true);
+    triggerConfetti({ particleCount: 70, spread: 80 });
+  };
 
   // Multi-panel interactive state (shortens page into organized switchable panels)
   const [activePanelTab, setActivePanelTab] = useState<'profe' | 'tweak' | 'challenge' | 'blog'>('profe');
@@ -229,8 +237,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(245,158,11,0.08),rgba(16,185,129,0.05),transparent)] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Tagline - Centered & Animated */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-5 reveal-on-scroll">
+        {/* Top Tagline with Real Visits Indicator - Centered & Animated */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-6 reveal-on-scroll">
           <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-300 bg-[#16113A]/90 border border-[#2F2468] px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md card-hover-lift">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -242,11 +250,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <span aria-hidden="true" className="text-slate-600">·</span>
             <span className="text-violet-400 font-bold">⚡ Fluidez Real</span>
           </div>
-        </div>
-
-        {/* Restored Discriminative Real Visits Panel (Totales, Únicas y Diarias) */}
-        <div className="max-w-3xl mx-auto mb-8 reveal-on-scroll">
-          <RealVisitsBadge variant="panel" />
+          <RealVisitsBadge compact={true} />
         </div>
 
         {/* Main Centralized Hero Header with Typography Polish & Gradient Shimmer */}

@@ -22,6 +22,7 @@ import {
   PartyPopper,
   Gift,
 } from 'lucide-react';
+import { downloadFreePocketSample } from '../utils/packGenerator';
 
 interface RoleplaySimulatorProps {
   currentSpeed: number;
@@ -827,17 +828,15 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
                   <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-400/30 flex flex-col sm:flex-row items-center justify-between gap-2.5">
                     <div className="text-left text-xs text-slate-300">
                       🎧 <strong className="text-white">¿Querés practicar estas conversaciones en el auto con pantalla apagada?</strong>{' '}
-                      El Audio-Kit Completo incluye los 100 Bloques de Oro en MP3 en 4 velocidades para tu celular.
+                      Llevá el Audio-Kit de Bolsillo ($9.990) o descargá los 15 Bloques de Oro en PDF gratis.
                     </div>
-                    <a
-                      href="https://mpago.li/1PhcDv4"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3.5 py-1.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg cursor-pointer shrink-0 transition-colors flex items-center gap-1.5 shadow-sm no-underline"
+                    <button
+                      onClick={() => downloadFreePocketSample()}
+                      className="px-3 py-1.5 text-xs font-bold text-emerald-300 bg-emerald-400/20 hover:bg-emerald-400/30 rounded-lg border border-emerald-400/40 cursor-pointer shrink-0 transition-colors flex items-center gap-1.5"
                     >
-                      <span>Obtener Pack ($9.990)</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
-                    </a>
+                      <Gift className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Bajar Muestra Gratis</span>
+                    </button>
                   </div>
 
                   {/* Actions Footer */}

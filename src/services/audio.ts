@@ -60,102 +60,6 @@ export function setGlobalAudioSpeed(speed: number) {
   }
 }
 
-// Available native English voices for learners
-export type AudioVoiceId = 'Kore' | 'Puck' | 'Fenrir' | 'Zephyr';
-
-export interface VoiceOption {
-  id: AudioVoiceId;
-  name: string;
-  avatar: string;
-  gender: 'Femenina' | 'Masculina';
-  genderLabel: string;
-  tone: string;
-  description: string;
-  samplePhrase: string;
-}
-
-export const VOICE_OPTIONS: VoiceOption[] = [
-  {
-    id: 'Kore',
-    name: 'Emma (Kore)',
-    avatar: '👩',
-    gender: 'Femenina',
-    genderLabel: 'Femenina',
-    tone: 'Cálida, dulce y cristalina',
-    description: 'Voz femenina pausada y clara, ideal para captar cada letra y fonema.',
-    samplePhrase: 'Hello, welcome! Take your time to listen and repeat.',
-  },
-  {
-    id: 'Puck',
-    name: 'Leo (Puck)',
-    avatar: '👨',
-    gender: 'Masculina',
-    genderLabel: 'Masculina',
-    tone: 'Joven, enérgica y amigable',
-    description: 'Voz masculina conversacional, perfecta para el ritmo de la calle.',
-    samplePhrase: 'Hey there! Nice to meet you. Ready to practice speaking?',
-  },
-  {
-    id: 'Fenrir',
-    name: 'David (Fenrir)',
-    avatar: '🧔',
-    gender: 'Masculina',
-    genderLabel: 'Masculina',
-    tone: 'Profunda, grave y muy articulada',
-    description: 'Voz masculina grave y serena, excelente para quien prefiere frecuencias bajas.',
-    samplePhrase: 'Good morning. Listen carefully to each word, you can do this.',
-  },
-  {
-    id: 'Zephyr',
-    name: 'Sarah (Zephyr)',
-    avatar: '👱‍♀️',
-    gender: 'Femenina',
-    genderLabel: 'Femenina',
-    tone: 'Suave, melódica y paciente',
-    description: 'Voz femenina relajada, excelente para reducir el estrés al escuchar.',
-    samplePhrase: 'Hi! Let us make learning English simple and enjoyable.',
-  },
-];
-
-let globalAudioVoice: AudioVoiceId = 'Kore';
-try {
-  const savedVoice = localStorage.getItem('vibe_english_voice') as AudioVoiceId;
-  if (savedVoice && ['Kore', 'Puck', 'Fenrir', 'Zephyr'].includes(savedVoice)) {
-    globalAudioVoice = savedVoice;
-  }
-} catch {
-  // localStorage not available
-}
-
-const voiceChangeListeners = new Set<(voice: AudioVoiceId) => void>();
-
-export function getGlobalAudioVoice(): AudioVoiceId {
-  return globalAudioVoice;
-}
-
-export function setGlobalAudioVoice(voice: AudioVoiceId) {
-  globalAudioVoice = voice;
-  try {
-    localStorage.setItem('vibe_english_voice', voice);
-  } catch {
-    // ignore
-  }
-  voiceChangeListeners.forEach((fn) => {
-    try {
-      fn(voice);
-    } catch {
-      // ignore
-    }
-  });
-}
-
-export function subscribeVoiceChange(listener: (voice: AudioVoiceId) => void): () => void {
-  voiceChangeListeners.add(listener);
-  return () => {
-    voiceChangeListeners.delete(listener);
-  };
-}
-
 // Global audio tracking and mobile audio unlock pipeline
 let currentAudio: HTMLAudioElement | null = null;
 let sharedAudioContext: AudioContext | null = null;
@@ -276,15 +180,14 @@ export function formatSpacedSpeechText(text: string): string {
 export function getAudioStreamUrl(
   text: string,
   speed?: number,
-  voice?: AudioVoiceId,
+  voice: 'Kore' | 'Puck' | 'Zephyr' = 'Kore',
   filename?: string
 ): string {
   const effectiveSpeed = speed !== undefined ? speed : globalAudioSpeed;
-  const effectiveVoice = voice || globalAudioVoice;
   const roundedSpeed = Math.round(effectiveSpeed * 100) / 100;
   const isUltraSlow = roundedSpeed <= 0.55;
   const clean = isUltraSlow ? formatSpacedSpeechText(text) : cleanSpeechText(text);
-  let url = `/api/audio-stream?text=${encodeURIComponent(clean)}&speed=${roundedSpeed}&voice=${effectiveVoice}`;
+  let url = `/api/audio-stream?text=${encodeURIComponent(clean)}&speed=${roundedSpeed}&voice=${voice}`;
   if (filename) {
     url += `&filename=${encodeURIComponent(filename)}`;
   }
@@ -298,14 +201,13 @@ export function getAudioDownloadUrl(
   text: string,
   filename: string,
   speed?: number,
-  voice?: AudioVoiceId
+  voice: 'Kore' | 'Puck' | 'Zephyr' = 'Kore'
 ): string {
   const effectiveSpeed = speed !== undefined ? speed : globalAudioSpeed;
-  const effectiveVoice = voice || globalAudioVoice;
   const roundedSpeed = Math.round(effectiveSpeed * 100) / 100;
   const isUltraSlow = roundedSpeed <= 0.55;
   const clean = isUltraSlow ? formatSpacedSpeechText(text) : cleanSpeechText(text);
-  return `/api/audio-download?text=${encodeURIComponent(clean)}&speed=${roundedSpeed}&voice=${effectiveVoice}&filename=${encodeURIComponent(filename)}`;
+  return `/api/audio-download?text=${encodeURIComponent(clean)}&speed=${roundedSpeed}&voice=${voice}&filename=${encodeURIComponent(filename)}`;
 }
 
 /**
@@ -367,8 +269,7 @@ export function speakWithWebSpeech(
   text: string,
   speed: number = globalAudioSpeed,
   onStart?: () => void,
-  onEnd?: () => void,
-  voiceName: AudioVoiceId = globalAudioVoice
+  onEnd?: () => void
 ) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     if (onEnd) onEnd();
@@ -384,9 +285,6 @@ export function speakWithWebSpeech(
     // Allow down to 0.45 for ultra-slow beginner mode
     utterance.rate = isUltraSlow ? 0.45 : Math.max(0.55, Math.min(1.2, speed));
 
-    const isMale = voiceName === 'Puck' || voiceName === 'Fenrir';
-    utterance.pitch = isMale ? (voiceName === 'Fenrir' ? 0.8 : 0.92) : (voiceName === 'Zephyr' ? 1.0 : 1.08);
-
     if (onStart) utterance.onstart = () => onStart();
     if (onEnd) {
       utterance.onend = () => onEnd();
@@ -394,50 +292,22 @@ export function speakWithWebSpeech(
     }
 
     const voices = window.speechSynthesis.getVoices();
-    const enVoices = voices.filter((v) => v.lang.startsWith('en'));
-
-    let chosenVoice: SpeechSynthesisVoice | undefined;
-    if (isMale) {
-      chosenVoice = enVoices.find((v) => {
-        const name = v.name.toLowerCase();
-        return (
-          name.includes('male') ||
-          name.includes('daniel') ||
-          name.includes('david') ||
-          name.includes('guy') ||
-          name.includes('alex') ||
-          name.includes('fred') ||
-          name.includes('george')
-        );
-      });
-    } else {
-      chosenVoice = enVoices.find((v) => {
-        const name = v.name.toLowerCase();
-        return (
-          name.includes('female') ||
-          name.includes('samantha') ||
-          name.includes('ava') ||
-          name.includes('victoria') ||
-          name.includes('zira') ||
-          name.includes('karen') ||
-          name.includes('susan')
-        );
-      });
-    }
-
-    if (!chosenVoice) {
-      chosenVoice =
-        enVoices.find(
-          (v) =>
-            v.name.includes('Natural') ||
+    const enVoice =
+      voices.find(
+        (v) =>
+          v.lang.startsWith('en') &&
+          (v.name.includes('Natural') ||
             v.name.includes('Google') ||
             v.name.includes('Samantha') ||
-            v.name.includes('Ava')
-        ) || enVoices[0];
-    }
+            v.name.includes('Ava') ||
+            v.name.includes('Daniel') ||
+            v.name.includes('Zira'))
+      ) ||
+      voices.find((v) => v.lang.startsWith('en-US')) ||
+      voices.find((v) => v.lang.startsWith('en'));
 
-    if (chosenVoice) {
-      utterance.voice = chosenVoice;
+    if (enVoice) {
+      utterance.voice = enVoice;
     }
 
     // Workaround for mobile Chromium/iOS speech freeze
@@ -685,8 +555,7 @@ function speakWithWebSpeechLatinMale(
 }
 
 export interface PlayVoiceOptions {
-  voiceName?: AudioVoiceId;
-  forceVoice?: boolean;
+  voiceName?: 'Kore' | 'Puck' | 'Zephyr';
   speed?: number;
   useDeviceSpeech?: boolean;
   onStart?: () => void;
@@ -700,21 +569,15 @@ export interface PlayVoiceOptions {
  */
 export async function playEnglishVoice(
   text: string,
-  voiceName?: AudioVoiceId,
+  voiceName: 'Kore' | 'Puck' | 'Zephyr' = 'Kore',
   overrideSpeed?: number,
   options?: PlayVoiceOptions
 ): Promise<void> {
-  // If voice is forced explicitly (e.g. previewing in voice selector modal), use that voice.
-  // Otherwise, respect globalAudioVoice so the user's preference applies everywhere!
-  const effectiveVoice: AudioVoiceId = options?.forceVoice
-    ? (options.voiceName || voiceName || globalAudioVoice)
-    : (options?.voiceName || (voiceName && voiceName !== 'Kore' ? voiceName : globalAudioVoice));
-
   const effectiveSpeed = overrideSpeed !== undefined ? overrideSpeed : globalAudioSpeed;
   const roundedSpeed = Math.round(effectiveSpeed * 100) / 100;
   const isUltraSlow = roundedSpeed <= 0.55;
   const clean = isUltraSlow ? formatSpacedSpeechText(text) : cleanSpeechText(text);
-  const cacheKey = `${effectiveVoice}_${roundedSpeed}_${clean.toLowerCase()}`;
+  const cacheKey = `${voiceName}_${roundedSpeed}_${clean.toLowerCase()}`;
 
   unlockMobileAudio();
   recordAudioListenEvent();
@@ -727,7 +590,7 @@ export async function playEnglishVoice(
 
   // 1. If explicit device speech is selected, play immediately with zero network latency
   if (options?.useDeviceSpeech) {
-    speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd, effectiveVoice);
+    speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
     return;
   }
 
@@ -753,7 +616,7 @@ export async function playEnglishVoice(
 
   // 3. Direct Audio Stream via singleton DOM-attached element
   try {
-    const streamUrl = getAudioStreamUrl(clean, effectiveSpeed, effectiveVoice);
+    const streamUrl = getAudioStreamUrl(clean, effectiveSpeed, voiceName);
     const audio = getSharedAudio();
     audio.playbackRate = effectiveSpeed;
     currentAudio = audio;
@@ -770,7 +633,7 @@ export async function playEnglishVoice(
 
     audio.onerror = () => {
       if (!hasStarted) {
-        speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd, effectiveVoice);
+        speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
       } else if (onEnd) {
         onEnd();
       }
@@ -793,7 +656,7 @@ export async function playEnglishVoice(
   }
 
   // 4. Instant Fallback: Browser Web Speech API
-  speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd, effectiveVoice);
+  speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
 }
 
 export function stopAllAudio() {
