@@ -1,14 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, LayoutGrid, ScrollText, Headphones, HelpCircle, X, Check, Info, Sparkles, User } from 'lucide-react';
-import {
-  SPEED_LEVELS,
-  VOICE_OPTIONS,
-  AudioVoiceId,
-  getGlobalAudioVoice,
-  setGlobalAudioVoice,
-  subscribeVoiceChange,
-  playEnglishVoice,
-} from '../services/audio';
+import { Volume2, LayoutGrid, ScrollText, Headphones, HelpCircle, X, Check, Info } from 'lucide-react';
+import { SPEED_LEVELS } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
 
 interface HeaderProps {
@@ -36,34 +28,19 @@ export const Header: React.FC<HeaderProps> = ({
   const [showSpeedHelp, setShowSpeedHelp] = useState(false);
   const speedHelpRef = useRef<HTMLDivElement>(null);
 
-  // Dynamic user-selected voice state (Emma, Leo, David, Sarah)
-  const [currentVoice, setCurrentVoice] = useState<AudioVoiceId>(getGlobalAudioVoice);
-  const [showVoicePicker, setShowVoicePicker] = useState(false);
-  const [previewingVoiceId, setPreviewingVoiceId] = useState<AudioVoiceId | null>(null);
-  const voicePickerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const unsub = subscribeVoiceChange((v) => setCurrentVoice(v));
-    return () => unsub();
-  }, []);
-
   // Close speed help popover if clicked outside or Esc key pressed
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (speedHelpRef.current && !speedHelpRef.current.contains(event.target as Node)) {
         setShowSpeedHelp(false);
       }
-      if (voicePickerRef.current && !voicePickerRef.current.contains(event.target as Node)) {
-        setShowVoicePicker(false);
-      }
     }
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setShowSpeedHelp(false);
-        setShowVoicePicker(false);
       }
     }
-    if (showSpeedHelp || showVoicePicker) {
+    if (showSpeedHelp) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
     }
@@ -71,23 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showSpeedHelp, showVoicePicker]);
-
-  const activeVoiceObj =
-    VOICE_OPTIONS.find((v) => v.id === currentVoice) || VOICE_OPTIONS[0];
-
-  const handlePreviewVoice = async (v: typeof VOICE_OPTIONS[0], e: React.MouseEvent) => {
-    e.stopPropagation();
-    setPreviewingVoiceId(v.id);
-    try {
-      await playEnglishVoice(v.samplePhrase, v.id, 0.8, {
-        forceVoice: true,
-        onEnd: () => setPreviewingVoiceId(null),
-      });
-    } catch {
-      setPreviewingVoiceId(null);
-    }
-  };
+  }, [showSpeedHelp]);
 
   return (
     <header className="sticky top-0 z-40 bg-[#0C0A1D]/85 backdrop-blur-md border-b border-[#281F54]/80 shadow-md">
@@ -235,128 +196,6 @@ export const Header: React.FC<HeaderProps> = ({
             <RealVisitsBadge compact={true} />
           </div>
 
-
-          {/* Voice Selector (Feminine or Masculine choices) */}
-          <div className="relative" ref={voicePickerRef}>
-            <div className="flex items-center bg-slate-900/95 border border-sky-400/40 px-2 py-1 rounded-xl shadow-xs">
-              <button
-                type="button"
-                onClick={() => setShowVoicePicker((prev) => !prev)}
-                className="text-[11px] font-bold text-sky-300 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
-                title="Elegir voz femenina o masculina para todos los audios"
-                aria-label="Elegir voz de pronunciación"
-              >
-                <span className="text-sm leading-none">{activeVoiceObj.avatar}</span>
-                <span className="hidden sm:inline text-slate-300 font-semibold">Voz:</span>
-                <span className="text-white font-extrabold">{activeVoiceObj.name.split(' ')[0]}</span>
-                <span
-                  className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase hidden md:inline ${
-                    activeVoiceObj.gender === 'Femenina'
-                      ? 'bg-pink-400/20 text-pink-300'
-                      : 'bg-blue-400/20 text-blue-300'
-                  }`}
-                >
-                  {activeVoiceObj.genderLabel.slice(0, 4)}
-                </span>
-                <span className="text-[10px] text-sky-400">▾</span>
-              </button>
-            </div>
-
-            {/* Voice Selection Dropdown Popover */}
-            {showVoicePicker && (
-              <div className="absolute right-0 top-full mt-2 w-80 sm:w-92 bg-[#110D2C] border-2 border-sky-400/70 rounded-2xl p-4 shadow-2xl z-50 animate-fade-in text-left">
-                {/* Popover Header */}
-                <div className="flex items-center justify-between pb-2 border-b border-[#2C215C] mb-2.5">
-                  <div className="flex items-center gap-1.5 text-xs font-black text-white">
-                    <Headphones className="w-4 h-4 text-sky-400" />
-                    <span>Elegí tu voz preferida</span>
-                  </div>
-                  <button
-                    onClick={() => setShowVoicePicker(false)}
-                    className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-                    aria-label="Cerrar selector de voz"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                <p className="text-[11px] text-slate-300 mb-3 leading-relaxed">
-                  Podés elegir una <strong>voz femenina o masculina</strong>, la que te resulte más clara y cómoda para memorizar y repetir:
-                </p>
-
-                {/* Voice Choices List */}
-                <div className="space-y-2 text-xs">
-                  {VOICE_OPTIONS.map((v) => {
-                    const isSelected = currentVoice === v.id;
-                    const isPreviewing = previewingVoiceId === v.id;
-                    return (
-                      <div
-                        key={v.id}
-                        onClick={() => {
-                          setGlobalAudioVoice(v.id);
-                          setCurrentVoice(v.id);
-                        }}
-                        className={`w-full p-2.5 rounded-xl border transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-sky-500/20 border-sky-400 text-white shadow-sm ring-1 ring-sky-400'
-                            : 'bg-black/40 border-[#261E52] text-slate-300 hover:bg-white/5'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xl shrink-0">{v.avatar}</span>
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-extrabold text-white text-xs">{v.name}</span>
-                                <span
-                                  className={`text-[9px] px-1.5 py-0.2 rounded font-black uppercase ${
-                                    v.gender === 'Femenina'
-                                      ? 'bg-pink-400/25 text-pink-300 border border-pink-400/30'
-                                      : 'bg-blue-400/25 text-blue-300 border border-blue-400/30'
-                                  }`}
-                                >
-                                  {v.genderLabel}
-                                </span>
-                              </div>
-                              <span className="text-[10px] text-sky-300 block font-medium mt-0.5">{v.tone}</span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            {/* Sample Preview Play Button */}
-                            <button
-                              type="button"
-                              onClick={(e) => handlePreviewVoice(v, e)}
-                              className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
-                              title="Escuchar cómo suena esta voz"
-                            >
-                              <Volume2 className={`w-3 h-3 ${isPreviewing ? 'text-amber-400 animate-pulse' : 'text-sky-300'}`} />
-                              <span>{isPreviewing ? 'Sonando...' : 'Probar'}</span>
-                            </button>
-
-                            {/* Status Badge */}
-                            {isSelected ? (
-                              <span className="text-[10px] bg-sky-400 text-slate-950 px-2 py-0.5 rounded-md font-black">
-                                ACTIVA
-                              </span>
-                            ) : (
-                              <span className="text-[10px] text-slate-400 hover:text-white px-1 font-semibold">
-                                Elegir
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <p className="text-[11px] text-slate-400 mt-1.5 leading-snug">
-                          {v.description}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Beginner-friendly Speed Selector with Clear Explanation Popover */}
           <div className="relative" ref={speedHelpRef}>
