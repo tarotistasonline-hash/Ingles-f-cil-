@@ -54,7 +54,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
     try {
       const data = await askTeacher(q);
       setResponse(data);
-      setNotification('✨ ¡El profe Leo ha respondido a tu consulta con audio masculino claro y fonética!');
+      setNotification('✨ ¡La profe ha respondido a tu consulta con audio y fonética!');
       
       // Auto-scroll gently to the response card so the user sees it immediately
       setTimeout(() => {
@@ -71,7 +71,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
   const handlePlayVoice = async (text: string, key: string, speedOverride?: number) => {
     setPlayingAudioKey(key);
     try {
-      await playEnglishVoice(text, 'Puck', speedOverride || currentSpeed);
+      await playEnglishVoice(text, 'Kore', speedOverride || currentSpeed);
     } finally {
       setPlayingAudioKey(null);
     }
@@ -82,22 +82,17 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header */}
         <div className="max-w-3xl space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-400">
-              <span>👨‍🏫 Tu Mentor Bilingüe</span>
-              <span aria-hidden="true">·</span>
-              <span>Cero Vergüenza · Cero Jerga</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
-              <span>🎙️ Voz: Hombre Latino Neutro</span>
-            </div>
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-400">
+            <span>👩‍🏫 Tu Mentora Bilingüe</span>
+            <span aria-hidden="true">·</span>
+            <span>Cero Vergüenza · Cero Jerga</span>
           </div>
           <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <span>Pregúntale al profe Leo: "¿Cómo se dice esto de verdad?"</span>
+            <span>Pregúntale a la profe: "¿Cómo se dice esto de verdad?"</span>
           </h2>
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
             Pregúntale cualquier duda que siempre te dio pena hacer en clase o cualquier expresión que no sepas cómo decir naturalmente.
-            El profe Leo te responderá con bloques de la vida real, ritmo pausado y ejemplos claros con voz masculina comprensible.
+            La profe te responderá con bloques de la vida real, ritmo pausado y ejemplos claros con audio.
           </p>
         </div>
 
@@ -110,7 +105,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
-                placeholder="Pregunta al profe Leo: ej. '¿Cómo cancelo una cita sin sonar grosero?'"
+                placeholder="Pregunta a la profe: ej. '¿Cómo cancelo una cita sin sonar grosero?'"
                 className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 transition-all"
               />
               <button
@@ -119,7 +114,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                 className="px-6 py-3 rounded-xl bg-amber-400 text-slate-950 font-bold text-sm hover:bg-amber-300 disabled:opacity-40 transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap shadow-md hover:scale-102"
               >
                 <Sparkles className="w-4 h-4 text-slate-950" />
-                <span>{isLoading ? 'Consultando...' : 'Preguntar al profe Leo'}</span>
+                <span>{isLoading ? 'Consultando...' : 'Preguntar a la profe'}</span>
               </button>
             </div>
 

@@ -214,7 +214,7 @@ export const QuickDailyTip: React.FC<QuickDailyTipProps> = ({
     setIsPlayingAudio(true);
     setHasInteracted(true);
     try {
-      await playEnglishVoice(tip.englishPhrase, 'Puck');
+      await playEnglishVoice(tip.englishPhrase, 'Kore');
     } catch (e) {
       console.warn('Audio tip playback:', e);
     } finally {

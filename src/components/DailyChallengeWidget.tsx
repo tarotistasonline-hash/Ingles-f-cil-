@@ -239,7 +239,7 @@ export const DailyChallengeWidget: React.FC<DailyChallengeWidgetProps> = ({
     setIsPlaying(true);
     setPlayingSpeed(speed);
     try {
-      await playEnglishVoice(text, 'Puck', speed, {
+      await playEnglishVoice(text, 'Kore', speed, {
         useDeviceSpeech: forceDevice,
         onStart: () => setIsPlaying(true),
         onEnd: () => {

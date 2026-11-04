@@ -168,7 +168,7 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
   const handlePlayVoice = async (text: string, id: string, speedOverride?: number) => {
     setVoicePlayingId(id);
     try {
-      await playEnglishVoice(text, 'Puck', speedOverride || currentSpeed);
+      await playEnglishVoice(text, 'Kore', speedOverride || currentSpeed);
     } finally {
       setVoicePlayingId(null);
     }
@@ -793,12 +793,12 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
                               onClick={() =>
                                 playEnglishVoice(
                                   confidenceReport.topNativeTweak.nativeUpgrade,
-                                  'Puck',
+                                  'Kore',
                                   currentSpeed
                                 )
                               }
                               className="text-amber-400 hover:text-amber-300 cursor-pointer"
-                              title="Escuchar audio con voz masculina clara"
+                              title="Escuchar audio"
                             >
                               <Volume2 className="w-3.5 h-3.5" />
                             </button>

@@ -405,7 +405,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
     setIsPlayingSlowVoice(true);
     setSlowVoiceSpeed(speed);
 
-    playEnglishVoice(currentSong.lyricsEnglish, 'Puck', speed, {
+    playEnglishVoice(currentSong.lyricsEnglish, 'Kore', speed, {
       onStart: () => setIsPlayingSlowVoice(true),
       onEnd: () => {
         setIsPlayingSlowVoice(false);
@@ -420,7 +420,7 @@ export const MusicEarLab: React.FC<MusicEarLabProps> = ({
 
   const handlePlayChunkAudio = (chunkText: string) => {
     unlockMobileAudio();
-    playEnglishVoice(chunkText, 'Puck', 0.85);
+    playEnglishVoice(chunkText, 'Kore', 0.85);
   };
 
   const handleSelectQuizOption = (index: number) => {

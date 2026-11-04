@@ -433,25 +433,25 @@ function prepareSpeechTextAndStyle(rawText: string, speed: number) {
   const cleanText = formatted.slice(0, 350);
 
   const speechStyle = isUltraSlow
-    ? 'Ultra slow, crystal-clear, isolated word-by-word pronunciation for an absolute beginner with zero prior English knowledge. Speak with a clear, warm, neutral male voice. Every single word separately with a distinct pause between words. Enunciate every phoneme perfectly and distinctly.'
+    ? 'Ultra slow, crystal-clear, isolated word-by-word pronunciation for an absolute beginner with zero prior English knowledge. Speak every single word separately with a clear, deliberate pause between words. Enunciate every phoneme perfectly and distinctly without blending, linking, or connected speech.'
     : isSlow
-    ? 'Very slow, patient, crystal-clear neutral male speaker enunciation for language students'
+    ? 'Very slow, patient, crystal-clear American English speaker enunciation for language beginners'
     : speed < 0.9
-    ? 'Calm, clearly articulated, friendly neutral male speaker at a comfortable teaching pace'
-    : 'Natural, friendly, casual clear neutral male voice';
+    ? 'Calm, clearly articulated, friendly native American English speaker at a comfortable pace'
+    : 'Natural, friendly, casual native American English speaker';
 
   return { cleanText, speechStyle };
 }
 
 // 1. Voice TTS Endpoint
 app.post('/api/generate-tts', async (req, res) => {
-  const { text, voice = 'Puck', speed = 0.8 } = req.body;
+  const { text, voice = 'Kore', speed = 0.8 } = req.body;
   if (!text || typeof text !== 'string') {
     return res.status(400).json({ error: 'Text is required' });
   }
 
-  const validVoices = ['Puck', 'Fenrir', 'Charon', 'Kore', 'Zephyr'];
-  const selectedVoice = validVoices.includes(voice) ? voice : 'Puck';
+  const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
+  const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
   const roundedSpeed = Math.round((Number(speed) || 0.8) * 100) / 100;
   const { cleanText, speechStyle } = prepareSpeechTextAndStyle(text, roundedSpeed);
   const cacheKey = `${selectedVoice}_${roundedSpeed}_${cleanText.toLowerCase()}`;
@@ -541,7 +541,7 @@ app.post('/api/generate-tts', async (req, res) => {
 // 1.5. Direct Audio Stream Endpoint (Native HTML5 <audio src="..."> compatible)
 app.get('/api/audio-stream', async (req, res) => {
   const text = String(req.query.text || '').trim();
-  const voice = String(req.query.voice || 'Puck');
+  const voice = String(req.query.voice || 'Kore');
   const speed = Math.round((Number(req.query.speed) || 0.8) * 100) / 100;
   const isDownload = req.query.download === 'true' || req.query.download === '1';
   const customFilename = String(req.query.filename || 'audio_frase').replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -550,8 +550,8 @@ app.get('/api/audio-stream', async (req, res) => {
     return res.status(400).send('Text parameter is required');
   }
 
-  const validVoices = ['Puck', 'Fenrir', 'Charon', 'Kore', 'Zephyr'];
-  const selectedVoice = validVoices.includes(voice) ? voice : 'Puck';
+  const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
+  const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
   const { cleanText, speechStyle } = prepareSpeechTextAndStyle(text, speed);
   const cacheKey = `${selectedVoice}_${speed}_${cleanText.toLowerCase()}`;
 
@@ -640,7 +640,7 @@ app.get('/api/audio-stream', async (req, res) => {
 // 1.6 Dedicated Mobile Direct Audio Download Endpoint (Always forces .wav download)
 app.get('/api/audio-download', async (req, res) => {
   const text = String(req.query.text || '').trim();
-  const voice = String(req.query.voice || 'Puck');
+  const voice = String(req.query.voice || 'Kore');
   const speed = Math.round((Number(req.query.speed) || 0.8) * 100) / 100;
   const rawName = String(req.query.filename || 'InglesFacil_Audio');
   const cleanFilename = rawName.replace(/[^a-zA-Z0-9_\-.]/g, '_').replace(/\.wav$/i, '');
@@ -649,8 +649,8 @@ app.get('/api/audio-download', async (req, res) => {
     return res.status(400).send('Text parameter is required');
   }
 
-  const validVoices = ['Puck', 'Fenrir', 'Charon', 'Kore', 'Zephyr'];
-  const selectedVoice = validVoices.includes(voice) ? voice : 'Puck';
+  const validVoices = ['Kore', 'Puck', 'Fenrir', 'Zephyr', 'Charon'];
+  const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
   const { cleanText, speechStyle } = prepareSpeechTextAndStyle(text, speed);
   const cacheKey = `${selectedVoice}_${speed}_${cleanText.toLowerCase()}`;
 
@@ -874,11 +874,11 @@ app.post('/api/coach-ask', async (req, res) => {
   }
 
   try {
-    const prompt = `Eres el "Profe Leo", un profesor y mentor bilingüe de inglés con acento latino neutro, dicción masculina clara, cercano, empático, paciente y motivador. Ayudas a hispanohablantes a hablar inglés con fluidez y naturalidad REAL.
+    const prompt = `Eres "La Profe", una profesora y mentora bilingüe de inglés muy cercana, empática, paciente y motivadora. Ayudas a hispanohablantes a hablar inglés con fluidez y naturalidad REAL.
 REGLA DE ORO INQUEBRANTABLE:
 - TIENES PROHIBIDO usar terminología gramatical abstracta (nada de tiempos verbales formales, participios, complementos directos, modales auxiliares, etc.).
-- Explica usando BLOQUES DE LENGUAJE (chunks), cómo sienten los nativos la frase en la vida real, ejemplos cotidianos, y trucos de pronunciación y ritmo con tu tono masculino claro y pausado.
-- Sé ultra cálido, motivador, pedagógico y directo al grano.
+- Explica usando BLOQUES DE LENGUAJE (chunks), cómo sienten los nativos la frase en la vida real, ejemplos cotidianos, y trucos de pronunciación y ritmo.
+- Sé ultra cálida, motivadora, pedagógica y directa al grano.
 
 Pregunta del alumno: "${query}"
 

@@ -173,7 +173,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
   const handlePlaySample = async (sample: AudioSample, speed: number = 0.8) => {
     setPlayingSampleId(sample.id);
     try {
-      await playEnglishVoice(sample.phrase, 'Puck', speed);
+      await playEnglishVoice(sample.phrase, 'Kore', speed);
     } catch (err) {
       console.warn('Playback error', err);
     } finally {

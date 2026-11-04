@@ -263,7 +263,7 @@ export async function askTeacher(query: string) {
   const cleanQ = (query || '').replace(/[¿?]/g, '').trim();
   return {
     answer:
-      `¡Hola! Me alegra que me preguntes sobre "${cleanQ || 'esta duda'}". En inglés real, la regla de oro del profe Leo es no traducir palabra por palabra. Los nativos usan bloques automáticos que se dicen con ritmo y confianza, como **'I was wondering if...'** o **'How does that sound?'**.`,
+      `¡Hola! Me alegra que me preguntes sobre "${cleanQ || 'esta duda'}". En inglés real, la regla de oro de la profe es no traducir palabra por palabra. Los nativos usan bloques automáticos que se dicen con ritmo y confianza, como **'I was wondering if...'** o **'How does that sound?'**.`,
     powerChunk: "I was wondering if...",
     naturalExamples: [
       { en: "I was wondering if that works for you.", es: "Me preguntaba si eso te queda bien / te sirve.", chunkNote: "Cálido y seguro" },

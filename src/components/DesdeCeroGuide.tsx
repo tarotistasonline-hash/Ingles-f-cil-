@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import { playEnglishVoice } from '../services/audio';
+import React, { useState, useEffect } from 'react';
+import {
+  playEnglishVoice,
+  VOICE_OPTIONS,
+  getGlobalAudioVoice,
+  setGlobalAudioVoice,
+  subscribeVoiceChange,
+  AudioVoiceId,
+} from '../services/audio';
 import {
   Sprout,
   Volume2,
@@ -12,6 +19,7 @@ import {
   Sparkles,
   ArrowRight,
   Turtle,
+  Headphones,
 } from 'lucide-react';
 import { KeyTakeawaysToggle } from './KeyTakeawaysToggle';
 import { triggerConfetti, triggerSuperConfetti } from '../utils/confetti';
@@ -38,6 +46,12 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [learnedIds, setLearnedIds] = useState<string[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [currentVoice, setCurrentVoice] = useState<AudioVoiceId>(getGlobalAudioVoice());
+
+  useEffect(() => {
+    const unsub = subscribeVoiceChange((v) => setCurrentVoice(v));
+    return unsub;
+  }, []);
 
   const basicPhrases: BasicPhrase[] = [
     {
@@ -117,7 +131,7 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
   const handlePlayAudio = async (text: string, id: string, speedModifier: number = 0.65) => {
     setPlayingId(id);
     try {
-      await playEnglishVoice(text, 'Puck', speedModifier);
+      await playEnglishVoice(text, 'Kore', speedModifier);
     } finally {
       setPlayingId(null);
     }
@@ -149,14 +163,9 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Header */}
         <div className="max-w-3xl space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
-              <Sprout className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Nivel 0 · Inglés Desde Cero (Sin Miedo ni Gramática)</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-xs font-bold">
-              <span>🎙️ Voz: Hombre Latino Neutro · Dicción Clara</span>
-            </div>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+            <Sprout className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Nivel 0 · Inglés Desde Cero (Sin Miedo ni Gramática)</span>
           </div>
 
           <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
@@ -228,6 +237,73 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
           </div>
         </div>
 
+        {/* Voice & Speed Preference Banner */}
+        <div className="bg-[#120E32] border border-sky-500/30 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sky-900/40 pb-3">
+            <div className="flex items-center gap-2">
+              <Headphones className="w-4 h-4 text-sky-400" />
+              <span className="text-sm font-extrabold text-white">
+                Elige la voz que te resulte más clara para repetir:
+              </span>
+            </div>
+            <span className="text-xs text-sky-300 font-medium">
+              Puedes elegir entre voces femeninas y masculinas
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {VOICE_OPTIONS.map((v) => {
+              const isSelected = currentVoice === v.id;
+              return (
+                <button
+                  key={v.id}
+                  onClick={async () => {
+                    setGlobalAudioVoice(v.id);
+                    setCurrentVoice(v.id);
+                    await playEnglishVoice(v.samplePhrase, v.id, 0.8, { forceVoice: true });
+                  }}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                    isSelected
+                      ? 'bg-sky-500/20 border-sky-400 text-white shadow-md ring-1 ring-sky-400'
+                      : 'bg-black/30 border-[#261E52] text-slate-300 hover:bg-white/5 hover:border-sky-500/40'
+                  }`}
+                  title={`Seleccionar voz de ${v.name}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg">{v.avatar}</span>
+                      <span className="font-extrabold text-xs text-white">{v.name}</span>
+                    </div>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.2 rounded font-black uppercase ${
+                        v.gender === 'Femenina'
+                          ? 'bg-pink-400/25 text-pink-300'
+                          : 'bg-blue-400/25 text-blue-300'
+                      }`}
+                    >
+                      {v.genderLabel}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-sky-200/90 leading-tight">{v.tone}</p>
+                  <div className="mt-1 flex items-center justify-between pt-1 border-t border-white/5">
+                    <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                      <Volume2 className="w-2.5 h-2.5 text-sky-400" />
+                      Probar voz
+                    </span>
+                    {isSelected ? (
+                      <span className="text-[9px] bg-sky-400 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase">
+                        ACTIVA
+                      </span>
+                    ) : (
+                      <span className="text-[9px] text-slate-400 font-semibold">Tocar para usar</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Interactive Filter Tabs */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
           <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-900 border border-slate-800 rounded-xl">
@@ -273,23 +349,11 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
                 }`}
               >
                 <div className="space-y-3">
-                  {/* Situation badge and live audio equalizer */}
+                  {/* Situation badge */}
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold text-emerald-400/90 uppercase tracking-wide">
-                        {item.situation}
-                      </span>
-                      {isPlaying && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/40 animate-pulse">
-                          <span className="flex items-end gap-0.5 h-3">
-                            <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '400ms' }} />
-                            <span className="w-1 h-3 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '600ms', animationDelay: '100ms' }} />
-                            <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '500ms', animationDelay: '200ms' }} />
-                          </span>
-                          <span>Voz Profe</span>
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-[11px] font-semibold text-emerald-400/90 uppercase tracking-wide">
+                      {item.situation}
+                    </span>
                     <button
                       onClick={() => toggleLearned(item.id)}
                       className={`text-xs px-2.5 py-1 rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer ${
