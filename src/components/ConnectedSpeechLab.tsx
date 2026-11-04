@@ -18,7 +18,7 @@ export const ConnectedSpeechLab: React.FC<ConnectedSpeechLabProps> = ({ currentS
   const handlePlayVoice = async (text: string, key: string, speed: number = 0.8) => {
     setPlayingAudioKey(key);
     try {
-      await playEnglishVoice(text, 'Kore', speed);
+      await playEnglishVoice(text, 'Puck', speed);
     } finally {
       setPlayingAudioKey(null);
     }
@@ -51,10 +51,15 @@ export const ConnectedSpeechLab: React.FC<ConnectedSpeechLabProps> = ({ currentS
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header */}
         <div className="max-w-3xl space-y-3">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-400">
-            <span>El Laboratorio del Oído Nativo</span>
-            <span aria-hidden="true">·</span>
-            <span>Connected Speech & Velocidad Lenta</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-400">
+              <span>El Laboratorio del Oído Nativo</span>
+              <span aria-hidden="true">·</span>
+              <span>Connected Speech & Velocidad Lenta</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
+              <span>🎙️ Voz: Hombre Latino Neutro</span>
+            </div>
           </div>
           <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white">
             Por qué no entiendes a los nativos (Y cómo solucionarlo hoy)

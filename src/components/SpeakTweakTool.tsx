@@ -83,7 +83,7 @@ export const SpeakTweakTool: React.FC<SpeakTweakToolProps> = ({ currentSpeed }) 
   const handlePlayAudio = async (text: string, key: string, speedOverride?: number) => {
     setPlayingAudioKey(key);
     try {
-      await playEnglishVoice(text, 'Kore', speedOverride || currentSpeed);
+      await playEnglishVoice(text, 'Puck', speedOverride || currentSpeed);
     } finally {
       setPlayingAudioKey(null);
     }

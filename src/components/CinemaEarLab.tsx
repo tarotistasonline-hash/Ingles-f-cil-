@@ -268,7 +268,7 @@ export const CinemaEarLab: React.FC<CinemaEarLabProps> = ({
     setIsPlayingAudio(true);
     setPlayingSpeed(speed);
     try {
-      await playEnglishVoice(currentScene.englishQuote, 'Kore', speed);
+      await playEnglishVoice(currentScene.englishQuote, 'Puck', speed);
     } catch {
       // Audio playback caught gracefully
     } finally {
@@ -281,7 +281,7 @@ export const CinemaEarLab: React.FC<CinemaEarLabProps> = ({
     if (isPlayingAudio) return;
     setIsPlayingAudio(true);
     try {
-      await playEnglishVoice(text, 'Kore', speed);
+      await playEnglishVoice(text, 'Puck', speed);
     } finally {
       setIsPlayingAudio(false);
     }

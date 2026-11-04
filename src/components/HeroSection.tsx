@@ -165,7 +165,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     setIsPlayingAudio(true);
     setPlayingSpeed(customSpeed);
     try {
-      await playEnglishVoice(text, 'Kore', customSpeed);
+      await playEnglishVoice(text, 'Puck', customSpeed);
     } catch {
       // Audio playback caught gracefully
     } finally {
@@ -195,9 +195,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     try {
       const data = await askTeacher(q);
       setProfeResponse(data);
-      setProfeNotification('✨ ¡La profe ha respondido a tu consulta con audio y fonética!');
+      setProfeNotification('✨ ¡El profe Leo ha respondido a tu consulta con voz masculina clara y fonética!');
     } catch {
-      setProfeNotification('No se pudo conectar con la profe. Intenta nuevamente.');
+      setProfeNotification('No se pudo conectar con el profe Leo. Intenta nuevamente.');
     } finally {
       setIsProfeLoading(false);
     }
@@ -229,8 +229,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(245,158,11,0.08),rgba(16,185,129,0.05),transparent)] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Tagline - Centered & Animated */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-5 reveal-on-scroll">
+        {/* Top Tagline with Real Visits Indicator - Centered & Animated */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-6 reveal-on-scroll">
           <div className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-300 bg-[#16113A]/90 border border-[#2F2468] px-4 py-1.5 rounded-full shadow-lg backdrop-blur-md card-hover-lift">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -242,11 +242,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <span aria-hidden="true" className="text-slate-600">·</span>
             <span className="text-violet-400 font-bold">⚡ Fluidez Real</span>
           </div>
-        </div>
-
-        {/* Restored Discriminative Real Visits Panel (Totales, Únicas y Diarias) */}
-        <div className="max-w-3xl mx-auto mb-8 reveal-on-scroll">
-          <RealVisitsBadge variant="panel" />
+          <RealVisitsBadge compact={true} />
         </div>
 
         {/* Main Centralized Hero Header with Typography Polish & Gradient Shimmer */}
@@ -360,10 +356,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <button
                 onClick={onAskTeacher}
                 className="group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 border border-purple-400/50 rounded-xl shadow-lg shadow-purple-900/30 transition-all cursor-pointer hover:scale-103 flex items-center gap-2"
-                title="Escribe tu duda y la profe te responde con audio y fonética"
+                title="Escribe tu duda y el profe Leo te responde con audio masculino claro y fonética"
               >
-                <span>👩‍🏫</span>
-                <span>Preguntarle a la profe</span>
+                <span>👨‍🏫</span>
+                <span>Preguntar al Profe Leo</span>
               </button>
             )}
             <button
@@ -728,7 +724,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     Todo lo que necesitas en un solo lugar
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300">
-                    Cambia de panel con un clic: consulta a la profe, desarma frases literales, haz tu reto diario o lee opiniones.
+                    Cambia de panel con un clic: consulta al profe Leo, desarma frases literales, haz tu reto diario o lee opiniones.
                   </p>
                 </div>
               </div>
@@ -743,12 +739,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                       : 'bg-[#0A071E]/80 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900'
                   }`}
                 >
-                  <span className="text-2xl shrink-0">👩‍🏫</span>
+                  <span className="text-2xl shrink-0">👨‍🏫</span>
                   <div className="min-w-0">
                     <p className={`text-xs font-bold truncate ${activePanelTab === 'profe' ? 'text-amber-300' : 'text-slate-200'}`}>
-                      Preguntarle a la Profe
+                      Preguntar al Profe Leo
                     </p>
-                    <p className="text-[10px] text-slate-400 truncate">Dudas sin vergüenza</p>
+                    <p className="text-[10px] text-slate-400 truncate">Voz masculina clara</p>
                   </div>
                 </button>
 
@@ -807,14 +803,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
             {/* TAB CONTENTS */}
             <div className="pt-6 relative z-10">
-              {/* PANEL 1: PREGUNTARLE A LA PROFE */}
+              {/* PANEL 1: PREGUNTARLE AL PROFE LEO */}
               {activePanelTab === 'profe' && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <span>👩‍🏫 Consulta directa con La Profe:</span>
-                        <span className="text-[10px] text-emerald-400 font-semibold">(Responde con audio y fonética)</span>
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 flex-wrap">
+                        <span>👨‍🏫 Consulta directa con el Profe Leo:</span>
+                        <span className="text-[10px] text-emerald-400 font-semibold">(Voz Masculina Clara + Fonética)</span>
                       </label>
                       {onAskTeacher && (
                         <button
@@ -841,7 +837,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                         className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold text-sm disabled:opacity-40 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md whitespace-nowrap hover:scale-102"
                       >
                         <Sparkles className="w-4 h-4 text-slate-950" />
-                        <span>{isProfeLoading ? 'Consultando...' : 'Preguntar a la Profe'}</span>
+                        <span>{isProfeLoading ? 'Consultando...' : 'Preguntar al Profe Leo'}</span>
                       </button>
                     </div>
 

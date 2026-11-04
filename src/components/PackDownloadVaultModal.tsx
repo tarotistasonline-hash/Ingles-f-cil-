@@ -134,7 +134,7 @@ export const PackDownloadVaultModal: React.FC<PackDownloadVaultModalProps> = ({
     setPlayingPhraseId(item.id);
 
     try {
-      await playEnglishVoice(item.entrecasaNative, 'Kore', selectedSpeed, {
+      await playEnglishVoice(item.entrecasaNative, 'Puck', selectedSpeed, {
         useDeviceSpeech: forceSpeech || useDeviceSpeech,
         onStart: () => {
           setAudioLoadingId(null);

@@ -100,7 +100,7 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
   const handlePlaySample = async (speed: number = 0.8) => {
     setIsPlayingAudio(true);
     try {
-      await playEnglishVoice(currentSample.phrase, 'Kore', speed);
+      await playEnglishVoice(currentSample.phrase, 'Puck', speed);
     } catch (err) {
       console.warn('Playback error', err);
     } finally {

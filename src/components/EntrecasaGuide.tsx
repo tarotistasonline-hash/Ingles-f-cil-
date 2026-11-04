@@ -57,7 +57,7 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
 
   const handlePlay = async (phrase: EntrecasaPhrase, speedModifier?: number) => {
     setPlayingId(phrase.id);
-    await playEnglishVoice(phrase.audioText, 'Kore', speedModifier || currentSpeed);
+    await playEnglishVoice(phrase.audioText, 'Puck', speedModifier || currentSpeed);
     setPlayingId(null);
   };
 
@@ -88,9 +88,14 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-semibold mb-3">
-            <Coffee className="w-3.5 h-3.5 text-amber-400" />
-            <span>Inglés Fácil y Fluido · Una Forma Sencilla de Aprender</span>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-semibold">
+              <Coffee className="w-3.5 h-3.5 text-amber-400" />
+              <span>Inglés Fácil y Fluido · Una Forma Sencilla de Aprender</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
+              <span>🎙️ Voz: Hombre Latino Neutro · Dicción Clara</span>
+            </div>
           </div>
           <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
             El inglés que se habla en zapatillas y con una taza en la mano
@@ -282,17 +287,33 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
                       </span>
                       {levelBadge}
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePlay(phrase);
-                      }}
-                      disabled={isPlayingThis}
-                      className="p-1.5 rounded-lg bg-amber-400/10 hover:bg-amber-400 text-amber-300 hover:text-slate-950 transition-colors cursor-pointer"
-                      title="Escuchar audio"
-                    >
-                      <Volume2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {isPlayingThis && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/40 animate-pulse">
+                          <span className="flex items-end gap-0.5 h-3">
+                            <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '400ms' }} />
+                            <span className="w-1 h-3.5 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '600ms', animationDelay: '100ms' }} />
+                            <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '500ms', animationDelay: '200ms' }} />
+                          </span>
+                          <span className="hidden sm:inline">Voz Profe</span>
+                        </span>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlay(phrase);
+                        }}
+                        disabled={isPlayingThis}
+                        className={`p-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1 ${
+                          isPlayingThis
+                            ? 'bg-amber-400 text-slate-950 font-bold scale-105'
+                            : 'bg-amber-400/10 hover:bg-amber-400 text-amber-300 hover:text-slate-950'
+                        }`}
+                        title="Escuchar audio con voz masculina clara"
+                      >
+                        <Volume2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
                   <h4 className="text-sm font-semibold text-slate-100">

@@ -34,7 +34,7 @@ export const PowerChunksExplorer: React.FC<PowerChunksExplorerProps> = ({ curren
   const handlePlayVoice = async (text: string, key: string, speedOverride?: number) => {
     setPlayingExample(key);
     try {
-      await playEnglishVoice(text, 'Kore', speedOverride || currentSpeed);
+      await playEnglishVoice(text, 'Puck', speedOverride || currentSpeed);
     } finally {
       setPlayingExample(null);
     }
@@ -68,10 +68,15 @@ export const PowerChunksExplorer: React.FC<PowerChunksExplorerProps> = ({ curren
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-400">
-              <span>La Caja de Herramientas</span>
-              <span aria-hidden="true">·</span>
-              <span>Bloques Prefabricados</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase text-amber-400">
+                <span>La Caja de Herramientas</span>
+                <span aria-hidden="true">·</span>
+                <span>Bloques Prefabricados</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
+                <span>🎙️ Voz: Hombre Latino Neutro</span>
+              </div>
             </div>
             <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white">
               Bloques de Poder: Habla sin Conjugar
