@@ -174,13 +174,44 @@ export function formatSpacedSpeechText(text: string): string {
   return words.join(' , ');
 }
 
+export type VoiceName = 'Puck' | 'Fenrir' | 'Kore' | 'Zephyr';
+
+export const DEFAULT_MALE_VOICE: VoiceName = 'Puck';
+
+let globalVoice: VoiceName = 'Puck';
+
+export function getGlobalVoice(): VoiceName {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('vibe_global_voice') as VoiceName;
+      if (stored === 'Puck' || stored === 'Fenrir' || stored === 'Kore' || stored === 'Zephyr') {
+        globalVoice = stored;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return globalVoice;
+}
+
+export function setGlobalVoice(voice: VoiceName): void {
+  globalVoice = voice;
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('vibe_global_voice', voice);
+    } catch {
+      // ignore
+    }
+  }
+}
+
 /**
  * Returns a direct streaming audio URL for any phrase and speed
  */
 export function getAudioStreamUrl(
   text: string,
   speed?: number,
-  voice: 'Kore' | 'Puck' | 'Zephyr' = 'Kore',
+  voice: VoiceName = 'Puck',
   filename?: string
 ): string {
   const effectiveSpeed = speed !== undefined ? speed : globalAudioSpeed;
@@ -201,7 +232,7 @@ export function getAudioDownloadUrl(
   text: string,
   filename: string,
   speed?: number,
-  voice: 'Kore' | 'Puck' | 'Zephyr' = 'Kore'
+  voice: VoiceName = 'Puck'
 ): string {
   const effectiveSpeed = speed !== undefined ? speed : globalAudioSpeed;
   const roundedSpeed = Math.round(effectiveSpeed * 100) / 100;
@@ -292,22 +323,41 @@ export function speakWithWebSpeech(
     }
 
     const voices = window.speechSynthesis.getVoices();
-    const enVoice =
-      voices.find(
-        (v) =>
-          v.lang.startsWith('en') &&
-          (v.name.includes('Natural') ||
-            v.name.includes('Google') ||
-            v.name.includes('Samantha') ||
-            v.name.includes('Ava') ||
-            v.name.includes('Daniel') ||
-            v.name.includes('Zira'))
-      ) ||
-      voices.find((v) => v.lang.startsWith('en-US')) ||
-      voices.find((v) => v.lang.startsWith('en'));
 
-    if (enVoice) {
-      utterance.voice = enVoice;
+    // Strictly prioritize clear neutral male voices and exclude female voices
+    const isFemaleVoice = (name: string) => {
+      const lower = name.toLowerCase();
+      const femaleKeywords = [
+        'samantha', 'ava', 'zira', 'victoria', 'karen', 'susan', 'jenny', 'monica',
+        'paulina', 'helena', 'sabina', 'female', 'woman', 'chica', 'mujer', 'carmen',
+        'conchita', 'luciana', 'rosa', 'soledad', 'laura', 'sofia', 'marisol', 'mia',
+        'andrea', 'paloma', 'ximena', 'valentina', 'camila', 'eva', 'dalia', 'angie', 'lupe'
+      ];
+      return femaleKeywords.some((k) => lower.includes(k));
+    };
+
+    const isPreferredMaleVoice = (name: string) => {
+      const lower = name.toLowerCase();
+      const maleKeywords = [
+        'daniel', 'david', 'guy', 'george', 'alex', 'fred', 'oliver', 'arthur',
+        'male', 'hombre', 'diego', 'jorge', 'raul', 'carlos', 'miguel', 'gonzalo',
+        'mark', 'james', 'brian', 'andrew'
+      ];
+      return maleKeywords.some((m) => lower.includes(m));
+    };
+
+    // Priority 1: English male voice with known male name
+    // Priority 2: en-US voice not marked female
+    // Priority 3: any English voice not marked female
+    const maleVoice =
+      voices.find((v) => v.lang.startsWith('en') && isPreferredMaleVoice(v.name)) ||
+      voices.find((v) => v.lang.startsWith('en-US') && !isFemaleVoice(v.name)) ||
+      voices.find((v) => v.lang.startsWith('en') && !isFemaleVoice(v.name)) ||
+      voices.find((v) => isPreferredMaleVoice(v.name)) ||
+      voices.find((v) => !isFemaleVoice(v.name));
+
+    if (maleVoice) {
+      utterance.voice = maleVoice;
     }
 
     // Workaround for mobile Chromium/iOS speech freeze
@@ -555,7 +605,7 @@ function speakWithWebSpeechLatinMale(
 }
 
 export interface PlayVoiceOptions {
-  voiceName?: 'Kore' | 'Puck' | 'Zephyr';
+  voiceName?: VoiceName;
   speed?: number;
   useDeviceSpeech?: boolean;
   onStart?: () => void;
@@ -569,15 +619,16 @@ export interface PlayVoiceOptions {
  */
 export async function playEnglishVoice(
   text: string,
-  voiceName: 'Kore' | 'Puck' | 'Zephyr' = 'Kore',
+  voiceName: VoiceName = 'Puck',
   overrideSpeed?: number,
   options?: PlayVoiceOptions
 ): Promise<void> {
+  const activeVoice: VoiceName = options?.voiceName || (voiceName && voiceName !== 'Kore' ? voiceName : getGlobalVoice() || 'Puck');
   const effectiveSpeed = overrideSpeed !== undefined ? overrideSpeed : globalAudioSpeed;
   const roundedSpeed = Math.round(effectiveSpeed * 100) / 100;
   const isUltraSlow = roundedSpeed <= 0.55;
   const clean = isUltraSlow ? formatSpacedSpeechText(text) : cleanSpeechText(text);
-  const cacheKey = `${voiceName}_${roundedSpeed}_${clean.toLowerCase()}`;
+  const cacheKey = `${activeVoice}_${roundedSpeed}_${clean.toLowerCase()}`;
 
   unlockMobileAudio();
   recordAudioListenEvent();
@@ -616,7 +667,7 @@ export async function playEnglishVoice(
 
   // 3. Direct Audio Stream via singleton DOM-attached element
   try {
-    const streamUrl = getAudioStreamUrl(clean, effectiveSpeed, voiceName);
+    const streamUrl = getAudioStreamUrl(clean, effectiveSpeed, activeVoice);
     const audio = getSharedAudio();
     audio.playbackRate = effectiveSpeed;
     currentAudio = audio;

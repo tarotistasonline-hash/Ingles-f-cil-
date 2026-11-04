@@ -242,7 +242,7 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
       title: '📈 Dudas, Comunidad y Progreso',
       shortLabel: 'Dudas & Progreso',
       icon: '📈',
-      tagline: 'Consultas a la profe, opiniones reales y tus medallas',
+      tagline: 'Consultas al profe Leo, opiniones reales y tus medallas',
       badge: '3 Módulos',
       themeColor: 'text-purple-400',
       activeBorder: 'border-purple-400/80 shadow-purple-950/40',
@@ -250,17 +250,17 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
       items: [
         {
           id: 'coach',
-          title: 'Preguntarle a la Profe',
-          tagline: '👩‍🏫 Tu mentora bilingüe cercana y paciente',
+          title: 'Preguntarle al Profe Leo',
+          tagline: '👨‍🏫 Tu mentor bilingüe cercano y paciente',
           description:
-            '¿Tienes una duda de cómo se dice algo o te trabas con un sonido? Pregúntale a la profe en español y te responderá con calidez, bloques reales y audio.',
+            '¿Tienes una duda de cómo se dice algo o te trabas con un sonido? Pregúntale al profe Leo en español y te responderá con calidez, bloques reales y audio masculino claro.',
           levelBadge: 'Dudas & Asesoría',
           levelColor: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
-          icon: <span className="text-xl">👩‍🏫</span>,
+          icon: <span className="text-xl">👨‍🏫</span>,
           accentColor: 'text-amber-400',
           borderColor: 'border-amber-400/50 hover:border-amber-400',
           hoverBg: 'hover:bg-amber-950/20',
-          features: ['Respuestas con audio y fonética', 'Ejemplos cotidianos', 'Cero vergüenza'],
+          features: ['Respuestas con voz masculina clara y fonética', 'Ejemplos cotidianos', 'Cero vergüenza'],
         },
         {
           id: 'blog',

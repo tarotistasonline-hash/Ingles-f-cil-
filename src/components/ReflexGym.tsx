@@ -49,8 +49,8 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit })
   useEffect(() => {
     if (gameState === 'running') {
       setTimeLeft(challenge.timeLimitSec);
-      // Play challenge audio automatically at selected learner speed
-      playEnglishVoice(challenge.audioPrompt, 'Kore', currentSpeed);
+      // Play challenge audio automatically at selected learner speed with clear neutral male voice
+      playEnglishVoice(challenge.audioPrompt, 'Puck', currentSpeed);
 
       timerRef.current = setInterval(() => {
         setTimeLeft((prev) => {
@@ -287,23 +287,23 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit })
               <span className="italic font-medium text-amber-200">"{challenge.audioPrompt}"</span>
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => playEnglishVoice(challenge.audioPrompt, 'Kore', 0.5)}
+                  onClick={() => playEnglishVoice(challenge.audioPrompt, 'Puck', 0.5)}
                   className="text-[10px] text-amber-300 hover:text-white px-1.5 py-0.5 rounded bg-amber-400/15 border border-amber-400/40 font-bold cursor-pointer"
                   title="Ultra Lento (0.5x) con palabras separadas una a una"
                 >
                   0.5x
                 </button>
                 <button
-                  onClick={() => playEnglishVoice(challenge.audioPrompt, 'Kore', 0.65)}
+                  onClick={() => playEnglishVoice(challenge.audioPrompt, 'Puck', 0.65)}
                   className="text-[10px] text-slate-400 hover:text-white px-1 py-0.5 rounded bg-slate-900 border border-slate-700 cursor-pointer"
                   title="Escuchar lento (0.65x)"
                 >
                   0.65x
                 </button>
                 <button
-                  onClick={() => playEnglishVoice(challenge.audioPrompt, 'Kore', currentSpeed)}
+                  onClick={() => playEnglishVoice(challenge.audioPrompt, 'Puck', currentSpeed)}
                   className="text-slate-400 hover:text-amber-400 p-1 cursor-pointer"
-                  title="Volver a escuchar"
+                  title="Volver a escuchar (Voz masculina clara)"
                 >
                   <Volume2 className="w-4 h-4 text-amber-400" />
                 </button>
@@ -424,7 +424,7 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit })
                             onClick={() =>
                               playEnglishVoice(
                                 evalResult.nativeVersion || challenge.targetEnglish,
-                                'Kore',
+                                'Puck',
                                 0.5
                               )
                             }
@@ -437,7 +437,7 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit })
                             onClick={() =>
                               playEnglishVoice(
                                 evalResult.nativeVersion || challenge.targetEnglish,
-                                'Kore',
+                                'Puck',
                                 0.65
                               )
                             }
@@ -450,11 +450,12 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit })
                             onClick={() =>
                               playEnglishVoice(
                                 evalResult.nativeVersion || challenge.targetEnglish,
-                                'Kore',
+                                'Puck',
                                 currentSpeed
                               )
                             }
                             className="text-emerald-400 hover:text-emerald-300 p-1 cursor-pointer"
+                            title="Escuchar respuesta con voz masculina clara"
                           >
                             <Volume2 className="w-3.5 h-3.5" />
                           </button>

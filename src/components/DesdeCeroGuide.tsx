@@ -117,7 +117,7 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
   const handlePlayAudio = async (text: string, id: string, speedModifier: number = 0.65) => {
     setPlayingId(id);
     try {
-      await playEnglishVoice(text, 'Kore', speedModifier);
+      await playEnglishVoice(text, 'Puck', speedModifier);
     } finally {
       setPlayingId(null);
     }
@@ -149,9 +149,14 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Header */}
         <div className="max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
-            <Sprout className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Nivel 0 · Inglés Desde Cero (Sin Miedo ni Gramática)</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+              <Sprout className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Nivel 0 · Inglés Desde Cero (Sin Miedo ni Gramática)</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-xs font-bold">
+              <span>🎙️ Voz: Hombre Latino Neutro · Dicción Clara</span>
+            </div>
           </div>
 
           <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
@@ -268,11 +273,23 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
                 }`}
               >
                 <div className="space-y-3">
-                  {/* Situation badge */}
+                  {/* Situation badge and live audio equalizer */}
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-semibold text-emerald-400/90 uppercase tracking-wide">
-                      {item.situation}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-semibold text-emerald-400/90 uppercase tracking-wide">
+                        {item.situation}
+                      </span>
+                      {isPlaying && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/40 animate-pulse">
+                          <span className="flex items-end gap-0.5 h-3">
+                            <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '400ms' }} />
+                            <span className="w-1 h-3 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '600ms', animationDelay: '100ms' }} />
+                            <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDuration: '500ms', animationDelay: '200ms' }} />
+                          </span>
+                          <span>Voz Profe</span>
+                        </span>
+                      )}
+                    </div>
                     <button
                       onClick={() => toggleLearned(item.id)}
                       className={`text-xs px-2.5 py-1 rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer ${

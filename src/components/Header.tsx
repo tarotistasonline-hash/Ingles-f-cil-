@@ -132,10 +132,10 @@ export const Header: React.FC<HeaderProps> = ({
                 ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
                 : 'bg-purple-950/40 hover:bg-purple-900/60 border-purple-400/40 hover:border-amber-400 text-purple-200 hover:text-white'
             }`}
-            title="Pregúntale cualquier duda de inglés a la profe"
+            title="Pregúntale cualquier duda de inglés al profe Leo"
           >
-            <span>👩‍🏫</span>
-            <span>Preguntarle a la profe</span>
+            <span>👨‍🏫</span>
+            <span>Preguntar al Profe Leo</span>
           </button>
           <button
             onClick={() => setActiveTab('dashboard')}
@@ -196,6 +196,12 @@ export const Header: React.FC<HeaderProps> = ({
             <RealVisitsBadge compact={true} />
           </div>
 
+
+          {/* Active Voice Badge */}
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold" title="Voz de enseñanza activa: Masculina Latina Neutra y Clara">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>🎙️ Voz: Hombre Latino Neutro</span>
+          </div>
 
           {/* Beginner-friendly Speed Selector with Clear Explanation Popover */}
           <div className="relative" ref={speedHelpRef}>
@@ -380,6 +386,14 @@ export const Header: React.FC<HeaderProps> = ({
                       Velocidad espontánea real tal como hablan los nativos en la calle, el trabajo y películas.
                     </p>
                   </button>
+                </div>
+
+                {/* Voice clarity note */}
+                <div className="mt-2.5 p-2 rounded-xl bg-slate-950 border border-emerald-500/30 flex items-center gap-2 text-xs">
+                  <span className="text-emerald-400">🎙️</span>
+                  <span className="text-[11px] text-slate-300">
+                    <strong className="text-emerald-300">Voz activa:</strong> Hombre latino neutro con dicción clara y pausada (sin acento cerrado).
+                  </span>
                 </div>
 
                 {/* Footer advice */}
