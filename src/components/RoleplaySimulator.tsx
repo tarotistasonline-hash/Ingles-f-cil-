@@ -39,10 +39,10 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
   const [isListening, setIsListening] = useState(false);
   const [voicePlayingId, setVoicePlayingId] = useState<string | null>(null);
 
-  // Confidence Score state
   const [confidenceReport, setConfidenceReport] = useState<SessionConfidenceFeedback | null>(null);
   const [isEvaluatingConfidence, setIsEvaluatingConfidence] = useState(false);
   const [showConfidenceModal, setShowConfidenceModal] = useState(false);
+  const [micNotice, setMicNotice] = useState<string | null>(null);
 
   const recognitionRef = useRef<any>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -102,13 +102,14 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
       try {
         recognizer.start();
         setIsListening(true);
+        setMicNotice(null);
       } catch (e) {
         console.error('Failed to start speech recognition:', e);
         setIsListening(false);
       }
     } else {
-      alert(
-        'El reconocimiento de voz no está soportado en este navegador. Puedes escribir directamente en el campo de texto.'
+      setMicNotice(
+        'El reconocimiento de voz por micrófono no está disponible en este navegador. Podés escribir tu respuesta directamente en el campo de texto.'
       );
     }
   };
@@ -581,6 +582,20 @@ export const RoleplaySimulator: React.FC<RoleplaySimulatorProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Mic Notice (if speech recognition unavailable) */}
+            {micNotice && (
+              <div className="px-3 py-2 bg-amber-500/15 border-t border-amber-400/30 flex items-center justify-between text-xs text-amber-200">
+                <span className="flex-1">{micNotice}</span>
+                <button
+                  type="button"
+                  onClick={() => setMicNotice(null)}
+                  className="ml-2 text-amber-400 hover:text-white p-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
             {/* Input & Mic Bar */}
             <div className="p-3.5 border-t border-[#281F54] bg-[#0C0A1D] flex items-center gap-2">

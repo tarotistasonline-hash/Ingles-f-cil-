@@ -604,6 +604,87 @@ function speakWithWebSpeechLatinMale(
   }
 }
 
+/**
+ * Asynchronously speaks Spanish text with a male Latin American neutral voice.
+ * Never consumes API credits, runs locally with 0ms latency.
+ */
+export function speakLatinMaleAsync(text: string, speed: number = 0.95): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      resolve();
+      return;
+    }
+    speakWithWebSpeechLatinMale(text, speed, undefined, () => resolve());
+  });
+}
+
+/**
+ * Asynchronously speaks English text with clear male pronunciation.
+ */
+export function speakEnglishMaleAsync(text: string, speed: number = 0.8): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      resolve();
+      return;
+    }
+    speakWithWebSpeech(text, speed, undefined, () => resolve());
+  });
+}
+
+/**
+ * Dictates a complete phrase/lesson with the Professor Leo persona:
+ * Spoken in clear, warm Latin American neutral male voice with native English pronunciation.
+ * Free, offline-capable, and uses ZERO API credits.
+ */
+export async function dictatePhraseWithProfeLeo(
+  phrase: {
+    situation: string;
+    english: string;
+    phoneticSimple: string;
+    spanish: string;
+    goldenRule?: string;
+  },
+  speed: number = 0.8,
+  onStart?: () => void,
+  onEnd?: () => void
+): Promise<void> {
+  stopAllAudio();
+  unlockMobileAudio();
+  if (onStart) onStart();
+
+  const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  try {
+    // 1. Situation & meaning in Latin neutral Spanish
+    const intro = `Situación: ${phrase.situation}. En español: ${phrase.spanish}. En inglés de la vida real se dice:`;
+    await speakLatinMaleAsync(intro, 0.95);
+    await pause(350);
+
+    // 2. English phrase spoken clearly
+    await speakEnglishMaleAsync(phrase.english, speed);
+    await pause(450);
+
+    // 3. Phonetic explanation
+    const phoneticIntro = `Para pronunciarlo fácil, léelo como: ${phrase.phoneticSimple}. Repite conmigo:`;
+    await speakLatinMaleAsync(phoneticIntro, 0.95);
+    await pause(350);
+
+    // 4. Repeat English phrase cleanly
+    await speakEnglishMaleAsync(phrase.english, speed <= 0.65 ? speed : 0.7);
+    await pause(400);
+
+    // 5. Golden tip if present
+    if (phrase.goldenRule) {
+      const tip = `Consejo del profe Leo: ${phrase.goldenRule}`;
+      await speakLatinMaleAsync(tip, 0.95);
+    }
+  } catch (err) {
+    console.warn('Dictation interrupted', err);
+  } finally {
+    if (onEnd) onEnd();
+  }
+}
+
 export interface PlayVoiceOptions {
   voiceName?: VoiceName;
   speed?: number;
@@ -693,9 +774,9 @@ export async function playEnglishVoice(
     audio.src = streamUrl;
     const playPromise = audio.play();
 
-    // 8-second buffer to allow Gemini TTS synthesis on network without premature cutoff
+    // 2.5-second buffer to allow quick cloud stream before failing over to local device voice
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Audio stream buffering exceeded 8s')), 8000)
+      setTimeout(() => reject(new Error('Audio stream buffering exceeded 2.5s')), 2500)
     );
 
     if (playPromise !== undefined) {
@@ -703,7 +784,7 @@ export async function playEnglishVoice(
       return;
     }
   } catch (streamErr) {
-    console.warn('Audio stream delayed or blocked, activating native speech fallback', streamErr);
+    console.warn('Audio stream unavailable or delayed, activating crystal-clear male speech fallback', streamErr);
   }
 
   // 4. Instant Fallback: Browser Web Speech API
