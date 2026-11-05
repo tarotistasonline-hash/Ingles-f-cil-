@@ -869,12 +869,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   {isProfeLoading && (
                     <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-950/60 via-slate-950 to-indigo-950/60 border border-amber-400/50 flex items-center gap-4 animate-in fade-in shadow-lg">
                       <div className="w-11 h-11 rounded-2xl bg-amber-400 text-slate-950 font-black text-2xl flex items-center justify-center shrink-0 shadow-md animate-pulse">
-                        👨‍🏫
+                        👩‍🏫
                       </div>
                       <div className="space-y-1 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-amber-300">
-                            El Profe Leo está escribiendo tu respuesta
+                            La Profe está escribiendo tu respuesta
                           </span>
                           <span className="inline-flex gap-1 items-center">
                             <span className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
@@ -907,10 +907,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     <div className="bg-gradient-to-br from-[#1A1440]/90 to-slate-900/90 border-2 border-amber-400/50 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl animate-in fade-in">
                       <div className="flex items-center justify-between border-b border-[#2B205D] pb-3">
                         <div className="flex items-center gap-2.5">
-                          <span className="text-2xl">👨‍🏫</span>
+                          <span className="text-2xl">👩‍🏫</span>
                           <div>
                             <span className="text-xs font-bold text-white uppercase tracking-wider block">
-                              Respuesta del Profe Leo
+                              Respuesta de La Profe
                             </span>
                             <span className="text-[11px] text-emerald-400 font-medium">
                               Inglés real · Sin jerga gramatical

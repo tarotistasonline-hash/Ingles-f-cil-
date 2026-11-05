@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { playEnglishVoice, dictatePhraseWithProfeLeo, stopAllAudio } from '../services/audio';
+import React, { useState } from 'react';
+import { playEnglishVoice } from '../services/audio';
 import {
   Sprout,
   Volume2,
@@ -12,9 +12,6 @@ import {
   Sparkles,
   ArrowRight,
   Turtle,
-  Play,
-  Square,
-  Headphones,
 } from 'lucide-react';
 import { KeyTakeawaysToggle } from './KeyTakeawaysToggle';
 import { triggerConfetti, triggerSuperConfetti } from '../utils/confetti';
@@ -117,93 +114,13 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
     },
   ];
 
-  const [isDictatingClass, setIsDictatingClass] = useState(false);
-  const [dictatingPhraseId, setDictatingPhraseId] = useState<string | null>(null);
-  const isDictatingRef = useRef(false);
-
-  // Stop dictation when leaving module
-  useEffect(() => {
-    return () => {
-      isDictatingRef.current = false;
-      stopAllAudio();
-    };
-  }, []);
-
   const handlePlayAudio = async (text: string, id: string, speedModifier: number = 0.65) => {
-    if (isDictatingClass) {
-      handleStopClassDictation();
-    }
     setPlayingId(id);
     try {
       await playEnglishVoice(text, 'Puck', speedModifier);
     } finally {
       setPlayingId(null);
     }
-  };
-
-  const handleDictatePhrase = async (phrase: BasicPhrase) => {
-    if (isDictatingClass) {
-      handleStopClassDictation();
-    }
-    setDictatingPhraseId(phrase.id);
-    try {
-      await dictatePhraseWithProfeLeo(
-        {
-          situation: phrase.situation,
-          english: phrase.english,
-          phoneticSimple: phrase.phoneticSimple,
-          spanish: phrase.spanish,
-          goldenRule: phrase.goldenRule,
-        },
-        currentSpeed
-      );
-    } finally {
-      setDictatingPhraseId(null);
-    }
-  };
-
-  const handleStartClassDictation = async () => {
-    if (isDictatingClass) {
-      handleStopClassDictation();
-      return;
-    }
-
-    stopAllAudio();
-    setIsDictatingClass(true);
-    isDictatingRef.current = true;
-
-    // Dictate phrases sequentially
-    for (let i = 0; i < filtered.length; i++) {
-      if (!isDictatingRef.current) break;
-      const phrase = filtered[i];
-      setDictatingPhraseId(phrase.id);
-
-      await dictatePhraseWithProfeLeo(
-        {
-          situation: `Lección ${i + 1} de ${filtered.length}: ${phrase.situation}`,
-          english: phrase.english,
-          phoneticSimple: phrase.phoneticSimple,
-          spanish: phrase.spanish,
-          goldenRule: phrase.goldenRule,
-        },
-        currentSpeed
-      );
-
-      if (isDictatingRef.current) {
-        await new Promise((r) => setTimeout(r, 1200));
-      }
-    }
-
-    setIsDictatingClass(false);
-    setDictatingPhraseId(null);
-    isDictatingRef.current = false;
-  };
-
-  const handleStopClassDictation = () => {
-    isDictatingRef.current = false;
-    stopAllAudio();
-    setIsDictatingClass(false);
-    setDictatingPhraseId(null);
   };
 
   const toggleLearned = (id: string) => {
@@ -340,70 +257,17 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
           </div>
         </div>
 
-        {/* Guided Class Player Banner */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-[#18123A] to-emerald-500/15 border-2 border-amber-400/50 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center shrink-0 shadow-md">
-              <Headphones className="w-6 h-6 animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-black text-amber-300 uppercase tracking-wider">
-                  Clase Guiada · Dictada por el Profe Leo
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
-                  🎙️ Voz Masculina Latina Neutra
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                  100% Sin Consumo de Créditos
-                </span>
-              </div>
-              <p className="text-sm font-bold text-white mt-1">
-                {isDictatingClass
-                  ? `Dictando clase en vivo: ${filtered.find((p) => p.id === dictatingPhraseId)?.situation || 'Iniciando...'} (${filtered.findIndex((p) => p.id === dictatingPhraseId) + 1} de ${filtered.length})`
-                  : 'Escucha la clase completa dictada y explicada paso a paso'}
-              </p>
-              <p className="text-xs text-slate-300">
-                El profe Leo te explica la situación en español latino neutro, te guía con la fonética y pronuncia en inglés para que repitas con confianza.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
-            {isDictatingClass ? (
-              <button
-                onClick={handleStopClassDictation}
-                className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all"
-              >
-                <Square className="w-4 h-4 fill-current" />
-                <span>Detener Clase</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleStartClassDictation}
-                className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-amber-400/25 transition-all hover:scale-102"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Dictar Clase Completa ({filtered.length} frases)</span>
-              </button>
-            )}
-          </div>
-        </div>
-
         {/* Phrase Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map((item) => {
             const isLearned = learnedIds.includes(item.id);
             const isPlaying = playingId === item.id;
-            const isBeingDictated = dictatingPhraseId === item.id;
 
             return (
               <div
                 key={item.id}
                 className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col justify-between space-y-4 ${
-                  isBeingDictated
-                    ? 'bg-amber-950/30 border-amber-400 shadow-lg ring-2 ring-amber-400/50'
-                    : isLearned
+                  isLearned
                     ? 'bg-emerald-950/20 border-emerald-500/40 shadow-sm'
                     : 'bg-[#130F33]/80 border-[#261E58] hover:border-emerald-500/30'
                 }`}
@@ -462,25 +326,10 @@ export const DesdeCeroGuide: React.FC<DesdeCeroGuideProps> = ({
 
                     {/* Multi-Speed Audio Buttons */}
                     <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-                      {/* Profe Leo Dictation & Explanation button */}
-                      <button
-                        onClick={() => handleDictatePhrase(item)}
-                        disabled={isBeingDictated}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                          isBeingDictated
-                            ? 'bg-amber-400 text-slate-950 font-black shadow-md scale-105 ring-1 ring-amber-300'
-                            : 'bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-300'
-                        }`}
-                        title="Escuchar al Profe Leo dictar y explicar esta frase en voz masculina latina neutra"
-                      >
-                        <span>👨‍🏫</span>
-                        <span>{isBeingDictated ? 'Dictando...' : 'Explicar'}</span>
-                      </button>
-
                       {/* Ultra slow 0.5x button with separated words */}
                       <button
                         onClick={() => handlePlayAudio(item.english, item.id, 0.5)}
-                        disabled={isPlaying || isBeingDictated}
+                        disabled={isPlaying}
                         className="px-2.5 py-1.5 rounded-lg bg-amber-400/20 border border-amber-400/50 text-amber-300 text-xs font-bold hover:bg-amber-400/30 transition-colors flex items-center gap-1 cursor-pointer"
                         title="Ultra Lento (0.5x) con palabras separadas una a una para que puedas memorizar y repetir"
                       >

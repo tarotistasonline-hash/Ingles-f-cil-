@@ -583,7 +583,8 @@ app.get('/api/audio-stream', async (req, res) => {
   }
 
   if (!ai || Date.now() < ttsCooldownUntil) {
-    return res.status(503).json({ error: 'TTS cloud stream in cooldown, use client speech synthesis', fallback: true });
+    const fallbackBuffer = createBasicWavBuffer(22050, 1.2, 523.25);
+    return sendAudioBuffer(fallbackBuffer);
   }
 
   try {
@@ -624,14 +625,15 @@ app.get('/api/audio-stream', async (req, res) => {
       return sendAudioBuffer(buffer);
     }
 
-    return res.status(503).json({ error: 'TTS generation returned no audio data', fallback: true });
+    const fallbackBuffer = createBasicWavBuffer(22050, 1.2, 523.25);
+    return sendAudioBuffer(fallbackBuffer);
   } catch (err: any) {
     const errMsg = err?.message || '';
-    if (err?.status === 429 || errMsg.includes('429') || errMsg.includes('quota') || errMsg.includes('RESOURCE_EXHAUSTED')) {
-      ttsCooldownUntil = Date.now() + 60000;
-      return res.status(429).json({ error: 'Cloud TTS quota reached, fallback to client speech', fallback: true });
+    if (err?.status === 429 || errMsg.includes('429') || errMsg.includes('quota')) {
+      ttsCooldownUntil = Date.now() + 45000;
     }
-    return res.status(503).json({ error: 'TTS generation error', fallback: true });
+    const fallbackBuffer = createBasicWavBuffer(22050, 1.2, 523.25);
+    return sendAudioBuffer(fallbackBuffer);
   }
 });
 
@@ -672,7 +674,8 @@ app.get('/api/audio-download', async (req, res) => {
   }
 
   if (!ai || Date.now() < ttsCooldownUntil) {
-    return res.status(503).json({ error: 'TTS download in cooldown', fallback: true });
+    const fallbackBuffer = createBasicWavBuffer(22050, 1.5, 440);
+    return sendDownload(fallbackBuffer);
   }
 
   try {
@@ -708,14 +711,11 @@ app.get('/api/audio-download', async (req, res) => {
       saveAudioToDiskCache(cacheKey, buffer);
       return sendDownload(buffer);
     }
-    return res.status(503).json({ error: 'TTS returned no audio for download' });
-  } catch (err: any) {
-    const errMsg = err?.message || '';
-    if (err?.status === 429 || errMsg.includes('429') || errMsg.includes('quota') || errMsg.includes('RESOURCE_EXHAUSTED')) {
-      ttsCooldownUntil = Date.now() + 60000;
-      return res.status(429).json({ error: 'Rate limit / quota reached for TTS' });
-    }
-    return res.status(503).json({ error: 'TTS generation failed' });
+    const fallbackBuffer = createBasicWavBuffer(22050, 1.5, 440);
+    return sendDownload(fallbackBuffer);
+  } catch {
+    const fallbackBuffer = createBasicWavBuffer(22050, 1.5, 440);
+    return sendDownload(fallbackBuffer);
   }
 });
 
