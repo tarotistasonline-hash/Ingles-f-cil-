@@ -1,0 +1,10 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+[build.environment]
+  # firebase-applet-config.json holds the Firebase *web* config. Its apiKey is a
+  # public client identifier (it ships in the browser bundle by design and is
+  # protected by Firebase Security Rules / API key restrictions), so exclude this
+  # file from Netlify's smart secret detection.
+  SECRETS_SCAN_OMIT_PATHS = "firebase-applet-config.json"
