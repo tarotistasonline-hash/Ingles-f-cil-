@@ -101,8 +101,13 @@ export const ReflexGym: React.FC<ReflexGymProps> = ({ currentSpeed, onOpenKit })
 
     if (recognizer) {
       recognitionRef.current = recognizer;
-      recognizer.start();
-      setIsListening(true);
+      try {
+        recognizer.start();
+        setIsListening(true);
+      } catch (e) {
+        console.warn('Failed to start recognizer in ReflexGym:', e);
+        setIsListening(false);
+      }
     }
   };
 

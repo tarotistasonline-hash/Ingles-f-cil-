@@ -69,10 +69,10 @@ export const AudioKitFloatingTrigger: React.FC<AudioKitFloatingTriggerProps> = (
 
           <div className="mt-2.5 flex items-center justify-between pt-1 border-t border-white/10 text-[11px]">
             <span className="font-mono font-bold text-amber-400">
-              Pago único: $9 USD
+              Pago único: $9.990 ARS / $9 USD
             </span>
             <span className="font-semibold text-white group-hover:text-amber-300 flex items-center gap-1 transition-colors">
-              <span>Escuchar muestra</span>
+              <span>Ver Kit & Audios</span>
               <ArrowRight className="w-3 h-3 text-amber-400" />
             </span>
           </div>
@@ -98,7 +98,7 @@ export const AudioKitFloatingTrigger: React.FC<AudioKitFloatingTriggerProps> = (
               Audio-Kit de Bolsillo
             </span>
             <span className="text-[10px] text-amber-300 font-medium hidden sm:inline">
-              120 Audios MP3 · Offline ($9)
+              120 Audios MP3 · Offline ($9.990 ARS)
             </span>
           </div>
         </div>

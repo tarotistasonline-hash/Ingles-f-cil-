@@ -126,19 +126,8 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
   };
 
   const handleActionClick = () => {
-    const customUrl = localStorage.getItem('vibe_custom_checkout_url');
-    if (customUrl) {
-      window.open(customUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
-    try {
-      localStorage.setItem('vibe_kit_purchased', 'true');
-    } catch {
-      // ignore
-    }
-    // Simulate purchase & celebration
-    setShowDirectDownloadSuccess(true);
-    triggerConfetti({ particleCount: 80, spread: 85 });
+    const url = localStorage.getItem('vibe_custom_checkout_url') || OFFICIAL_MERCADO_PAGO_URL;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -379,6 +368,35 @@ export const AudioKitModal: React.FC<AudioKitModalProps> = ({
               <div className="flex items-start gap-1.5">
                 <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                 <span><strong>Acceso Vitalicio:</strong> Descarga inmediata, un único pago sin cuotas.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3 Exclusive Free Bonuses Today */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/40 via-[#1C1438] to-[#120B2E] border-2 border-amber-400/60 text-left space-y-2.5 shadow-lg">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Gift className="w-4 h-4 text-amber-400 shrink-0" />
+                <h4 className="text-xs sm:text-sm font-black text-amber-300">
+                  🎁 3 Bonos de Regalo Inmediato (100% Gratis con tu Compra)
+                </h4>
+              </div>
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-slate-950">
+                Valor Total: $25.000 ARS → ¡$0!
+              </span>
+            </div>
+            <div className="space-y-1.5 text-[11px] text-slate-300">
+              <div className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">1.</span>
+                <span><strong>Guía Maestra Imprimible en PDF:</strong> Toda la fonética masticada en español para consultar en tu celular o imprimir.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">2.</span>
+                <span><strong>Reproductor Web Offline de Bolsillo:</strong> Escucha con pantalla apagada en el auto o bus sin gastar batería ni datos.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-amber-400 font-bold">3.</span>
+                <span><strong>300 Frases de Rescate Inmediato:</strong> Expresiones cortas de 3 palabras para zafar de aduanas, compras y restaurantes.</span>
               </div>
             </div>
           </div>

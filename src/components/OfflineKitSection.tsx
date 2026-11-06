@@ -79,6 +79,91 @@ const AUDIO_SAMPLES: AudioSample[] = [
   },
 ];
 
+export interface LockedTrack {
+  id: string;
+  category: string;
+  icon: string;
+  situation: string;
+  englishSnippet: string;
+  phoneticHint: string;
+  realBenefit: string;
+}
+
+export const LOCKED_CATALOGUE_PREVIEWS: LockedTrack[] = [
+  {
+    id: 'airport-immigration',
+    category: '✈️ Aduanas & Migraciones',
+    icon: '🛂',
+    situation: 'Preguntas del oficial de aduanas sin entrar en pánico',
+    englishSnippet: "I'm here for vacation for ten days, staying downtown...",
+    phoneticHint: "aim jir for vei-kéi-shon ten déis...",
+    realBenefit: 'Responde con seguridad en 3 segundos sin que te lleven a revisión.',
+  },
+  {
+    id: 'hotel-checkin',
+    category: '🏨 Hotel & Airbnb',
+    icon: '🔑',
+    situation: 'Pedir entrar antes o dejar valijas sin pagar de más',
+    englishSnippet: "Is there any chance we could drop off our bags before check-in?",
+    phoneticHint: "is der é-ni chens wi kud drop of...",
+    realBenefit: 'Ahorra tiempo y no cargues valijas pesadas por la ciudad.',
+  },
+  {
+    id: 'uber-taxi',
+    category: '🚕 Uber, Taxi & Transporte',
+    icon: '🚖',
+    situation: 'Indicarle al chofer exactamente dónde bajarte',
+    englishSnippet: "Could you drop me off right past the traffic light, please?",
+    phoneticHint: "kud iu drop mi of rait past...",
+    realBenefit: 'Evita perderte o que el chofer dé vueltas innecesarias.',
+  },
+  {
+    id: 'supermarket-stores',
+    category: '🛒 Compras & Tiendas',
+    icon: '🛍️',
+    situation: 'Preguntar por un talle o producto sin señalar con el dedo',
+    englishSnippet: "Excuse me, do you happen to have this in a medium?",
+    phoneticHint: "du iu já-pen tu jav dis in a mí-dium?",
+    realBenefit: 'Consigue lo que buscas en 10 segundos con tono nativo.',
+  },
+  {
+    id: 'restaurant-complaint',
+    category: '🍽️ Comida & Reclamos Educados',
+    icon: '🍲',
+    situation: 'Corregir si te trajeron el plato equivocado con clase',
+    englishSnippet: "Excuse me, I think this might not be what I ordered...",
+    phoneticHint: "ai zink dis mait not bi wat ai ór-derd...",
+    realBenefit: 'Soluciona errores de comida sin sonar agresivo ni pasar vergüenza.',
+  },
+  {
+    id: 'work-calls',
+    category: '💼 Trabajo & Reuniones Remotas',
+    icon: '💻',
+    situation: 'Pedir que repitan sin decir "what?" ni quedar mal con el cliente',
+    englishSnippet: "You broke up for a second, could you repeat that last part?",
+    phoneticHint: "iu brouk ap for a sé-kond, kud iu...",
+    realBenefit: 'Suena 100% profesional en videollamadas de Zoom o Meet.',
+  },
+  {
+    id: 'pharmacy-health',
+    category: '🏥 Farmacia & Salud',
+    icon: '💊',
+    situation: 'Explicar síntomas simples para que te den el remedio correcto',
+    englishSnippet: "I have a sore throat and a slight headache, what do you recommend?",
+    phoneticHint: "ai jav a sor zróut end a slait jed-éik...",
+    realBenefit: 'Obtén la medicina exacta sin confusiones peligrosas.',
+  },
+  {
+    id: 'social-chat',
+    category: '👋 Conversación Casual & Vecinos',
+    icon: '🍻',
+    situation: 'Romper el hielo amablemente y despedirse con soltura',
+    englishSnippet: "I'm about to head out, but it was great catching up!",
+    phoneticHint: "aim a-báut tu jed áut, bat it was greit...",
+    realBenefit: 'Deja de sonar como un robot de instituto y habla relajado.',
+  },
+];
+
 export const OFFICIAL_MERCADO_PAGO_URL = 'https://mpago.li/1PhcDv4';
 
 const CURRENCIES = [
@@ -676,6 +761,90 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
             </div>
           ))}
         </div>
+
+        {/* Catálogo Exclusivo con Candado 🔒 */}
+        <div className="pt-6 border-t border-[#2C215A] space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2 text-xs font-black uppercase text-amber-400">
+                <Lock className="w-4 h-4 text-amber-400" />
+                <span>Catálogo Completo: 120 Pistas de Audio MP3 Offline</span>
+              </div>
+              <p className="text-xs text-slate-300">
+                3 audios de prueba en la web · <strong>117 audios adicionales bloqueados</strong> listos en el archivo de descarga.
+              </p>
+            </div>
+            <a
+              href={customCheckoutUrl || OFFICIAL_MERCADO_PAGO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs cursor-pointer shadow-md transition-all self-start sm:self-auto no-underline hover:scale-102"
+            >
+              <span>Desbloquear Todo el Pack ($9.990 ARS)</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {LOCKED_CATALOGUE_PREVIEWS.map((track) => (
+              <div
+                key={track.id}
+                className="relative p-3.5 rounded-xl bg-[#120E2E]/90 border border-amber-500/30 hover:border-amber-400/60 transition-all text-left flex flex-col justify-between group overflow-hidden"
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                      <span>{track.icon}</span>
+                      <span className="truncate">{track.category}</span>
+                    </span>
+                    <span className="p-1 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0" title="Audio bloqueado para descarga">
+                      <Lock className="w-3 h-3 text-amber-400" />
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-white leading-tight group-hover:text-amber-200 transition-colors">
+                    {track.situation}
+                  </h4>
+                  <p className="text-[11px] text-slate-400 font-mono italic leading-snug line-clamp-1">
+                    "{track.englishSnippet}"
+                  </p>
+                  <p className="text-[10px] text-amber-300/80 leading-snug">
+                    ✓ {track.realBenefit}
+                  </p>
+                </div>
+
+                <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-400">
+                  <span className="inline-flex items-center gap-1 text-amber-400/90 font-medium">
+                    <span>🔒 Audio MP3 de Bolsillo</span>
+                  </span>
+                  <span className="text-slate-500 font-mono">0.8x & 1.0x</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Banner de +110 audios adicionales */}
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-950/40 via-[#1C133F] to-[#120E2E] border border-amber-400/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">📦</span>
+              <div>
+                <p className="text-xs sm:text-sm font-black text-white">
+                  + 110 Pistas adicionales organizadas por carpetas temáticas
+                </p>
+                <p className="text-[11px] text-slate-300">
+                  Aduanas, cafés, hoteles, tiendas, llamadas laborales, restaurantes, reclamos y frases de rescate en tu celular.
+                </p>
+              </div>
+            </div>
+            <a
+              href={customCheckoutUrl || OFFICIAL_MERCADO_PAGO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-black text-xs whitespace-nowrap shadow-md no-underline transition-transform hover:scale-102"
+            >
+              Obtener Pack Completo
+            </a>
+          </div>
+        </div>
       </section>
 
       {/* 4. Pricing Box & Checkout Action */}
@@ -740,6 +909,81 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
               <p className="text-xs text-slate-300 leading-relaxed">
                 Descargá el kit y escuchalo en tu celular durante una semana entera. Si sentís que no soltaste la lengua o no te sirvió, nos enviás un correo a <strong className="text-white">inglesfacilyfluido@gmail.com</strong> y te reembolsamos el 100% de tu dinero de inmediato. Sin letra chica ni preguntas incómodas.
               </p>
+            </div>
+          </div>
+
+          {/* 3 Exclusive Free Bonuses Today Card */}
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-950/50 via-[#1C143B] to-[#120B2E] border-2 border-amber-400/70 text-left space-y-3 shadow-xl">
+            <div className="flex items-center justify-between flex-wrap gap-2 border-b border-amber-400/20 pb-2.5">
+              <div className="flex items-center gap-2">
+                <Gift className="w-5 h-5 text-amber-400 shrink-0" />
+                <h4 className="text-sm sm:text-base font-black text-amber-300">
+                  🎁 3 Bonos de Regalo Inmediato (100% Gratis con tu Compra Hoy)
+                </h4>
+              </div>
+              <span className="text-[10px] sm:text-xs font-black uppercase px-2.5 py-1 rounded-full bg-amber-400 text-slate-950 shadow-sm">
+                Valor Total: $25.000 ARS → ¡$0!
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-300 pt-1">
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                  <span>📄 Bono 1 (Valor $12.000)</span>
+                </div>
+                <p className="font-bold text-white text-xs">Guía Maestra en PDF Imprimible</p>
+                <p className="text-[11px] text-slate-400 leading-snug">
+                  Cheatsheet visual con fonética masticada en español para consultar en tu celular o imprimir para la heladera.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-emerald-300">
+                  <span>📱 Bono 2 (Valor $8.000)</span>
+                </div>
+                <p className="font-bold text-white text-xs">Reproductor Web de Bolsillo Offline</p>
+                <p className="text-[11px] text-slate-400 leading-snug">
+                  Escucha todos los audios con la pantalla apagada en el auto o metro sin gastar batería ni datos móviles.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-sky-300">
+                  <span>🛟 Bono 3 (Valor $5.000)</span>
+                </div>
+                <p className="font-bold text-white text-xs">300 Frases de Rescate Inmediato</p>
+                <p className="text-[11px] text-slate-400 leading-snug">
+                  Expresiones cortas de 3 a 4 palabras para zafar de aduanas, compras, reclamos y comida sin dudar.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Cómo Recibes tu Compra en 3 Pasos Claros */}
+          <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-left space-y-2.5">
+            <h4 className="text-xs sm:text-sm font-black text-white flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>¿Cómo recibo mis archivos después de pagar? (Cero Esperas)</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs text-slate-300">
+              <div className="flex items-start gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+                <span className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-[11px] shrink-0 mt-0.5">1</span>
+                <p className="text-[11px] leading-snug">
+                  <strong>Abonas en Mercado Pago</strong> ($9.990 ARS) con tarjeta de débito, crédito o dinero en cuenta.
+                </p>
+              </div>
+              <div className="flex items-start gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+                <span className="w-5 h-5 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center font-black text-[11px] shrink-0 mt-0.5">2</span>
+                <p className="text-[11px] leading-snug">
+                  <strong>Tu pantalla se desbloquea al instante</strong> con el botón de descarga (.ZIP y archivos sueltos).
+                </p>
+              </div>
+              <div className="flex items-start gap-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+                <span className="w-5 h-5 rounded-full bg-sky-400 text-slate-950 flex items-center justify-center font-black text-[11px] shrink-0 mt-0.5">3</span>
+                <p className="text-[11px] leading-snug">
+                  <strong>Te queda de por vida</strong> en tu celular y también recibes copia de respaldo a tu correo/WhatsApp.
+                </p>
+              </div>
             </div>
           </div>
 

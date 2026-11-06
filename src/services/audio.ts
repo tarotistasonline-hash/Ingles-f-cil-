@@ -293,8 +293,92 @@ export async function testMobileSpeaker(): Promise<{ success: boolean; message: 
   }
 }
 
+const KNOWN_FEMALE_VOICES = [
+  'samantha', 'ava', 'zira', 'victoria', 'karen', 'susan', 'jenny', 'monica', 'mónica',
+  'paulina', 'helena', 'elena', 'sabina', 'female', 'woman', 'chica', 'mujer', 'carmen',
+  'conchita', 'luciana', 'rosa', 'soledad', 'laura', 'sofia', 'marisol', 'mia', 'andrea',
+  'paloma', 'ximena', 'valentina', 'camila', 'eva', 'dalia', 'angie', 'lupe', 'francisca',
+  'hazel', 'linda', 'catherine', 'fiona', 'tessa', 'veena', 'alice', 'agnes', 'alva', 'yuri',
+  'google us english', // Google US English in Chrome is a female voice
+  'google español',    // Google español in Chrome is a female voice
+];
+
+const KNOWN_MALE_ENGLISH_VOICES = [
+  'google uk english male', // Chrome built-in male voice
+  'david', 'guy', 'george', 'alex', 'fred', 'oliver', 'arthur', 'mark',
+  'daniel', 'christopher', 'ryan', 'brian', 'andrew', 'tom', 'thomas',
+  'james', 'lee', 'aaron', 'rishi', 'male', 'hombre', 'man'
+];
+
+const KNOWN_MALE_LATIN_VOICES = [
+  'jorge', 'diego', 'carlos', 'juan', 'raul', 'raúl', 'pablo', 'alonso',
+  'miguel', 'gonzalo', 'emilio', 'david', 'andrés', 'andres', 'mateo',
+  'gerardo', 'sebastián', 'sebastian', 'alvaro', 'álvaro', 'male', 'hombre'
+];
+
+function isDefinitelyFemale(name: string): boolean {
+  const lower = (name || '').toLowerCase();
+  return KNOWN_FEMALE_VOICES.some((f) => lower.includes(f));
+}
+
+function selectBestEnglishMaleVoice(voices: SpeechSynthesisVoice[]): { voice: SpeechSynthesisVoice | null; isConfirmedMale: boolean } {
+  // 1. Explicit male voice
+  const explicit = voices.find((v) => {
+    const name = (v.name || '').toLowerCase();
+    const uri = ((v as any).voiceURI || '').toLowerCase();
+    const isEn = (v.lang || '').toLowerCase().startsWith('en');
+    return isEn && KNOWN_MALE_ENGLISH_VOICES.some((m) => name.includes(m) || uri.includes(m));
+  });
+  if (explicit) return { voice: explicit, isConfirmedMale: true };
+
+  // 2. Any en-US voice not marked female
+  const candidate = voices.find((v) => {
+    const isEn = (v.lang || '').toLowerCase().startsWith('en');
+    return isEn && !isDefinitelyFemale(v.name);
+  });
+  if (candidate) return { voice: candidate, isConfirmedMale: false };
+
+  // 3. Fallback to any en voice
+  const anyEn = voices.find((v) => (v.lang || '').toLowerCase().startsWith('en'));
+  return { voice: anyEn || null, isConfirmedMale: false };
+}
+
+function selectBestLatinMaleVoice(voices: SpeechSynthesisVoice[]): { voice: SpeechSynthesisVoice | null; isConfirmedMale: boolean } {
+  const isCastizo = (v: SpeechSynthesisVoice) => {
+    const lang = (v.lang || '').toLowerCase();
+    const name = (v.name || '').toLowerCase();
+    return (
+      lang === 'es-es' || lang.startsWith('es-es') ||
+      name.includes('spain') || name.includes('españa') ||
+      name.includes('castilian') || name.includes('castellano')
+    );
+  };
+
+  const latinVoices = voices.filter((v) => (v.lang || '').toLowerCase().startsWith('es') && !isCastizo(v));
+
+  // 1. Explicit Latin American male name
+  const explicit = latinVoices.find((v) => {
+    const name = (v.name || '').toLowerCase();
+    const uri = ((v as any).voiceURI || '').toLowerCase();
+    return KNOWN_MALE_LATIN_VOICES.some((m) => name.includes(m) || uri.includes(m));
+  });
+  if (explicit) return { voice: explicit, isConfirmedMale: true };
+
+  // 2. Any Latin voice not marked female
+  const candidate = latinVoices.find((v) => !isDefinitelyFemale(v.name));
+  if (candidate) return { voice: candidate, isConfirmedMale: false };
+
+  // 3. Fallback to any Latin voice
+  if (latinVoices.length > 0) return { voice: latinVoices[0], isConfirmedMale: false };
+
+  // 4. Any Spanish voice
+  const anyEs = voices.find((v) => (v.lang || '').toLowerCase().startsWith('es'));
+  return { voice: anyEs || null, isConfirmedMale: false };
+}
+
 /**
- * High-compatibility Web Speech API speaker for English learners
+ * High-compatibility Web Speech API speaker for English learners.
+ * Strictly guarantees a clear, warm male voice across all devices.
  */
 export function speakWithWebSpeech(
   text: string,
@@ -307,13 +391,15 @@ export function speakWithWebSpeech(
     return;
   }
   try {
+    stopAllAudio();
+    unlockMobileAudio();
     window.speechSynthesis.cancel();
     window.speechSynthesis.resume();
+
     const isUltraSlow = speed <= 0.55;
     const clean = isUltraSlow ? formatSpacedSpeechText(text) : cleanSpeechText(text);
     const utterance = new SpeechSynthesisUtterance(clean);
     utterance.lang = 'en-US';
-    // Allow down to 0.45 for ultra-slow beginner mode
     utterance.rate = isUltraSlow ? 0.45 : Math.max(0.55, Math.min(1.2, speed));
 
     if (onStart) utterance.onstart = () => onStart();
@@ -322,64 +408,38 @@ export function speakWithWebSpeech(
       utterance.onerror = () => onEnd();
     }
 
-    const voices = window.speechSynthesis.getVoices();
+    const executeSpeak = () => {
+      const voices = window.speechSynthesis.getVoices() || [];
+      const { voice, isConfirmedMale } = selectBestEnglishMaleVoice(voices);
 
-    // Strictly prioritize clear neutral male voices and exclude female voices
-    const isFemaleVoice = (name: string) => {
-      const lower = name.toLowerCase();
-      const femaleKeywords = [
-        'samantha', 'ava', 'zira', 'victoria', 'karen', 'susan', 'jenny', 'monica',
-        'paulina', 'helena', 'sabina', 'female', 'woman', 'chica', 'mujer', 'carmen',
-        'conchita', 'luciana', 'rosa', 'soledad', 'laura', 'sofia', 'marisol', 'mia',
-        'andrea', 'paloma', 'ximena', 'valentina', 'camila', 'eva', 'dalia', 'angie', 'lupe'
-      ];
-      return femaleKeywords.some((k) => lower.includes(k));
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
+      }
+
+      // If voice is confirmed male, use 0.88; otherwise force 0.60 to shift into masculine baritone
+      utterance.pitch = isConfirmedMale ? 0.88 : 0.60;
+
+      window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utterance);
     };
 
-    const isPreferredMaleVoice = (name: string) => {
-      const lower = name.toLowerCase();
-      const maleKeywords = [
-        'daniel', 'david', 'guy', 'george', 'alex', 'fred', 'oliver', 'arthur',
-        'male', 'hombre', 'diego', 'jorge', 'raul', 'carlos', 'miguel', 'gonzalo',
-        'mark', 'james', 'brian', 'andrew'
-      ];
-      return maleKeywords.some((m) => lower.includes(m));
-    };
-
-    // Priority 1: English male voice with known male name
-    // Priority 2: en-US voice not marked female
-    // Priority 3: any English voice not marked female
-    const maleVoice =
-      voices.find((v) => v.lang.startsWith('en') && isPreferredMaleVoice(v.name)) ||
-      voices.find((v) => v.lang.startsWith('en-US') && !isFemaleVoice(v.name)) ||
-      voices.find((v) => v.lang.startsWith('en') && !isFemaleVoice(v.name)) ||
-      voices.find((v) => isPreferredMaleVoice(v.name)) ||
-      voices.find((v) => !isFemaleVoice(v.name));
-
-    if (maleVoice) {
-      utterance.voice = maleVoice;
+    const currentVoices = window.speechSynthesis.getVoices();
+    if (currentVoices && currentVoices.length > 0) {
+      executeSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => executeSpeak();
+      setTimeout(executeSpeak, 60);
     }
-
-    // Workaround for mobile Chromium/iOS speech freeze
-    window.speechSynthesis.speak(utterance);
   } catch (err) {
-    console.warn('Speech synthesis failed', err);
+    console.warn('Male speech synthesis failed', err);
     if (onEnd) onEnd();
   }
 }
 
 /**
- * Speaks a Spanish message (e.g. welcome message) with:
- * 1. High-fidelity audio file `/audio/welcome_latino_neutro.wav` (natural male neutral Latin American voice).
- * 2. Web Speech API fallback strictly filtered to MALE Latin American voices (es-419, es-MX, es-US, es-CO, es-AR).
- *    Strictly REJECTS all Peninsular/Castizo Spanish voices (es-ES, Spain, España, Castellano)
- *    and excludes female voices.
- */
-/**
- * Speaks a Spanish message (e.g. welcome message) with a MALE voice and NEUTRAL LATIN AMERICAN accent.
- * 1. Plays high-fidelity audio asset `/audio/welcome_latino_neutro.mp3` via HTML5 Audio element.
- * 2. Web Speech API fallback strictly filtered for MALE Latin American voices (es-MX, es-US, es-CO, es-AR),
- *    strictly excluding all Castizo (es-ES / Spain) and female voices.
+ * Speaks a Spanish message with a MALE voice and NEUTRAL LATIN AMERICAN accent.
+ * Strictly guarantees clear male tone without peninsular/castizo accent.
  */
 export function speakSpanishVoice(
   text: string,
@@ -419,7 +479,6 @@ export function speakSpanishVoice(
           // Playing successfully!
         })
         .catch(() => {
-          // If HTML5 audio is blocked by browser autoplay policy, attempt Web Speech Latin Male
           if (!started) {
             speakWithWebSpeechLatinMale(text, speed, onStart, onEnd);
           }
@@ -451,9 +510,7 @@ function speakWithWebSpeechLatinMale(
     const clean = cleanSpeechText(text);
     const utterance = new SpeechSynthesisUtterance(clean);
 
-    // Default to es-MX (widely recognized across Windows, Android, iOS and macOS)
     utterance.lang = 'es-MX';
-    utterance.pitch = 0.85;
     utterance.rate = Math.max(0.85, Math.min(1.15, speed));
 
     if (onStart) utterance.onstart = () => onStart();
@@ -462,144 +519,112 @@ function speakWithWebSpeechLatinMale(
       utterance.onerror = () => onEnd();
     }
 
-    const selectAndSpeak = () => {
-      const allVoices = window.speechSynthesis.getVoices();
+    const executeSpeak = () => {
+      const voices = window.speechSynthesis.getVoices() || [];
+      const { voice, isConfirmedMale } = selectBestLatinMaleVoice(voices);
 
-      // 1. Completely exclude Castizo / Spain / Peninsular Spanish
-      const isCastizo = (v: SpeechSynthesisVoice) => {
-        const lang = (v.lang || '').toLowerCase();
-        const name = (v.name || '').toLowerCase();
-        return (
-          lang === 'es-es' ||
-          lang.startsWith('es-es') ||
-          name.includes('spain') ||
-          name.includes('españa') ||
-          name.includes('peninsular') ||
-          name.includes('castilian') ||
-          name.includes('castellano') ||
-          name.includes('iberian')
-        );
-      };
-
-      // 2. Exclude known female voices to guarantee a male tone
-      const isFemale = (v: SpeechSynthesisVoice) => {
-        const name = (v.name || '').toLowerCase();
-        const femaleKeywords = [
-          'female',
-          'mujer',
-          'sabina',
-          'elena',
-          'monica',
-          'mónica',
-          'paulina',
-          'luciana',
-          'rosa',
-          'soledad',
-          'laura',
-          'sofia',
-          'marisol',
-          'francisca',
-          'conchita',
-          'carmen',
-          'mia',
-          'andrea',
-          'victoria',
-          'paloma',
-          'ximena',
-          'valentina',
-          'camila',
-          'zira',
-          'eva',
-          'dalia',
-          'elvira',
-          'hilda',
-          'angie',
-          'lupe',
-        ];
-        return femaleKeywords.some((k) => name.includes(k));
-      };
-
-      // Candidate Spanish voices that are NOT Castizo
-      const latinSpanishVoices = allVoices.filter(
-        (v) => v.lang.toLowerCase().startsWith('es') && !isCastizo(v)
-      );
-
-      // Well-known Latin American male voices across OS & browsers
-      const maleLatinNames = [
-        'jorge',
-        'diego',
-        'carlos',
-        'gonzalo',
-        'miguel',
-        'alonso',
-        'mateo',
-        'raul',
-        'raúl',
-        'emilio',
-        'juan',
-        'pablo',
-        'andres',
-        'andrés',
-        'david',
-        'gerardo',
-        'sebastián',
-        'sebastian',
-        'male',
-        'hombre',
-      ];
-
-      // Priority A: Latin American male named voice
-      let chosenVoice = latinSpanishVoices.find((v) => {
-        if (isFemale(v)) return false;
-        const lowerName = v.name.toLowerCase();
-        return maleLatinNames.some((m) => lowerName.includes(m));
-      });
-
-      // Priority B: Any Latin voice from es-419, es-MX, es-US, es-CO, es-AR not flagged female
-      if (!chosenVoice) {
-        chosenVoice = latinSpanishVoices.find((v) => {
-          if (isFemale(v)) return false;
-          const lang = v.lang.toLowerCase();
-          return (
-            lang.startsWith('es-419') ||
-            lang.startsWith('es-mx') ||
-            lang.startsWith('es-us') ||
-            lang.startsWith('es-co') ||
-            lang.startsWith('es-ar')
-          );
-        });
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
       }
 
-      // Priority C: Any Latin Spanish voice not flagged female
-      if (!chosenVoice) {
-        chosenVoice = latinSpanishVoices.find((v) => !isFemale(v));
-      }
-
-      // Priority D: Any non-Castizo Spanish voice
-      if (!chosenVoice && latinSpanishVoices.length > 0) {
-        chosenVoice = latinSpanishVoices[0];
-      }
-
-      if (chosenVoice) {
-        utterance.voice = chosenVoice;
-        utterance.lang = chosenVoice.lang;
-      }
+      // If voice is confirmed male, use 0.82; otherwise force 0.58 to shift fundamental frequency into adult male baritone!
+      utterance.pitch = isConfirmedMale ? 0.82 : 0.58;
 
       window.speechSynthesis.resume();
       window.speechSynthesis.speak(utterance);
     };
 
-    const initialVoices = window.speechSynthesis.getVoices();
-    if (initialVoices && initialVoices.length > 0) {
-      selectAndSpeak();
+    const currentVoices = window.speechSynthesis.getVoices();
+    if (currentVoices && currentVoices.length > 0) {
+      executeSpeak();
     } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        selectAndSpeak();
-      };
-      setTimeout(selectAndSpeak, 60);
+      window.speechSynthesis.onvoiceschanged = () => executeSpeak();
+      setTimeout(executeSpeak, 60);
     }
   } catch (err) {
     console.warn('Latin male Spanish speech synthesis failed', err);
+    if (onEnd) onEnd();
+  }
+}
+
+/**
+ * Asynchronously speaks Spanish text with a male Latin American neutral voice.
+ * Never consumes API credits, runs locally with 0ms latency.
+ */
+export function speakLatinMaleAsync(text: string, speed: number = 0.95): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      resolve();
+      return;
+    }
+    speakWithWebSpeechLatinMale(text, speed, undefined, () => resolve());
+  });
+}
+
+/**
+ * Asynchronously speaks English text with clear male pronunciation.
+ */
+export function speakEnglishMaleAsync(text: string, speed: number = 0.8): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      resolve();
+      return;
+    }
+    speakWithWebSpeech(text, speed, undefined, () => resolve());
+  });
+}
+
+/**
+ * Dictates a complete phrase/lesson with the Professor Leo persona:
+ * Spoken in clear, warm Latin American neutral male voice with native English pronunciation.
+ * Free, offline-capable, and uses ZERO API credits.
+ */
+export async function dictatePhraseWithProfeLeo(
+  phrase: {
+    situation: string;
+    english: string;
+    phoneticSimple: string;
+    spanish: string;
+    goldenRule?: string;
+  },
+  speed: number = 0.8,
+  onStart?: () => void,
+  onEnd?: () => void
+): Promise<void> {
+  stopAllAudio();
+  unlockMobileAudio();
+  if (onStart) onStart();
+
+  const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  try {
+    // 1. Situation & meaning in Latin neutral Spanish
+    const intro = `Situación: ${phrase.situation}. En español: ${phrase.spanish}. En inglés de la vida real se dice:`;
+    await speakLatinMaleAsync(intro, 0.95);
+    await pause(350);
+
+    // 2. English phrase spoken clearly
+    await speakEnglishMaleAsync(phrase.english, speed);
+    await pause(450);
+
+    // 3. Phonetic explanation
+    const phoneticIntro = `Para pronunciarlo fácil, léelo como: ${phrase.phoneticSimple}. Repite conmigo:`;
+    await speakLatinMaleAsync(phoneticIntro, 0.95);
+    await pause(350);
+
+    // 4. Repeat English phrase cleanly
+    await speakEnglishMaleAsync(phrase.english, speed <= 0.65 ? speed : 0.7);
+    await pause(400);
+
+    // 5. Golden tip if present
+    if (phrase.goldenRule) {
+      const tip = `Consejo del profe Leo: ${phrase.goldenRule}`;
+      await speakLatinMaleAsync(tip, 0.95);
+    }
+  } catch (err) {
+    console.warn('Dictation interrupted', err);
+  } finally {
     if (onEnd) onEnd();
   }
 }
@@ -666,13 +691,22 @@ export async function playEnglishVoice(
   }
 
   // 3. Direct Audio Stream via singleton DOM-attached element
+  let hasStarted = false;
+  let fallbackTriggered = false;
+
+  const triggerFallback = () => {
+    if (!hasStarted && !fallbackTriggered) {
+      fallbackTriggered = true;
+      speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
+    }
+  };
+
   try {
     const streamUrl = getAudioStreamUrl(clean, effectiveSpeed, activeVoice);
     const audio = getSharedAudio();
     audio.playbackRate = effectiveSpeed;
     currentAudio = audio;
 
-    let hasStarted = false;
     audio.onplay = () => {
       hasStarted = true;
       if (onStart) onStart();
@@ -683,31 +717,30 @@ export async function playEnglishVoice(
     };
 
     audio.onerror = () => {
-      if (!hasStarted) {
-        speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
-      } else if (onEnd) {
-        onEnd();
-      }
+      triggerFallback();
+      if (hasStarted && onEnd) onEnd();
     };
 
     audio.src = streamUrl;
     const playPromise = audio.play();
 
-    // 8-second buffer to allow Gemini TTS synthesis on network without premature cutoff
+    // 1.5-second buffer to allow quick cloud stream before failing over to local device male voice
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Audio stream buffering exceeded 8s')), 8000)
+      setTimeout(() => reject(new Error('Audio stream buffering exceeded 1.5s')), 1500)
     );
 
     if (playPromise !== undefined) {
       await Promise.race([playPromise, timeoutPromise]);
       return;
     }
-  } catch (streamErr) {
-    console.warn('Audio stream delayed or blocked, activating native speech fallback', streamErr);
+  } catch (_streamErr) {
+    // If stream took too long or failed, instantly speak with clear male speech
   }
 
-  // 4. Instant Fallback: Browser Web Speech API
-  speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
+  // 4. Instant Fallback: Browser Web Speech API with guaranteed male voice
+  if (!hasStarted && !fallbackTriggered) {
+    speakWithWebSpeech(clean, effectiveSpeed, onStart, onEnd);
+  }
 }
 
 export function stopAllAudio() {

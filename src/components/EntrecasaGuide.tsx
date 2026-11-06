@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ENTRECASA_PHRASES, ENTRECASA_IMAGE } from '../data/defaultData';
 import { EntrecasaPhrase, SkillLevel } from '../types';
-import { playEnglishVoice } from '../services/audio';
+import { playEnglishVoice, dictatePhraseWithProfeLeo, stopAllAudio } from '../services/audio';
 import { KeyTakeawaysToggle, TakeawayItem } from './KeyTakeawaysToggle';
 import {
   Coffee,
@@ -18,6 +18,9 @@ import {
   Sprout,
   Zap,
   Turtle,
+  Play,
+  Square,
+  Headphones,
 } from 'lucide-react';
 
 interface EntrecasaGuideProps {
@@ -55,10 +58,88 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
   const activePhrase =
     filteredPhrases.find((p) => p.id === activePhraseId) || filteredPhrases[0] || ENTRECASA_PHRASES[0];
 
+  const [isDictatingClass, setIsDictatingClass] = useState(false);
+  const [dictatingPhraseId, setDictatingPhraseId] = useState<string | null>(null);
+  const isDictatingRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      isDictatingRef.current = false;
+      stopAllAudio();
+    };
+  }, []);
+
   const handlePlay = async (phrase: EntrecasaPhrase, speedModifier?: number) => {
+    if (isDictatingClass) {
+      handleStopClassDictation();
+    }
     setPlayingId(phrase.id);
     await playEnglishVoice(phrase.audioText, 'Puck', speedModifier || currentSpeed);
     setPlayingId(null);
+  };
+
+  const handleDictatePhrase = async (phrase: EntrecasaPhrase) => {
+    if (isDictatingClass) {
+      handleStopClassDictation();
+    }
+    setDictatingPhraseId(phrase.id);
+    try {
+      await dictatePhraseWithProfeLeo(
+        {
+          situation: phrase.spanishSituation,
+          english: phrase.entrecasaNative,
+          phoneticSimple: phrase.phoneticEasy || phrase.pronunciationGuide,
+          spanish: phrase.schoolStiff,
+          goldenRule: phrase.cozyTip,
+        },
+        currentSpeed
+      );
+    } finally {
+      setDictatingPhraseId(null);
+    }
+  };
+
+  const handleStartClassDictation = async () => {
+    if (isDictatingClass) {
+      handleStopClassDictation();
+      return;
+    }
+
+    stopAllAudio();
+    setIsDictatingClass(true);
+    isDictatingRef.current = true;
+
+    for (let i = 0; i < filteredPhrases.length; i++) {
+      if (!isDictatingRef.current) break;
+      const phrase = filteredPhrases[i];
+      setDictatingPhraseId(phrase.id);
+
+      await dictatePhraseWithProfeLeo(
+        {
+          situation: `Frase ${i + 1} de ${filteredPhrases.length}: ${phrase.spanishSituation}`,
+          english: phrase.entrecasaNative,
+          phoneticSimple: phrase.phoneticEasy || phrase.pronunciationGuide,
+          spanish: phrase.schoolStiff,
+          goldenRule: phrase.cozyTip,
+        },
+        currentSpeed
+      );
+
+      if (isDictatingRef.current) {
+        await new Promise((r) => setTimeout(r, 1200));
+      }
+    }
+
+    setIsDictatingClass(false);
+    setDictatingPhraseId(null);
+    isDictatingRef.current = false;
+  };
+
+  const handleStopClassDictation = () => {
+    isDictatingRef.current = false;
+    stopAllAudio();
+    setIsDictatingClass(false);
+    setDictatingPhraseId(null);
   };
 
   const entrecasaTakeaways: TakeawayItem[] = [
@@ -241,10 +322,59 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
           })}
         </div>
 
+        {/* Guided Class Player Banner */}
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-[#231A56] to-emerald-500/20 border-2 border-amber-400/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-2xl ${isDictatingClass ? 'bg-amber-400 text-slate-950 animate-pulse ring-4 ring-amber-400/30' : 'bg-[#181140] text-amber-300 border border-amber-400/40'}`}>
+              <Headphones className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40">
+                  Clase Guiada · Voz Masculina Neutra
+                </span>
+                <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  0 Créditos
+                </span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                {isDictatingClass ? 'Dictando clase de entrecasa con el Profe Leo...' : '¿Querés que el Profe Leo te dicte estas frases de entrecasa?'}
+              </h3>
+              <p className="text-xs text-slate-300">
+                {isDictatingClass
+                  ? 'Explicación de la situación en español latino neutro + pronunciación nativa + repetición.'
+                  : 'Te explica cada situación, la pronunciación fonética y te hace repetir con voz clara y pausada.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {isDictatingClass ? (
+              <button
+                onClick={handleStopClassDictation}
+                className="px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition-all cursor-pointer"
+              >
+                <Square className="w-4 h-4 fill-current" />
+                <span>Detener Clase</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleStartClassDictation}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-amber-400/20 hover:scale-[1.02] transition-all cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-current" />
+                <span>Dictar Clase de Entrecasa</span>
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Grid of Entrecasa Phrases */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {filteredPhrases.map((phrase) => {
             const isPlayingThis = playingId === phrase.id;
+            const isDictatingThis = dictatingPhraseId === phrase.id;
             const isSelected = activePhraseId === phrase.id;
 
             let levelBadge = null;
@@ -288,6 +418,11 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
                       {levelBadge}
                     </div>
                     <div className="flex items-center gap-1.5">
+                      {isDictatingThis && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/40 animate-pulse">
+                          <span>👨‍🏫 Dictando...</span>
+                        </span>
+                      )}
                       {isPlayingThis && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/40 animate-pulse">
                           <span className="flex items-end gap-0.5 h-3">
@@ -301,6 +436,22 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          handleDictatePhrase(phrase);
+                        }}
+                        disabled={isDictatingThis}
+                        className={`px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                          isDictatingThis
+                            ? 'bg-amber-400 text-slate-950 ring-2 ring-amber-300 animate-pulse'
+                            : 'bg-amber-400/20 hover:bg-amber-400 text-amber-300 hover:text-slate-950 border border-amber-400/40'
+                        }`}
+                        title="El Profe Leo te explica la situación, la frase y cómo pronunciarla"
+                      >
+                        <span>👨‍🏫</span>
+                        <span className="hidden sm:inline">{isDictatingThis ? 'Explicando...' : 'Explicar'}</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handlePlay(phrase);
                         }}
                         disabled={isPlayingThis}
@@ -309,7 +460,7 @@ export const EntrecasaGuide: React.FC<EntrecasaGuideProps> = ({
                             ? 'bg-amber-400 text-slate-950 font-bold scale-105'
                             : 'bg-amber-400/10 hover:bg-amber-400 text-amber-300 hover:text-slate-950'
                         }`}
-                        title="Escuchar audio con voz masculina clara"
+                        title="Escuchar audio en inglés con voz masculina clara"
                       >
                         <Volume2 className="w-3.5 h-3.5" />
                       </button>

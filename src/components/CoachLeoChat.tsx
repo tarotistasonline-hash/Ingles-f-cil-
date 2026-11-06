@@ -145,12 +145,12 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
           {isLoading && (
             <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-950/60 via-slate-950 to-indigo-950/60 border border-amber-400/50 flex items-center gap-4 animate-in fade-in shadow-lg">
               <div className="w-11 h-11 rounded-2xl bg-amber-400 text-slate-950 font-black text-2xl flex items-center justify-center shrink-0 shadow-md animate-pulse">
-                👩‍🏫
+                👨‍🏫
               </div>
               <div className="space-y-1 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-amber-300">
-                    La Profe está escribiendo tu respuesta
+                    El Profe Leo está escribiendo tu respuesta
                   </span>
                   {/* Bouncing dots */}
                   <span className="inline-flex gap-1 items-center">
@@ -162,7 +162,7 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
                 <p className="text-xs text-slate-300">
                   {typingStep === 1 && 'Desarmando la expresión a inglés de entrecasa...'}
                   {typingStep === 2 && 'Preparando ejemplos cotidianos y trucos de ritmo...'}
-                  {typingStep >= 3 && 'Generando el audio lento y pausado...'}
+                  {typingStep >= 3 && 'Generando el audio lento y pausado con voz clara...'}
                 </p>
               </div>
             </div>
@@ -196,16 +196,16 @@ export const CoachLeoChat: React.FC<CoachLeoChatProps> = ({ currentSpeed }) => {
 
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 font-extrabold text-2xl flex items-center justify-center shrink-0 shadow-lg shadow-amber-400/20">
-                  👩‍🏫
+                  👨‍🏫
                 </div>
                 <div className="space-y-4 flex-1">
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-sm sm:text-base font-bold text-white block">
-                        La Profe (Tu Mentora Easy)
+                        El Profe Leo (Tu Mentor Bilingüe)
                       </span>
                       <span className="text-[11px] text-slate-400">
-                        Respuesta personalizada · Cero gramática abstracta
+                        Voz masculina latina neutra · Cero gramática abstracta
                       </span>
                     </div>
                     <span className="text-[11px] text-amber-300 bg-amber-950/60 px-3 py-1 rounded-full font-bold border border-amber-900/60 shadow-xs">

@@ -206,16 +206,17 @@ function fallbackWebSpeechMale() {
 
     const isFemale = (v: SpeechSynthesisVoice) => {
       const n = (v.name || '').toLowerCase();
-      const femaleKeys = ['female', 'mujer', 'sabina', 'monica', 'elena', 'paulina', 'luciana', 'sofia', 'rosa'];
+      const femaleKeys = ['female', 'mujer', 'sabina', 'monica', 'mónica', 'elena', 'helena', 'paulina', 'luciana', 'sofia', 'rosa', 'google español', 'samantha', 'zira', 'carmen'];
       return femaleKeys.some((k) => n.includes(k));
     };
 
     const latinVoices = allVoices.filter(
-      (v) => v.lang.toLowerCase().startsWith('es') && !isCastizo(v)
+      (v) => (v.lang || '').toLowerCase().startsWith('es') && !isCastizo(v)
     );
 
-    const maleNames = ['jorge', 'diego', 'carlos', 'gonzalo', 'miguel', 'alonso', 'mateo', 'raul', 'male', 'hombre'];
+    const maleNames = ['jorge', 'diego', 'carlos', 'juan', 'gonzalo', 'miguel', 'alonso', 'mateo', 'raul', 'raúl', 'pablo', 'male', 'hombre'];
     let chosen = latinVoices.find((v) => !isFemale(v) && maleNames.some((m) => v.name.toLowerCase().includes(m)));
+    let isConfirmedMale = !!chosen;
     if (!chosen) chosen = latinVoices.find((v) => !isFemale(v));
     if (!chosen && latinVoices.length > 0) chosen = latinVoices[0];
 
@@ -223,6 +224,9 @@ function fallbackWebSpeechMale() {
       utterance.voice = chosen;
       utterance.lang = chosen.lang;
     }
+
+    // Force male baritone pitch
+    utterance.pitch = isConfirmedMale ? 0.82 : 0.58;
 
     utterance.onstart = () => {
       state.isPlaying = true;
