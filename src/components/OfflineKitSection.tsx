@@ -198,7 +198,7 @@ export const OfflineKitSection: React.FC<OfflineKitSectionProps> = ({
     if (typeof window !== 'undefined' && window.location && window.location.origin) {
       return `${window.location.origin}/?code=INGLES9990`;
     }
-    return 'https://ingles-express.online/?code=INGLES9990';
+    return 'https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/?code=INGLES9990';
   };
 
   const getDeliveryMessage = () => {
