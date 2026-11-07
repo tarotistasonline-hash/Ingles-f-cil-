@@ -251,8 +251,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <span className="inline-block bg-gradient-to-r from-white via-amber-200 via-emerald-100 to-amber-300 bg-clip-text text-transparent animate-title-shimmer">
               Inglés Fácil y Fluido
             </span>
-            <span className="block text-2xl sm:text-3xl lg:text-4xl font-semibold text-amber-400 mt-2 sm:mt-3 font-subheading tracking-normal">
-              El método más fácil y rápido para aprender inglés desde casa
+            <span className="block text-xl sm:text-2xl lg:text-3xl font-semibold text-amber-300 mt-2 sm:mt-3 font-subheading tracking-normal text-balance">
+              Si querés aprender inglés fácil y rápido, sin memorizar aburridas reglas gramaticales, estás en el lugar correcto... <span className="text-white font-black">Bienvenido</span>
             </span>
           </h1>
 

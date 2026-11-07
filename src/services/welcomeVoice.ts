@@ -252,30 +252,66 @@ function fallbackWebSpeechMale() {
  * Can be called programmatically or on user interaction.
  */
 export function playWelcomeVoice(options?: { fromBeginning?: boolean; force?: boolean }): Promise<void> {
-  if (state.isPlaying && !options?.fromBeginning) {
-    return Promise.resolve();
-  }
+  const audio = getOrCreateWelcomeAudio();
+  if (!audio) return Promise.resolve();
 
   prewarmAudioContext();
 
+  if (options?.fromBeginning) {
+    try {
+      audio.currentTime = 0;
+    } catch {
+      // ignore
+    }
+  }
+
+  audio.volume = 1.0;
+
   return new Promise((resolve) => {
     try {
-      fallbackWebSpeechMale();
-      state.hasStarted = true;
-      state.isBlockedByAutoplay = false;
-      removeGlobalUnlockListeners();
-      notifyListeners();
-    } catch {
-      // fallback
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            state.isPlaying = true;
+            state.hasStarted = true;
+            state.isBlockedByAutoplay = false;
+            (window as any).__welcomeAudioStarted = true;
+            removeGlobalUnlockListeners();
+            notifyListeners();
+            resolve();
+          })
+          .catch((err) => {
+            if (options?.force) {
+              fallbackWebSpeechMale();
+            } else if (!state.hasStarted) {
+              state.isBlockedByAutoplay = true;
+              notifyListeners();
+            }
+            resolve();
+          });
+      } else {
+        if (options?.force) {
+          fallbackWebSpeechMale();
+        }
+        resolve();
+      }
+    } catch (err) {
+      if (options?.force) {
+        fallbackWebSpeechMale();
+      } else if (!state.hasStarted) {
+        state.isBlockedByAutoplay = true;
+        notifyListeners();
+      }
+      resolve();
     }
-    resolve();
   });
 }
 
 export function pauseWelcomeVoice() {
-  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  if (welcomeAudio) {
     try {
-      window.speechSynthesis.cancel();
+      welcomeAudio.pause();
       state.isPlaying = false;
       notifyListeners();
     } catch {
@@ -292,15 +328,20 @@ export function toggleWelcomeVoice() {
   if (state.isPlaying) {
     pauseWelcomeVoice();
   } else {
-    playWelcomeVoice({ fromBeginning: true });
+    playWelcomeVoice();
   }
 }
 
 const GESTURE_EVENTS = [
-  'click',
   'pointerdown',
   'touchstart',
+  'mousedown',
   'keydown',
+  'click',
+  'scroll',
+  'wheel',
+  'touchmove',
+  'mousemove',
 ];
 let unlockListenersAttached = false;
 
