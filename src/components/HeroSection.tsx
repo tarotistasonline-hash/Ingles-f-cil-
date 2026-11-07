@@ -30,7 +30,7 @@ import {
   Gift,
 } from 'lucide-react';
 import { playEnglishVoice, stopAllAudio } from '../services/audio';
-import { initWelcomeVoice } from '../services/welcomeVoice';
+import { initWelcomeVoice, playWelcomeVoice } from '../services/welcomeVoice';
 import { askTeacher, fetchSpeakTweak } from '../services/api';
 import { triggerConfetti } from '../utils/confetti';
 import { RealVisitsBadge } from './RealVisitsBadge';
@@ -243,6 +243,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <span className="text-violet-400 font-bold">⚡ Fluidez Real</span>
           </div>
           <RealVisitsBadge compact={true} />
+          <button
+            onClick={() => playWelcomeVoice({ fromBeginning: true, force: true })}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-300 hover:text-white text-xs font-bold transition-all shadow-sm cursor-pointer group"
+            title="Escuchar saludo con voz de hombre neutra y latina"
+          >
+            <Volume2 className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+            <span>🎙️ Escuchar Bienvenida (Voz Latina)</span>
+          </button>
         </div>
 
         {/* Main Centralized Hero Header with Typography Polish & Gradient Shimmer */}
@@ -251,8 +259,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <span className="inline-block bg-gradient-to-r from-white via-amber-200 via-emerald-100 to-amber-300 bg-clip-text text-transparent animate-title-shimmer">
               Inglés Fácil y Fluido
             </span>
-            <span className="block text-xl sm:text-2xl lg:text-3xl font-semibold text-amber-300 mt-2 sm:mt-3 font-subheading tracking-normal text-balance">
-              Si querés aprender inglés fácil y rápido, sin memorizar aburridas reglas gramaticales, estás en el lugar correcto... <span className="text-white font-black">Bienvenido</span>
+            <span className="block text-2xl sm:text-3xl lg:text-4xl font-semibold text-amber-400 mt-2 sm:mt-3 font-subheading tracking-normal">
+              El método más fácil y rápido para aprender inglés desde casa
             </span>
           </h1>
 

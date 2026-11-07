@@ -177,73 +177,128 @@ function prewarmAudioContext() {
 }
 
 /**
- * Fallback synthesizer: Male Latin American voice (es-MX)
+/**
+ * High-fidelity Latin American Neutral Male Voice Synthesizer
+ * Strictly guarantees male baritone tone and neutral Latin American accent (es-419 / es-MX / es-US).
+ * Never picks peninsular/castilian (Spain) voices or female voices.
  */
+function selectLatinMaleVoice(allVoices: SpeechSynthesisVoice[]): { voice: SpeechSynthesisVoice | null; isConfirmedMale: boolean } {
+  const isCastizo = (v: SpeechSynthesisVoice) => {
+    const l = (v.lang || '').toLowerCase();
+    const n = (v.name || '').toLowerCase();
+    return (
+      l === 'es-es' ||
+      l.startsWith('es-es') ||
+      n.includes('spain') ||
+      n.includes('españa') ||
+      n.includes('castilian') ||
+      n.includes('castellano') ||
+      n.includes('conchita') ||
+      n.includes('enrique')
+    );
+  };
+
+  const isFemale = (v: SpeechSynthesisVoice) => {
+    const n = (v.name || '').toLowerCase();
+    const femaleKeys = [
+      'female', 'mujer', 'sabina', 'monica', 'mónica', 'elena', 'helena',
+      'paulina', 'luciana', 'sofia', 'sofía', 'rosa', 'google español',
+      'samantha', 'zira', 'carmen', 'dalia', 'mia', 'mía', 'paloma',
+      'ximena', 'soledad', 'andrea', 'laura', 'eva', 'francisca', 'lupe'
+    ];
+    return femaleKeys.some((k) => n.includes(k));
+  };
+
+  // Keep only Spanish voices that are NOT Spain/Castizo
+  const latinVoices = allVoices.filter(
+    (v) => (v.lang || '').toLowerCase().startsWith('es') && !isCastizo(v)
+  );
+
+  // Preferred confirmed Latin American male voices across Android, Windows, macOS, iOS
+  const maleIdentifiers = [
+    'jorge', 'diego', 'carlos', 'juan', 'raul', 'raúl', 'pablo', 'mateo',
+    'gonzalo', 'miguel', 'alonso', 'emilio', 'andrés', 'andres', 'david',
+    'gerardo', 'sebastián', 'sebastian', 'alvaro', 'álvaro', 'male', 'hombre',
+    'es-us-x-sfb', 'es-us-x-sfg', 'es-mx-x-sfb', 'es-mx-x-sfa'
+  ];
+
+  // 1. First priority: Latin voice with explicit male identifier
+  let chosen = latinVoices.find((v) => !isFemale(v) && maleIdentifiers.some((m) => v.name.toLowerCase().includes(m) || ((v as any).voiceURI || '').toLowerCase().includes(m)));
+  if (chosen) return { voice: chosen, isConfirmedMale: true };
+
+  // 2. Second priority: Any Latin American voice that is not marked female
+  chosen = latinVoices.find((v) => !isFemale(v));
+  if (chosen) return { voice: chosen, isConfirmedMale: true };
+
+  // 3. Third priority: Any Latin American voice (es-MX, es-US, es-419, es-AR, es-CO, etc.)
+  if (latinVoices.length > 0) return { voice: latinVoices[0], isConfirmedMale: false };
+
+  // 4. Any Spanish voice not female
+  const anyNonFemale = allVoices.find((v) => (v.lang || '').toLowerCase().startsWith('es') && !isFemale(v));
+  if (anyNonFemale) return { voice: anyNonFemale, isConfirmedMale: false };
+
+  return { voice: null, isConfirmedMale: false };
+}
+
 function fallbackWebSpeechMale() {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-  try {
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
 
-    const utterance = new SpeechSynthesisUtterance(WELCOME_TEXT);
-    utterance.lang = 'es-MX';
-    utterance.pitch = 0.88;
-    utterance.rate = 1.0;
+  const startSpeaking = () => {
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
 
-    const allVoices = window.speechSynthesis.getVoices();
-    const isCastizo = (v: SpeechSynthesisVoice) => {
-      const l = (v.lang || '').toLowerCase();
-      const n = (v.name || '').toLowerCase();
-      return (
-        l === 'es-es' ||
-        l.startsWith('es-es') ||
-        n.includes('spain') ||
-        n.includes('españa') ||
-        n.includes('castilian') ||
-        n.includes('castellano')
-      );
-    };
+      const voices = window.speechSynthesis.getVoices() || [];
+      const { voice, isConfirmedMale } = selectLatinMaleVoice(voices);
 
-    const isFemale = (v: SpeechSynthesisVoice) => {
-      const n = (v.name || '').toLowerCase();
-      const femaleKeys = ['female', 'mujer', 'sabina', 'monica', 'mónica', 'elena', 'helena', 'paulina', 'luciana', 'sofia', 'rosa', 'google español', 'samantha', 'zira', 'carmen'];
-      return femaleKeys.some((k) => n.includes(k));
-    };
+      const utterance = new SpeechSynthesisUtterance(WELCOME_TEXT);
+      utterance.lang = voice?.lang || 'es-419'; // Standard Latin American Spanish
+      if (voice) {
+        utterance.voice = voice;
+      }
 
-    const latinVoices = allVoices.filter(
-      (v) => (v.lang || '').toLowerCase().startsWith('es') && !isCastizo(v)
-    );
+      // Warm adult male pitch (0.85 for natural male voice, 0.62 to shift generic voice into warm baritone)
+      utterance.pitch = isConfirmedMale ? 0.85 : 0.62;
+      utterance.rate = 0.98; // Relaxed, friendly, warm pace
 
-    const maleNames = ['jorge', 'diego', 'carlos', 'juan', 'gonzalo', 'miguel', 'alonso', 'mateo', 'raul', 'raúl', 'pablo', 'male', 'hombre'];
-    let chosen = latinVoices.find((v) => !isFemale(v) && maleNames.some((m) => v.name.toLowerCase().includes(m)));
-    let isConfirmedMale = !!chosen;
-    if (!chosen) chosen = latinVoices.find((v) => !isFemale(v));
-    if (!chosen && latinVoices.length > 0) chosen = latinVoices[0];
+      utterance.onstart = () => {
+        state.isPlaying = true;
+        state.hasStarted = true;
+        state.isBlockedByAutoplay = false;
+        notifyListeners();
+      };
 
-    if (chosen) {
-      utterance.voice = chosen;
-      utterance.lang = chosen.lang;
+      utterance.onend = () => {
+        state.isPlaying = false;
+        state.hasPlayed = true;
+        notifyListeners();
+      };
+
+      utterance.onerror = () => {
+        state.isPlaying = false;
+        notifyListeners();
+      };
+
+      window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      // ignore
     }
+  };
 
-    // Force male baritone pitch
-    utterance.pitch = isConfirmedMale ? 0.82 : 0.58;
-
-    utterance.onstart = () => {
-      state.isPlaying = true;
-      state.hasStarted = true;
-      state.isBlockedByAutoplay = false;
-      notifyListeners();
+  const initialVoices = window.speechSynthesis.getVoices();
+  if (initialVoices && initialVoices.length > 0) {
+    startSpeaking();
+  } else {
+    // Wait for Chrome/Safari to populate voices asynchronously
+    let triggered = false;
+    const onVoices = () => {
+      if (triggered) return;
+      triggered = true;
+      startSpeaking();
     };
-
-    utterance.onend = () => {
-      state.isPlaying = false;
-      state.hasPlayed = true;
-      notifyListeners();
-    };
-
-    window.speechSynthesis.speak(utterance);
-  } catch {
-    // ignore
+    window.speechSynthesis.onvoiceschanged = onVoices;
+    setTimeout(onVoices, 80);
   }
 }
 
@@ -252,66 +307,30 @@ function fallbackWebSpeechMale() {
  * Can be called programmatically or on user interaction.
  */
 export function playWelcomeVoice(options?: { fromBeginning?: boolean; force?: boolean }): Promise<void> {
-  const audio = getOrCreateWelcomeAudio();
-  if (!audio) return Promise.resolve();
+  if (state.isPlaying && !options?.fromBeginning) {
+    return Promise.resolve();
+  }
 
   prewarmAudioContext();
 
-  if (options?.fromBeginning) {
-    try {
-      audio.currentTime = 0;
-    } catch {
-      // ignore
-    }
-  }
-
-  audio.volume = 1.0;
-
   return new Promise((resolve) => {
     try {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            state.isPlaying = true;
-            state.hasStarted = true;
-            state.isBlockedByAutoplay = false;
-            (window as any).__welcomeAudioStarted = true;
-            removeGlobalUnlockListeners();
-            notifyListeners();
-            resolve();
-          })
-          .catch((err) => {
-            if (options?.force) {
-              fallbackWebSpeechMale();
-            } else if (!state.hasStarted) {
-              state.isBlockedByAutoplay = true;
-              notifyListeners();
-            }
-            resolve();
-          });
-      } else {
-        if (options?.force) {
-          fallbackWebSpeechMale();
-        }
-        resolve();
-      }
-    } catch (err) {
-      if (options?.force) {
-        fallbackWebSpeechMale();
-      } else if (!state.hasStarted) {
-        state.isBlockedByAutoplay = true;
-        notifyListeners();
-      }
-      resolve();
+      fallbackWebSpeechMale();
+      state.hasStarted = true;
+      state.isBlockedByAutoplay = false;
+      removeGlobalUnlockListeners();
+      notifyListeners();
+    } catch {
+      // fallback
     }
+    resolve();
   });
 }
 
 export function pauseWelcomeVoice() {
-  if (welcomeAudio) {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
-      welcomeAudio.pause();
+      window.speechSynthesis.cancel();
       state.isPlaying = false;
       notifyListeners();
     } catch {
@@ -328,20 +347,15 @@ export function toggleWelcomeVoice() {
   if (state.isPlaying) {
     pauseWelcomeVoice();
   } else {
-    playWelcomeVoice();
+    playWelcomeVoice({ fromBeginning: true });
   }
 }
 
 const GESTURE_EVENTS = [
+  'click',
   'pointerdown',
   'touchstart',
-  'mousedown',
   'keydown',
-  'click',
-  'scroll',
-  'wheel',
-  'touchmove',
-  'mousemove',
 ];
 let unlockListenersAttached = false;
 
