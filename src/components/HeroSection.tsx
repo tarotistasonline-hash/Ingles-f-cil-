@@ -252,7 +252,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               Inglés Fácil y Fluido
             </span>
             <span className="block text-xl sm:text-2xl lg:text-3xl font-semibold text-amber-300 mt-2 sm:mt-3 font-subheading tracking-normal text-balance">
-              Si querés aprender inglés fácil y rápido, sin memorizar aburridas reglas gramaticales, estás en el lugar correcto... <span className="text-white font-black">Bienvenido</span>
+              Si querés aprender inglés fácil y rápido, sin memorizar aburridas reglas gramaticales, estás en el lugar correcto... <span className="animate-iridescent-welcome">¡Bienvenido!</span>
             </span>
           </h1>
 

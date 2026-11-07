@@ -32,7 +32,7 @@ const AUDIO_SRC_MP3 = resolveAudioPath('welcome_latino_neutro.mp3');
 const AUDIO_SRC_WAV = resolveAudioPath('welcome_latino_neutro.wav');
 const FALLBACK_SRC_MP3 = './audio/welcome_latino_neutro.mp3';
 const WELCOME_TEXT =
-  'Si querés aprender inglés fácil y rápido, sin memorizar aburridas reglas gramaticales, estás en el lugar correcto... Bienvenido';
+  'Si querés aprender inglés fácil y rápido, sin memorizar aburridas reglas gramaticales, estás en el lugar correcto... ¡Bienvenido!';
 
 let welcomeAudio: HTMLAudioElement | null = null;
 let isInitialized = false;
