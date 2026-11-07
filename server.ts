@@ -1603,8 +1603,8 @@ app.get('/robots.txt', (_req, res) => {
   if (fs.existsSync(robotsPath)) {
     return res.sendFile(robotsPath);
   }
-  res.setHeader('Content-Type', 'text/plain');
-  res.send("User-agent: *\nAllow: /\n\nSitemap: https://ais-pre-tjt2vclyi7urss34qpdmmo-172786148761.us-east1.run.app/sitemap.xml\n");
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.send("User-agent: *\nAllow: /\n\nSitemap: https://ingles-express.online/sitemap.xml\n");
 });
 
 app.get('/sitemap.xml', (_req, res) => {
@@ -1614,6 +1614,16 @@ app.get('/sitemap.xml', (_req, res) => {
     return res.sendFile(sitemapPath);
   }
   res.status(404).send('Not found');
+});
+
+// Explicit Google AdSense ads.txt route for https://ingles-express.online/
+app.get('/ads.txt', (_req, res) => {
+  const adsPath = path.resolve(__dirname, 'public', 'ads.txt');
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  if (fs.existsSync(adsPath)) {
+    return res.sendFile(adsPath);
+  }
+  res.send("google.com, pub-8099027931324700, DIRECT, f08c47fec0942fa0\n");
 });
 
 // Serve public directory explicitly

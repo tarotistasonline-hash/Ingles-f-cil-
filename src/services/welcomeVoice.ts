@@ -32,7 +32,7 @@ const AUDIO_SRC_MP3 = resolveAudioPath('welcome_latino_neutro.mp3');
 const AUDIO_SRC_WAV = resolveAudioPath('welcome_latino_neutro.wav');
 const FALLBACK_SRC_MP3 = './audio/welcome_latino_neutro.mp3';
 const WELCOME_TEXT =
-  '¡Hola! Estás en el lugar correcto si querés aprender inglés rápido y fácil. ¡Bienvenido!';
+  'Si querés aprender inglés fácil y rápido, sin memorizar aburridas reglas gramaticales, estás en el lugar correcto... Bienvenido';
 
 let welcomeAudio: HTMLAudioElement | null = null;
 let isInitialized = false;
@@ -252,66 +252,30 @@ function fallbackWebSpeechMale() {
  * Can be called programmatically or on user interaction.
  */
 export function playWelcomeVoice(options?: { fromBeginning?: boolean; force?: boolean }): Promise<void> {
-  const audio = getOrCreateWelcomeAudio();
-  if (!audio) return Promise.resolve();
+  if (state.isPlaying && !options?.fromBeginning) {
+    return Promise.resolve();
+  }
 
   prewarmAudioContext();
 
-  if (options?.fromBeginning) {
-    try {
-      audio.currentTime = 0;
-    } catch {
-      // ignore
-    }
-  }
-
-  audio.volume = 1.0;
-
   return new Promise((resolve) => {
     try {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            state.isPlaying = true;
-            state.hasStarted = true;
-            state.isBlockedByAutoplay = false;
-            (window as any).__welcomeAudioStarted = true;
-            removeGlobalUnlockListeners();
-            notifyListeners();
-            resolve();
-          })
-          .catch((err) => {
-            if (options?.force) {
-              fallbackWebSpeechMale();
-            } else if (!state.hasStarted) {
-              state.isBlockedByAutoplay = true;
-              notifyListeners();
-            }
-            resolve();
-          });
-      } else {
-        if (options?.force) {
-          fallbackWebSpeechMale();
-        }
-        resolve();
-      }
-    } catch (err) {
-      if (options?.force) {
-        fallbackWebSpeechMale();
-      } else if (!state.hasStarted) {
-        state.isBlockedByAutoplay = true;
-        notifyListeners();
-      }
-      resolve();
+      fallbackWebSpeechMale();
+      state.hasStarted = true;
+      state.isBlockedByAutoplay = false;
+      removeGlobalUnlockListeners();
+      notifyListeners();
+    } catch {
+      // fallback
     }
+    resolve();
   });
 }
 
 export function pauseWelcomeVoice() {
-  if (welcomeAudio) {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
-      welcomeAudio.pause();
+      window.speechSynthesis.cancel();
       state.isPlaying = false;
       notifyListeners();
     } catch {
@@ -328,20 +292,15 @@ export function toggleWelcomeVoice() {
   if (state.isPlaying) {
     pauseWelcomeVoice();
   } else {
-    playWelcomeVoice();
+    playWelcomeVoice({ fromBeginning: true });
   }
 }
 
 const GESTURE_EVENTS = [
+  'click',
   'pointerdown',
   'touchstart',
-  'mousedown',
   'keydown',
-  'click',
-  'scroll',
-  'wheel',
-  'touchmove',
-  'mousemove',
 ];
 let unlockListenersAttached = false;
 
