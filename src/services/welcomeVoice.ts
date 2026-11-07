@@ -313,30 +313,56 @@ export function playWelcomeVoice(options?: { fromBeginning?: boolean; force?: bo
 
   prewarmAudioContext();
 
-  return new Promise((resolve) => {
+  const audio = getOrCreateWelcomeAudio();
+  if (options?.fromBeginning && audio) {
     try {
-      fallbackWebSpeechMale();
-      state.hasStarted = true;
-      state.isBlockedByAutoplay = false;
-      removeGlobalUnlockListeners();
-      notifyListeners();
-    } catch {
-      // fallback
+      audio.currentTime = 0;
+    } catch {}
+  }
+
+  return new Promise((resolve) => {
+    if (audio) {
+      audio.volume = 1.0;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            state.hasStarted = true;
+            state.isPlaying = true;
+            state.isBlockedByAutoplay = false;
+            removeGlobalUnlockListeners();
+            notifyListeners();
+            resolve();
+          })
+          .catch(() => {
+            state.isBlockedByAutoplay = true;
+            notifyListeners();
+            if (options?.force) {
+              fallbackWebSpeechMale();
+            }
+            resolve();
+          });
+        return;
+      }
     }
+    fallbackWebSpeechMale();
     resolve();
   });
 }
 
 export function pauseWelcomeVoice() {
+  if (welcomeAudio) {
+    try {
+      welcomeAudio.pause();
+    } catch {}
+  }
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
       window.speechSynthesis.cancel();
-      state.isPlaying = false;
-      notifyListeners();
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
+  state.isPlaying = false;
+  notifyListeners();
 }
 
 export function restartWelcomeVoice() {
@@ -352,10 +378,15 @@ export function toggleWelcomeVoice() {
 }
 
 const GESTURE_EVENTS = [
-  'click',
-  'pointerdown',
   'touchstart',
+  'pointerdown',
+  'mousedown',
+  'scroll',
+  'wheel',
+  'touchmove',
+  'mousemove',
   'keydown',
+  'click',
 ];
 let unlockListenersAttached = false;
 
