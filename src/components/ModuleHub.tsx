@@ -54,8 +54,30 @@ interface HubPanel {
   items: HubItem[];
 }
 
-export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLevel }) => {
+export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule }) => {
   const [activePanelId, setActivePanelId] = useState<string>('fundamentos');
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const [completedSteps, setCompletedSteps] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem(`daily_route_${todayKey}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleStepDone = (stepId: string) => {
+    setCompletedSteps((prev) => {
+      const next = prev.includes(stepId) ? prev.filter((id) => id !== stepId) : [...prev, stepId];
+      try {
+        localStorage.setItem(`daily_route_${todayKey}`, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   const panels: HubPanel[] = [
     {
@@ -347,6 +369,123 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
           </div>
         </div>
 
+        {/* Guided 5-Minute Daily Route Card */}
+        <div className="bg-[#120D2C]/90 border border-emerald-500/30 rounded-2xl p-4 sm:p-5 shadow-lg reveal-on-scroll">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-[#251D52]">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🗺️</span>
+              <div>
+                <h3 className="font-heading text-sm sm:text-base font-extrabold text-white">
+                  Tu Ruta Guiada de 5 Minutos Hoy
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  Seguí estos 3 pasos simples para notar progreso real hoy mismo:
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 self-start sm:self-auto">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{completedSteps.length}/3 completados hoy</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              {
+                id: 'step-listen',
+                num: '1',
+                title: 'Escuchá 3 frases cotidianas',
+                desc: 'Activá el oído a velocidad 0.65x o 0.8x sin leer reglas.',
+                cta: 'Ir a Vida Real',
+                action: () => onSelectModule('entrecasa'),
+              },
+              {
+                id: 'step-gym',
+                num: '2',
+                title: 'Entrená tus reflejos en 5s',
+                desc: 'Respondé rápido antes de traducir mentalmente.',
+                cta: 'Abrir Gym 5s',
+                action: () => onSelectModule('gym'),
+              },
+              {
+                id: 'step-test',
+                num: '3',
+                title: 'Probá tu voz en el traductor',
+                desc: 'Decí una frase en inglés y verificá si te entiende.',
+                cta: 'Abrir Traductor',
+                href: 'https://traductor-ya-traductor-de-voz-y-conversaci-n.ai.studio/',
+              },
+            ].map((step) => {
+              const isDone = completedSteps.includes(step.id);
+              return (
+                <div
+                  key={step.id}
+                  className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between gap-2.5 ${
+                    isDone
+                      ? 'bg-emerald-950/30 border-emerald-500/50'
+                      : 'bg-[#0C0A1D]/80 border-[#251D52] hover:border-amber-400/40'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2.5">
+                      <span
+                        className={`w-6 h-6 rounded-full text-xs font-black flex items-center justify-center shrink-0 mt-0.5 ${
+                          isDone
+                            ? 'bg-emerald-400 text-slate-950'
+                            : 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                        }`}
+                      >
+                        {isDone ? '✓' : step.num}
+                      </span>
+                      <div>
+                        <h4 className={`text-xs sm:text-sm font-bold ${isDone ? 'text-emerald-300 line-through' : 'text-white'}`}>
+                          {step.title}
+                        </h4>
+                        <p className="text-[11px] text-slate-400 leading-snug mt-0.5">{step.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleStepDone(step.id)}
+                      className="text-[11px] font-semibold text-slate-400 hover:text-emerald-300 transition-colors cursor-pointer"
+                    >
+                      {isDone ? '✓ Listo (desmarcar)' : 'Marcar como hecho'}
+                    </button>
+                    {step.href ? (
+                      <a
+                        href={step.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => {
+                          if (!isDone) toggleStepDone(step.id);
+                        }}
+                        className="text-[11px] font-bold text-amber-300 hover:text-amber-200 inline-flex items-center gap-1"
+                      >
+                        <span>{step.cta}</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isDone) toggleStepDone(step.id);
+                          step.action?.();
+                        }}
+                        className="text-[11px] font-bold text-amber-300 hover:text-amber-200 inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>{step.cta}</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* 1. THEMATIC PANELS SELECTOR BAR (Ultra-compact & switchable) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 reveal-on-scroll">
           {panels.map((panel) => {
@@ -397,8 +536,11 @@ export const ModuleHub: React.FC<ModuleHubProps> = ({ onSelectModule, activeLeve
         </div>
 
         {/* 2. THEMATIC PANEL CONTENT: ONLY RELATED ITEMS APPEAR (Reduces vertical length by 70%) */}
-        <div className="pt-2 animate-in fade-in duration-300 reveal-on-scroll">
-          <div className="bg-[#120D2C]/90 border-2 border-[#2B215E] rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden card-hover-lift">
+        <div className="pt-2 reveal-on-scroll">
+          <div
+            key={currentPanel.id}
+            className="animate-scene-enter bg-[#120D2C]/90 border-2 border-[#2B215E] rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden card-hover-lift"
+          >
             {/* Header of Active Panel */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#281F54]">
               <div>

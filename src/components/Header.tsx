@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, LayoutGrid, ScrollText, Headphones, HelpCircle, X, Check, Info } from 'lucide-react';
+import { Volume2, Headphones, X, Menu } from 'lucide-react';
 import { SPEED_LEVELS } from '../services/audio';
 import { RealVisitsBadge } from './RealVisitsBadge';
 
@@ -21,11 +21,10 @@ export const Header: React.FC<HeaderProps> = ({
   onQuickTry,
   currentSpeed,
   onSpeedChange,
-  viewMode = 'modular',
-  onToggleViewMode,
   onOpenKitModal,
 }) => {
   const [showSpeedHelp, setShowSpeedHelp] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const speedHelpRef = useRef<HTMLDivElement>(null);
 
   // Close speed help popover if clicked outside or Esc key pressed
@@ -66,11 +65,11 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </button>
 
-        {/* Zone 2: 4-5 clean, high-impact navigation links (Decongested) */}
-        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
+        {/* Zone 2: Clean, focused primary navigation (5 top-level items) */}
+        <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-300">
           <button
             onClick={() => setActiveTab('desde-cero')}
-            className={`nav-link-item transition-colors hover:text-emerald-300 flex items-center gap-1.5 py-1 ${
+            className={`nav-link-item transition-colors hover:text-emerald-300 flex items-center gap-1.5 py-1 cursor-pointer ${
               activeTab === 'desde-cero'
                 ? 'text-emerald-400 font-bold underline decoration-2 underline-offset-4'
                 : 'text-emerald-300/90'
@@ -81,53 +80,30 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('entrecasa')}
-            className={`nav-link-item transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
+            className={`nav-link-item transition-colors hover:text-white flex items-center gap-1.5 py-1 cursor-pointer ${
               activeTab === 'entrecasa' || activeTab === 'simulator' || activeTab === 'chunks'
                 ? 'text-amber-400 font-bold underline decoration-2 underline-offset-4'
                 : ''
             }`}
           >
             <span>☕</span>
-            <span>Vida Real & Práctica</span>
+            <span>Vida Real</span>
           </button>
           <button
             onClick={() => setActiveTab('cinema')}
-            className={`btn-interactive flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
-              activeTab === 'cinema'
-                ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
-                : 'bg-red-950/40 hover:bg-red-900/60 border-red-500/40 hover:border-amber-400 text-amber-200 hover:text-white'
-            }`}
-            title="Aprende inglés con películas famosas y subtítulos en español"
-          >
-            <span>🎬</span>
-            <span>Películas</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('music')}
-            className={`btn-interactive flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold text-xs shadow-xs ${
-              activeTab === 'music'
-                ? 'bg-fuchsia-400 text-slate-950 border-fuchsia-400 shadow-md shadow-fuchsia-400/20'
-                : 'bg-fuchsia-950/40 hover:bg-fuchsia-900/60 border-fuchsia-500/40 hover:border-fuchsia-400 text-fuchsia-200 hover:text-white'
-            }`}
-            title="Aprende inglés con canciones famosas y subtítulos en español"
-          >
-            <span>🎵</span>
-            <span>Música & Oído</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('gym')}
-            className={`nav-link-item transition-colors hover:text-white flex items-center gap-1.5 py-1 ${
-              activeTab === 'gym'
+            className={`nav-link-item transition-colors hover:text-amber-300 flex items-center gap-1.5 py-1 cursor-pointer ${
+              activeTab === 'cinema' || activeTab === 'music'
                 ? 'text-amber-400 font-bold underline decoration-2 underline-offset-4'
                 : ''
             }`}
+            title="Aprende inglés con películas y música"
           >
-            <span>⚡</span>
-            <span>Reflejos 5s</span>
+            <span>🎬</span>
+            <span>Cine & Música</span>
           </button>
           <button
             onClick={() => setActiveTab('coach')}
-            className={`btn-interactive flex items-center gap-1.5 px-3 py-1 rounded-lg border font-bold text-xs shadow-xs ${
+            className={`btn-interactive flex items-center gap-1.5 px-3 py-1 rounded-lg border font-bold text-xs shadow-xs cursor-pointer ${
               activeTab === 'coach'
                 ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/20'
                 : 'bg-purple-950/40 hover:bg-purple-900/60 border-purple-400/40 hover:border-amber-400 text-purple-200 hover:text-white'
@@ -135,72 +111,26 @@ export const Header: React.FC<HeaderProps> = ({
             title="Pregúntale cualquier duda de inglés al profe Leo"
           >
             <span>👨‍🏫</span>
-            <span>Preguntar al Profe Leo</span>
+            <span>Profe Leo</span>
           </button>
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`btn-interactive flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400/10 border border-amber-400/25 ${
+            className={`nav-link-item transition-colors hover:text-amber-300 flex items-center gap-1.5 py-1 cursor-pointer ${
               activeTab === 'dashboard'
-                ? 'text-amber-400 font-bold border-amber-400/60'
-                : 'text-amber-300'
+                ? 'text-amber-400 font-bold underline decoration-2 underline-offset-4'
+                : ''
             }`}
           >
-            <span>📊 Progreso</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('blog')}
-            className={`btn-interactive flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold shadow-xs ${
-              activeTab === 'blog'
-                ? 'bg-amber-400 text-slate-950 font-bold border-amber-400'
-                : 'bg-slate-900 border-slate-700/80 text-slate-300 hover:text-white hover:border-amber-400/50'
-            }`}
-            title="Opiniones reales de estudiantes y buzón de la comunidad"
-          >
-            <span>💬</span>
-            <span>Blog & Opiniones</span>
-          </button>
-          <button
-            onClick={onOpenKitModal || (() => setActiveTab('kit'))}
-            className={`btn-interactive flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/15 to-emerald-500/15 border border-amber-400/40 hover:border-amber-400 text-amber-300 font-bold shadow-xs ${
-              activeTab === 'kit'
-                ? 'ring-2 ring-amber-400 text-white'
-                : 'hover:text-amber-200'
-            }`}
-          >
-            <Headphones className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>🎧 Audio-Kit ($9.990)</span>
+            <span>📊</span>
+            <span>Mi Progreso</span>
           </button>
         </nav>
 
-        {/* Zone 3: Speed control & Primary action */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Shortcut to Thematic Panels */}
-          <button
-            onClick={() => {
-              setActiveTab('hero');
-              setTimeout(() => {
-                const el = document.getElementById('hub-panels');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-                else window.scrollTo({ top: 0, behavior: 'smooth' });
-              }, 50);
-            }}
-            className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-700/80 text-xs text-slate-300 hover:text-amber-300 hover:border-amber-400/40 transition-colors cursor-pointer"
-            title="Ver los paneles de aprendizaje temáticos"
-          >
-            <LayoutGrid className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-[11px] font-medium">Paneles Temáticos</span>
-          </button>
-
+        {/* Zone 3: Visits counter, Speed control, Primary CTA & Mobile Hamburger */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {/* Real visits counter on desktop and tablet */}
-          <div className="hidden lg:block">
+          <div className="hidden md:block">
             <RealVisitsBadge compact={true} />
-          </div>
-
-
-          {/* Active Voice Badge */}
-          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold" title="Voz de enseñanza activa: Masculina Latina Neutra y Clara">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>🎙️ Voz: Hombre Latino Neutro</span>
           </div>
 
           {/* Beginner-friendly Speed Selector with Clear Explanation Popover */}
@@ -415,24 +345,81 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenKitModal || (() => setActiveTab('kit'))}
-            className="px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-bold text-amber-300 bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs hover:scale-102"
-            title="Abrir ventana emergente del Audio-Kit de Bolsillo"
+            className="hidden sm:flex px-2.5 sm:px-3 py-1.5 text-xs font-bold text-amber-300 bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 rounded-xl transition-all items-center gap-1.5 cursor-pointer shadow-xs"
+            title="Abrir ventana del Audio-Kit de Bolsillo"
           >
-            <Headphones className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span className="hidden sm:inline">Audio-Kit</span>
-            <span className="text-[10px] bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded font-extrabold uppercase">
-              $9.990
-            </span>
+            <Headphones className="w-3.5 h-3.5 text-amber-400" />
+            <span>Audio-Kit</span>
           </button>
 
           <button
             onClick={onQuickTry}
-            className="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors shadow-sm whitespace-nowrap cursor-pointer"
+            className="hidden sm:inline-flex px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors shadow-sm whitespace-nowrap cursor-pointer"
           >
             Probar Frase
           </button>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            className="lg:hidden p-2 rounded-xl bg-slate-900/90 border border-slate-700/80 text-slate-200 hover:text-amber-300 hover:border-amber-400/50 transition-colors cursor-pointer"
+            aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú de navegación'}
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Drawer Menu (Thumb-friendly access to all modules) */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-[#0E0B24] border-t border-[#281F54] px-4 py-4 space-y-3 shadow-2xl">
+          <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
+            {[
+              { id: 'desde-cero', label: '🌱 Desde Cero', accent: 'text-emerald-300 border-emerald-500/30 bg-emerald-950/30' },
+              { id: 'entrecasa', label: '☕ Vida Real', accent: 'text-amber-300 border-amber-500/30 bg-amber-950/30' },
+              { id: 'simulator', label: '🎙️ Simulador Voz', accent: 'text-slate-200 border-slate-700 bg-slate-900/80' },
+              { id: 'gym', label: '⚡ Reflejos 5s', accent: 'text-slate-200 border-slate-700 bg-slate-900/80' },
+              { id: 'cinema', label: '🎬 Películas', accent: 'text-amber-200 border-red-500/30 bg-red-950/30' },
+              { id: 'music', label: '🎵 Música & Oído', accent: 'text-fuchsia-200 border-fuchsia-500/30 bg-fuchsia-950/30' },
+              { id: 'coach', label: '👨‍🏫 Profe Leo', accent: 'text-purple-200 border-purple-500/30 bg-purple-950/30' },
+              { id: 'tweak', label: '✂️ Desarmar Frase', accent: 'text-slate-200 border-slate-700 bg-slate-900/80' },
+              { id: 'dashboard', label: '📊 Mi Progreso', accent: 'text-amber-300 border-slate-700 bg-slate-900/80' },
+              { id: 'blog', label: '💬 Opiniones', accent: 'text-slate-200 border-slate-700 bg-slate-900/80' },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                  activeTab === item.id
+                    ? 'ring-2 ring-amber-400 bg-amber-400/15 text-white border-amber-400'
+                    : item.accent
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="pt-2 border-t border-[#281F54] flex items-center justify-between gap-2">
+            <RealVisitsBadge compact={true} />
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                if (onOpenKitModal) onOpenKitModal();
+                else setActiveTab('kit');
+              }}
+              className="px-3.5 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-extrabold flex items-center gap-1.5 cursor-pointer"
+            >
+              <Headphones className="w-3.5 h-3.5" />
+              <span>Audio-Kit</span>
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

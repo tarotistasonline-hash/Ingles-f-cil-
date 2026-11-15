@@ -228,6 +228,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="absolute bottom-8 right-8 w-96 h-96 bg-amber-500/12 rounded-full blur-3xl pointer-events-none animate-float-reverse -z-10" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(245,158,11,0.08),rgba(16,185,129,0.05),transparent)] pointer-events-none -z-10" />
 
+      {/* Subtle Floating English Phrase Chips on Wide Screens (Atmospheric Life) */}
+      <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-semibold text-amber-200/70 backdrop-blur-sm pointer-events-none select-none absolute top-24 left-8 animate-drift-float">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80" />
+        <span>“Can I grab a coffee?”</span>
+      </div>
+      <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-semibold text-emerald-200/70 backdrop-blur-sm pointer-events-none select-none absolute top-44 right-10 animate-drift-float-alt">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" />
+        <span>“No worries, take your time!”</span>
+      </div>
+      <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-semibold text-sky-200/65 backdrop-blur-sm pointer-events-none select-none absolute top-80 left-12 animate-drift-float-alt">
+        <span className="w-1.5 h-1.5 rounded-full bg-sky-400/80" />
+        <span>“Sounds like a plan!”</span>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Tagline with Real Visits Indicator - Centered & Animated */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-6 reveal-on-scroll">
@@ -258,8 +272,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
           {/* 100% Free Access Reassurance Banner - No Paywall Mindset */}
           <div className="relative max-w-3xl mx-auto p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#181136]/95 via-[#231442]/95 to-[#101D33]/95 border-2 border-emerald-400/70 shadow-2xl shadow-emerald-400/20 backdrop-blur-md overflow-hidden text-left sm:text-center space-y-3.5 card-hover-lift reveal-on-scroll">
-            {/* Shimmer light beam running across */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+            {/* Automatic subtle light sweep across banner */}
+            <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-emerald-300/15 to-transparent animate-banner-sweep pointer-events-none" />
 
             <div className="flex items-start sm:items-center justify-center gap-2.5">
               <div className="shrink-0 mt-0.5 sm:mt-0">
@@ -306,83 +320,72 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           </div>
 
-          {/* Quick Action Buttons - Centered, Tactile & Micro-interactive */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 reveal-on-scroll">
-            {onStartDesdeCero && (
+          {/* Primary Action Buttons - Clear 2-path choice for beginners vs speakers */}
+          <div className="flex flex-col items-center gap-3 pt-2 reveal-on-scroll">
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {onStartDesdeCero && (
+                <button
+                  onClick={onStartDesdeCero}
+                  className="btn-interactive animate-cta-glow group relative px-7 py-3.5 text-sm sm:text-base font-extrabold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl shadow-lg shadow-emerald-400/25 flex items-center gap-2 cursor-pointer"
+                >
+                  <span>🌱 Empezar Desde Cero</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+                </button>
+              )}
               <button
-                onClick={onStartDesdeCero}
-                className="btn-interactive group relative px-6 py-3 text-sm font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl shadow-lg shadow-emerald-400/25 flex items-center gap-2 cursor-pointer"
+                onClick={onStartSimulator}
+                className="btn-interactive px-6 py-3.5 text-sm sm:text-base font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-lg shadow-amber-400/20 flex items-center gap-2 cursor-pointer"
               >
-                <span>🌱 Empezar Desde Cero</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+                <Radio className="w-4 h-4 text-slate-950" />
+                <span>Practicar Charla Real</span>
               </button>
-            )}
-            <button
-              onClick={onStartSimulator}
-              className="btn-interactive px-5 py-3 text-sm font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-xl shadow-lg shadow-amber-400/20 flex items-center gap-2 cursor-pointer"
-            >
-              <Radio className="w-4 h-4 text-slate-950" />
-              <span>Simulador de Charlas Reales</span>
-            </button>
-            {onOpenCinema && (
-              <button
-                onClick={onOpenCinema}
-                className="btn-interactive group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-red-600 via-amber-600 to-amber-500 hover:from-red-500 hover:to-amber-400 border border-amber-300/60 rounded-xl shadow-lg shadow-red-900/40 flex items-center gap-2 cursor-pointer"
-                title="Aprende inglés con películas famosas y subtítulos en español"
-              >
-                <Film className="w-4 h-4 text-amber-200 animate-pulse" />
-                <span>🎬 Películas & Oído</span>
-              </button>
-            )}
-            {onOpenMusic && (
-              <button
-                onClick={onOpenMusic}
-                className="btn-interactive group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-fuchsia-700 via-purple-600 to-amber-500 hover:from-fuchsia-600 hover:to-amber-400 border border-fuchsia-300/60 rounded-xl shadow-lg shadow-fuchsia-950/50 flex items-center gap-2 cursor-pointer"
-                title="Aprende inglés con canciones famosas y subtítulos en español"
-              >
-                <Music className="w-4 h-4 text-fuchsia-200 animate-pulse" />
-                <span>🎵 Música & Oído</span>
-              </button>
-            )}
-            {onExploreEntrecasa && (
-              <button
-                onClick={onExploreEntrecasa}
-                className="btn-interactive px-5 py-3 text-sm font-semibold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 rounded-xl cursor-pointer"
-              >
-                Vida Cotidiana
-              </button>
-            )}
-            {onAskTeacher && (
-              <button
-                onClick={onAskTeacher}
-                className="group relative px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 border border-purple-400/50 rounded-xl shadow-lg shadow-purple-900/30 transition-all cursor-pointer hover:scale-103 flex items-center gap-2"
-                title="Escribe tu duda y el profe Leo te responde con audio masculino claro y fonética"
-              >
-                <span>👨‍🏫</span>
-                <span>Preguntar al Profe Leo</span>
-              </button>
-            )}
-            <button
-              onClick={() => {
-                setActivePanelTab('tweak');
-                const el = document.getElementById('interactive-panels');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-                else onTryTweak();
-              }}
-              className="px-5 py-3 text-sm font-bold text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/40 rounded-xl transition-all cursor-pointer hover:scale-102 flex items-center gap-1.5"
-            >
-              <span>✂️</span>
-              <span>Desarmar Frase</span>
-            </button>
-            {onStartGym && (
-              <button
-                onClick={onStartGym}
-                className="px-5 py-3 text-sm font-bold text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 rounded-xl transition-all cursor-pointer hover:scale-102 flex items-center gap-1.5"
-              >
-                <span>⚡</span>
-                <span>Gym de Reflejos (5s)</span>
-              </button>
-            )}
+            </div>
+
+            {/* Subtle Secondary Quick Links */}
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
+              {onOpenCinema && (
+                <button
+                  onClick={onOpenCinema}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-amber-200 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Film className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Películas</span>
+                </button>
+              )}
+              {onOpenMusic && (
+                <button
+                  onClick={onOpenMusic}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-fuchsia-200 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Music className="w-3.5 h-3.5 text-fuchsia-300" />
+                  <span>Música</span>
+                </button>
+              )}
+              {onExploreEntrecasa && (
+                <button
+                  onClick={onExploreEntrecasa}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  ☕ Vida Cotidiana
+                </button>
+              )}
+              {onAskTeacher && (
+                <button
+                  onClick={onAskTeacher}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-purple-200 hover:text-white transition-colors cursor-pointer"
+                >
+                  👨‍🏫 Profe Leo
+                </button>
+              )}
+              {onStartGym && (
+                <button
+                  onClick={onStartGym}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-emerald-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  ⚡ Gym 5s
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Discreet link to offline kit at the end of the page */}
@@ -422,7 +425,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
         {/* Dynamic Interactive Scenario Bar with Gentle Live Ticker */}
         <div className="mt-8 sm:mt-10 max-w-5xl mx-auto reveal-on-scroll">
-          <div className="bg-[#120D2C]/90 border border-[#2B215E] rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-3 card-hover-lift">
+          <div className="relative overflow-hidden bg-[#120D2C]/90 border border-[#2B215E] rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-3 card-hover-lift">
             <div className="flex items-center gap-2 px-2">
               <span className="flex h-2.5 w-2.5 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -454,6 +457,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 );
               })}
             </div>
+
+            {/* Smooth live rotation progress bar */}
+            {!isPlayingAudio && (
+              <div
+                key={`progress-${activeDemoIndex}`}
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-400 via-emerald-400 to-amber-300 animate-demo-progress opacity-75"
+              />
+            )}
           </div>
         </div>
 
@@ -465,7 +476,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               key={currentDemo.tag}
               src={currentDemo.image || HERO_IMAGE}
               alt={currentDemo.context}
-              className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-[1.04] transition-all duration-700 opacity-90"
+              className="absolute inset-0 w-full h-full object-cover object-center animate-ken-burns group-hover:scale-[1.05] transition-all duration-700 opacity-90"
               fetchPriority="high"
               loading="eager"
               onError={(e) => {
@@ -550,7 +561,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
 
           {/* Right Column: Interactive Live Demonstration Card with Real Movement */}
-          <div className="bg-[#14102E]/90 rounded-2xl border border-[#2E2463] p-5 sm:p-6 shadow-xl space-y-4 backdrop-blur-md flex flex-col justify-between h-full">
+          <div
+            key={currentDemo.tag}
+            className="animate-scene-enter bg-[#14102E]/90 rounded-2xl border border-[#2E2463] p-5 sm:p-6 shadow-xl space-y-4 backdrop-blur-md flex flex-col justify-between h-full"
+          >
             {/* Header of Demo Card */}
             <div className="flex items-center justify-between pb-3 border-b border-[#251D52]">
               <div className="flex items-center gap-2">

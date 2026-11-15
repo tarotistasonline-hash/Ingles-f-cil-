@@ -149,7 +149,7 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} VibeEnglish. Aprende a hablar con libertad.</p>
+          <p>© {new Date().getFullYear()} Inglés Fácil y Fluido. Aprende a hablar con libertad.</p>
           
           <div className="flex flex-wrap items-center gap-3">
             <span>Audio adaptable para principiantes</span>

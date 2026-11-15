@@ -1,29 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { LevelSelectorBar } from './components/LevelSelectorBar';
 import { ModuleHub } from './components/ModuleHub';
 import { ModuleNavBar, ModuleBottomNav } from './components/ModuleNavBar';
-import { DesdeCeroGuide } from './components/DesdeCeroGuide';
-import { EntrecasaGuide } from './components/EntrecasaGuide';
-import { MethodComparison } from './components/MethodComparison';
-import { RoleplaySimulator } from './components/RoleplaySimulator';
-import { SpeakTweakTool } from './components/SpeakTweakTool';
-import { PowerChunksExplorer } from './components/PowerChunksExplorer';
-import { ConnectedSpeechLab } from './components/ConnectedSpeechLab';
-import { ReflexGym } from './components/ReflexGym';
-import { FluencyDashboard } from './components/FluencyDashboard';
-import { CoachLeoChat } from './components/CoachLeoChat';
-import { CommunityBlog } from './components/CommunityBlog';
-import { OfflineKitSection } from './components/OfflineKitSection';
-import { CinemaEarLab } from './components/CinemaEarLab';
-import { MusicEarLab } from './components/MusicEarLab';
-import { AudioKitModal } from './components/AudioKitModal';
 import { AudioKitFloatingTrigger } from './components/AudioKitFloatingTrigger';
-import { PackDownloadVaultModal } from './components/PackDownloadVaultModal';
 import { WhatsAppHelpButton } from './components/WhatsAppHelpButton';
 import { Footer } from './components/Footer';
 import { triggerConfetti } from './utils/confetti';
+
+const lazyNamed = <T extends React.ComponentType<any>>(
+  loader: () => Promise<Record<string, any>>,
+  exportName: string
+) =>
+  lazy(async () => {
+    const mod = await loader();
+    return { default: mod[exportName] as T };
+  });
+
+const DesdeCeroGuide = lazyNamed(() => import('./components/DesdeCeroGuide'), 'DesdeCeroGuide');
+const EntrecasaGuide = lazyNamed(() => import('./components/EntrecasaGuide'), 'EntrecasaGuide');
+const MethodComparison = lazyNamed(() => import('./components/MethodComparison'), 'MethodComparison');
+const RoleplaySimulator = lazyNamed(() => import('./components/RoleplaySimulator'), 'RoleplaySimulator');
+const SpeakTweakTool = lazyNamed(() => import('./components/SpeakTweakTool'), 'SpeakTweakTool');
+const PowerChunksExplorer = lazyNamed(() => import('./components/PowerChunksExplorer'), 'PowerChunksExplorer');
+const ConnectedSpeechLab = lazyNamed(() => import('./components/ConnectedSpeechLab'), 'ConnectedSpeechLab');
+const ReflexGym = lazyNamed(() => import('./components/ReflexGym'), 'ReflexGym');
+const FluencyDashboard = lazyNamed(() => import('./components/FluencyDashboard'), 'FluencyDashboard');
+const CoachLeoChat = lazyNamed(() => import('./components/CoachLeoChat'), 'CoachLeoChat');
+const CommunityBlog = lazyNamed(() => import('./components/CommunityBlog'), 'CommunityBlog');
+const OfflineKitSection = lazyNamed(() => import('./components/OfflineKitSection'), 'OfflineKitSection');
+const CinemaEarLab = lazyNamed(() => import('./components/CinemaEarLab'), 'CinemaEarLab');
+const MusicEarLab = lazyNamed(() => import('./components/MusicEarLab'), 'MusicEarLab');
+const AudioKitModal = lazyNamed(() => import('./components/AudioKitModal'), 'AudioKitModal');
+const PackDownloadVaultModal = lazyNamed(() => import('./components/PackDownloadVaultModal'), 'PackDownloadVaultModal');
+
+const ModuleLoader: React.FC = () => (
+  <div className="max-w-5xl mx-auto px-4 py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
+    <div className="w-8 h-8 rounded-full border-2 border-amber-400/30 border-t-amber-400 animate-spin" />
+    <span className="text-xs font-medium">Cargando módulo...</span>
+  </div>
+);
 import { getGlobalAudioSpeed, setGlobalAudioSpeed } from './services/audio';
 import { SkillLevel } from './types';
 import {
@@ -367,6 +384,7 @@ export default function App() {
                 onSelectLevel={handleLevelSelect}
               />
             </div>
+            <Suspense fallback={<ModuleLoader />}>
             <div id="desde-cero">
               <DesdeCeroGuide
                 currentSpeed={currentSpeed}
@@ -439,6 +457,7 @@ export default function App() {
                 onOpenVault={() => setIsVaultModalOpen(true)}
               />
             </div>
+            </Suspense>
           </div>
         ) : activeTab === 'hero' ? (
           <>
@@ -486,7 +505,9 @@ export default function App() {
 
             {/* Render Focused Module */}
             <div className="py-2">
-              {renderActiveModule()}
+              <Suspense fallback={<ModuleLoader />}>
+                {renderActiveModule()}
+              </Suspense>
             </div>
 
             {/* Module Next/Prev & Return Bar */}
@@ -505,21 +526,29 @@ export default function App() {
       <AudioKitFloatingTrigger onOpenModal={() => setIsKitModalOpen(true)} />
 
       {/* Audio-Kit de Bolsillo Popup Window (Ventana Emergente Interactiva) */}
-      <AudioKitModal
-        isOpen={isKitModalOpen}
-        onClose={() => setIsKitModalOpen(false)}
-        onGoToFullKit={() => {
-          setIsKitModalOpen(false);
-          navigateTo('kit');
-        }}
-        onOpenVault={() => setIsVaultModalOpen(true)}
-      />
+      {isKitModalOpen && (
+        <Suspense fallback={null}>
+          <AudioKitModal
+            isOpen={isKitModalOpen}
+            onClose={() => setIsKitModalOpen(false)}
+            onGoToFullKit={() => {
+              setIsKitModalOpen(false);
+              navigateTo('kit');
+            }}
+            onOpenVault={() => setIsVaultModalOpen(true)}
+          />
+        </Suspense>
+      )}
 
       {/* Delivery & Instant Download Vault Modal for Buyers */}
-      <PackDownloadVaultModal
-        isOpen={isVaultModalOpen}
-        onClose={() => setIsVaultModalOpen(false)}
-      />
+      {isVaultModalOpen && (
+        <Suspense fallback={null}>
+          <PackDownloadVaultModal
+            isOpen={isVaultModalOpen}
+            onClose={() => setIsVaultModalOpen(false)}
+          />
+        </Suspense>
+      )}
 
       {/* Floating WhatsApp Quick Consultation Button */}
       <WhatsAppHelpButton />
